@@ -29,6 +29,10 @@ app.get('/quartet', function (req, res) {
   	res.render('quartet.html');
 });
 
+app.get('/barley', function (req, res) {
+  	res.render('barley.html');
+});
+
 app.get('/test', function (req, res) {
   	res.render('test.html');
 });
