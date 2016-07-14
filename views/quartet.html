@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style type="text/css">
+
+	body {	
+		width: 600px;
+		margin: 20px auto;
+		font-family: arial;
+		font-size: 16px;
+	}
+
+	.title {
+		text-align: center;
+		font-color: red;
+		font-size: 34px;
+	}
+
+	.axis path {
+		fill:#f2f2f2;
+		fill-opacity:.3;
+		stroke:#cccccc;
+		stroke-width:1;
+	}
+
+	.axis text {
+		font: 15px sans-serif;
+	}
+
+	.axis line {
+		stroke: #bfbfbf;
+		stroke-width: 1;
+		stroke-dasharray: 3;
+	}
+
+	.buttonsGroup {
+		padding:25px;
+	}
+
+	.buttonsDiv {
+		width: 540px;
+		margin: 0 auto;
+	}
+
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<!-- <script src="d3.min.js" charset="utf-8"></script> -->
+
+
+<body>
+
+	<script>
+	//IDEAS
+	//use .on to display exact coordinates on hover over, but display them just outside the tick text of the axes, and in blue
+
+		var margin = {top: 8, right: 30, bottom: 25, left: 30};
+
+		var width = 600 - margin.left - margin.right,
+			height = 600 - margin.top - margin.bottom;
+
+		var xScale = d3.scale.linear()
+			.range ([0, width]);
+
+		var yScale = d3.scale.linear()
+			.range ([height, 0]);
+
+		var ticknum = 10
+
+		var xAxis = d3.svg.axis()
+			.scale(xScale)
+			.ticks(ticknum)
+			.tickSize(-height)
+			.tickPadding(10)
+			.orient("bottom");
+
+		var yAxis = d3.svg.axis()
+			.scale(yScale)
+			.ticks(ticknum)
+			.tickSize(-width)
+			.tickPadding(10)
+			.orient("left");
+
+		d3.tsv("quartet.tsv", function(error, quartetData) {
+			if (error) return console.warn(error);
+
+			quartetData.forEach(function(d) {
+				d.x = +d.x;
+				d.y = +d.y;
+			});
+
+			var nestedQuartetData = d3.nest()
+			.key(function(d) { return d.group })
+			.entries(quartetData);
+
+			window.nestedQuartetData = nestedQuartetData
+
+			var title = d3.select("body").append("h2")
+				.text("Anscombe's Quartet")
+				.attr("class","title");
+
+			var buttonsDiv = d3.select("body").append("div")
+				.attr("class","buttonsDiv");
+
+			var container = d3.select("body").append("div");
+
+			var buttonsGroup = buttonsDiv.selectAll(".buttonsGroup")
+				.data(nestedQuartetData)
+			  .enter().append("g")
+			  .attr("class", "buttonsGroup")
+
+			var buttons = buttonsGroup.append("input")
+				.attr({
+					type:"radio",
+					class:"buttons",
+					name:"groupNum",
+					// checked: "checked",
+				})
+				.on("change", function (d) { updateData(d.values) });
+
+			buttonsGroup.append("label")
+				.text(function(d) { return " Group " + d.key })
+
+			var svg = container.append("svg")
+			   .attr("width", width + margin.left + margin.right)
+			   .attr("height", height + margin.top + margin.bottom)
+			   .append("g")
+			   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			var data1 = quartetData.filter(function(d) { return d.group == 'I'; });
+			var data2 = quartetData.filter(function(d) { return d.group == 'II'; });
+			var data3 = quartetData.filter(function(d) { return d.group == 'III'; });
+			var data4 = quartetData.filter(function(d) { return d.group == 'IV'; });
+
+
+			var adjustedXMin = d3.min(data3, function(d) { return d.x-1 });
+			var adjustedXMax = d3.max(data3, function(d) { return d.x+1 });
+
+			var adjustedYMin = d3.min(data3, function(d) { return d.y-1});
+			var adjustedYMax = d3.max(data3, function(d) { return d.y+1 });
+
+			xScale.domain([3, 20]).nice();
+			yScale.domain([3, 20]).nice();
+
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate (0, " + height + ")" )
+				.call(xAxis);
+
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis);
+			
+			var circlegroup = svg.selectAll(".anscombeCircleGroup")
+			.data(data1)
+
+		  .enter()
+			.append("g")
+			.attr("class","anscombeCircleGroup")
+			.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
+
+			circlegroup.append("text")
+		   .attr("class",function(d,i) { return "T" + i })
+		   .attr("dx", 12)
+		   .attr("dy", 10)
+		   .text(function(d) { return d.x + ", " + d.y; })
+		   .style("fill","none")
+		   .style("font","12px sans-serif")
+
+			circlegroup.append("circle")
+			.attr("class",function(d,i) { return "anscombeCircles T" + i; })
+			.attr("r", 7)
+			.on("mouseenter", function() {
+				var mouseClass = d3.select(this).attr("class").split(" ")[1];
+				console.log(mouseClass);
+				d3.selectAll("." + mouseClass)
+				.style("fill", "#358DE6")
+			})
+			.on("mouseleave", function() {
+				d3.selectAll(".anscombeCircleGroup")
+				.selectAll("text")
+				.style("fill", "none")
+
+				d3.selectAll(".anscombeCircles")
+				.style("fill","#000")
+			});
+
+			function updateData(currentData) {
+				console.log(currentData)
+
+				svg.selectAll(".anscombeCircleGroup")
+				.data(currentData)
+				.transition()
+				.ease("elastic")
+				.attr("class","anscombeCircleGroup")
+				.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
+			}
+
+			d3.select(".buttons")
+             .attr("checked","checked")
+
+			//call(function(d) { updateData(d.values)});
+
+		});
+
+
+	</script>
+
+</body>

@@ -25,6 +25,10 @@ app.get('/', function (req, res) {
   	res.render('d3_graph.html');
 });
 
+app.get('/quartet', function (req, res) {
+  	res.render('quartet.html');
+});
+
 app.get('/test', function (req, res) {
   	res.render('test.html');
 });
