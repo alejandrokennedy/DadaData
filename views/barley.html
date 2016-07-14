@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style type="text/css">
+
+	body {
+		font: 14px sans-serif;
+		width: 750px;
+	    margin: 0px auto;
+	}
+
+	.myDiv {
+  		display: inline-block;
+  		/*background-color: #ccc;*/
+  	}
+
+  	.axis path {
+  		fill: none;
+	    stroke: #000;
+	    stroke-width: 1;
+  	}
+
+</style>
+
+<body></body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+
+<script>
+
+	var margin = {top: 50, right: 50, bottom: 50, left: 50};
+
+	var width = 250 - margin.left - margin.right,
+	    height = 380 - margin.top - margin.bottom;
+
+	var xScale = d3.scale.ordinal()
+		.domain(['1931', '1932'])
+		.rangeRoundBands([0, width]);
+
+	var offset = xScale.rangeBand()/2;
+
+	var yScale = d3.scale.linear()
+		.range([height, 0+25]);
+
+	var colorScale = d3.scale.category10()
+
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom")
+		.outerTickSize(0);
+
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left")
+		.outerTickSize(0);
+
+	d3.tsv("barley.tsv", function(error, barleyData) {
+		if (error) throw error;
+
+		barleyData.forEach(function(d) {
+			d.yield = +d.yield
+			d.variety = d.variety.replace(/ /g,"").replace(".","");
+		});
+
+		yScale.domain(d3.extent(barleyData, function(d) { return d.yield }));
+
+		var nestedData = d3.nest()
+			
+			.key(function(d) { return d.site })
+			.entries(barleyData);
+
+			window.nestedData = nestedData;
+
+		var svgContainer = d3.select("body").append("div")
+			.attr("class", "myDiv");
+
+		svgContainer.selectAll("svg")
+			.data(nestedData)
+		  .enter().append("svg")
+		  	.attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		    .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			.each(multiple);
+
+		function multiple(nestedData) {
+
+			d3.select(this)
+				.append("text")
+				.attr("text-anchor", "middle")
+				.attr("dx", width/2)
+		   		.attr("dy", 10)
+				.text(function(d) { return d.key })
+				.style("font-size", "18")
+
+
+			d3.select(this)
+				.append("g")
+				.attr("class","y axis")
+				.call(yAxis);
+
+			d3.select(this)
+				.append("g")
+				.attr("class","x axis")
+				.attr("transform","translate(0, " + height + ")")
+				.call(xAxis);
+
+			var circles = d3.select(this)
+				.selectAll(".circles")
+				.data(function(d) { return d.values})
+			  .enter().append("g")
+			  	.attr("class", function(d) {
+			  		// console.log("circles " + d.variety);
+			  		return "circles " + d.variety
+			  	})
+			  	.attr("transform", function(d) { return "translate( " + (xScale(d.year) + offset) + ", " + yScale(d.yield) + " )" });
+			
+
+			var varietyNestedData = d3.nest()
+				.key(function(d) { return d.variety })
+				.entries(nestedData.values);
+
+			var lines = d3.select(this)
+				.selectAll(".lines")
+				.data(varietyNestedData)
+			  .enter().append("line")
+			  	.attr("class", function(d) {
+			  		return "lines " + d.key
+			  	})
+			  	.attr("x1", function(d) { return xScale(d.values[0].year) + offset;  })
+			  	.attr("x2", function(d) { return xScale(d.values[1].year) + offset;  })
+			  	.attr("y1", function(d) { return yScale(d.values[0].yield);  })
+			  	.attr("y2", function(d) { return yScale(d.values[1].yield);  })
+			  	.style("stroke", function(d) { return colorScale(d.key); })
+		  		.style("stroke-width", 2.5)
+		  		.on("mouseenter", function(d) {
+					var varietyClass = d.key;
+					d3.selectAll("circle").style("fill-opacity", .1)
+					d3.selectAll("line").style("stroke-opacity", .1)
+					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
+					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
+
+
+				})
+				.on("mouseleave", function(d) {
+					d3.selectAll("circle").style("fill-opacity", 1)
+					d3.selectAll("line").style("stroke-opacity", 1)
+				});
+
+		  	 circles.append("circle")
+				.attr("r", 5)
+				.style("fill", function(d) { return colorScale(d.variety); })
+				.style("fill",function(d) { return colorScale(d.variety); })
+				.on("mouseenter", function(d) {
+					var varietyClass = d.variety;
+					d3.selectAll("circle").style("fill-opacity", .1)
+					d3.selectAll("line").style("stroke-opacity", .1)
+					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
+					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
+
+				})
+				.on("mouseleave", function(d) {
+					d3.selectAll("circle").style("fill-opacity", 1)
+					d3.selectAll("line").style("stroke-opacity", 1)
+				});
+
+
+		};
+
+	});
+
+</script>
