@@ -77,6 +77,8 @@
 
 		var ticknum = 10
 
+		var numSteps = 20;
+
 		var xAxis = d3.svg.axis()
 			.scale(xScale)
 			.ticks(ticknum)
@@ -194,92 +196,58 @@
 				.style("fill","#000")
 			});
 
+
+			// get the x and y values for least squares
+		    var xSeries = data1.map(function(d) { return parseFloat(d['x']); });
+		    var ySeries = data1.map(function(d) { return parseFloat(d['y']); });
+		    
+		    console.log('xSeries: ' + xSeries);
+		    console.log('ySeries: ' + ySeries);    
+
+		    var leastSquaresCoeff = leastSquares(xSeries, ySeries);
+
+		    var slope = leastSquaresCoeff[0];
+		    var intercept = leastSquaresCoeff[1];
+		    var rSquare = leastSquaresCoeff[2];
+
+		    console.log("slope: " + slope);
+		    console.log("intercept: " + intercept);
+
+		    var trendline = svg.append("line")
+		        .attr("x1", xScale(0.))
+		        .attr("y1", yScale(intercept))
+		        .attr("x2", xScale(numSteps))
+		        .attr("y2", yScale(numSteps*slope + intercept))
+		        .classed("trendline", true);
+
+		    var format2d = d3.format("0.1f");
+
+		    d3.select('#eq-text').text("y = " + format2d(slope) 
+		                                + "x + " + format2d(intercept));
 			
-			console.log(data1)
-			xMap = data1.map(function(d) { return d.x });
-			console.log(xMap);
-
-
-			var xSeries = d3.range(1, xMap.length + 1);
-			console.log(xSeries);
-
-			// var ySeries = d3.range(1, yMap.length);
-			var ySeries = data1.map(function(d) { return d.y });
-			console.log(ySeries);
-
-			var leastSquaresCoeff = leastSquares(xSeries, ySeries);
-			
-				// apply the reults of the least squares regression
-			var x1 = xMap[0];
-			var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
-			var x2 = xMap[xMap.length - 1];
-			var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
-			var trendData = [[x1,y1,x2,y2]];
-			
-			var trendline = svg.selectAll(".trendline")
-				.data(trendData);
-			
-			trendline.enter()
-				.append("line")
-				.attr("class", "trendline")
-				.attr("x1", function(d) { return xScale(d[0]); })
-				.attr("y1", function(d) { return yScale(d[1]); })
-				.attr("x2", function(d) { return xScale(d[2]); })
-				.attr("y2", function(d) { return yScale(d[3]); })
-				.attr("stroke", "black")
-				.attr("stroke-width", 1);
-
-			// returns slope, intercept and r-square of the line
 			function leastSquares(xSeries, ySeries) {
-				var reduceSumFunc = function(prev, cur) { return prev + cur; };
-				
-				var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
-				var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+			    var reduceSumFunc = function(prev, cur) { return prev + cur; };
+			    
+			    var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
+			    var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
 
-				var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
-					.reduce(reduceSumFunc);
-				
-				var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
-					.reduce(reduceSumFunc);
-					
-				var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
-					.reduce(reduceSumFunc);
-					
-				var slope = ssXY / ssXX;
-				var intercept = yBar - (xBar * slope);
-				var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
-				
-				return [slope, intercept, rSquare];
-			}
+			    var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
+			      .reduce(reduceSumFunc);
+			    
+			    var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
+			      .reduce(reduceSumFunc);
+			      
+			    var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
+			      .reduce(reduceSumFunc);
+			      
+			    var slope = ssXY / ssXX;
+			    var intercept = yBar - (xBar * slope);
+			    var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+			    
+			    return [slope, intercept, rSquare];
+			};
 
-
-			// //figure this out from http://bl.ocks.org/benvandyke/8459843
-
-			// 	// get the x and y values for least squares
-			// var xSeries = d3.range(1, xLabels.length + 1);
-			// var ySeries = data.map(function(d) { return parseFloat(d['rate']); });
 			
-			// var leastSquaresCoeff = leastSquares(xSeries, ySeries);
-			
-			// 	// apply the reults of the least squares regression
-			// var x1 = xLabels[0];
-			// var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
-			// var x2 = xLabels[xLabels.length - 1];
-			// var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
-			// var trendData = [[x1,y1,x2,y2]];
-			
-			// var trendline = svg.selectAll(".trendline")
-			// 	.data(trendData);
-			
-			// trendline.enter()
-			// 	.append("line")
-			// 	.attr("class", "trendline")
-			// 	.attr("x1", function(d) { return xScale(d[0]); })
-			// 	.attr("y1", function(d) { return yScale(d[1]); })
-			// 	.attr("x2", function(d) { return xScale(d[2]); })
-			// 	.attr("y2", function(d) { return yScale(d[3]); })
-			// 	.attr("stroke", "black")
-			// 	.attr("stroke-width", 1);
 
 
 
