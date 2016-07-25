@@ -131,7 +131,6 @@
 					type:"radio",
 					class:"buttons",
 					name:"groupNum",
-					// checked: "checked",
 				})
 				.on("change", function (d) { updateData(d.values) });
 
@@ -143,6 +142,12 @@
 			   .attr("height", height + margin.top + margin.bottom)
 			   .append("g")
 			   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			var eqText = svg.append("text")
+			.attr("id", "eq-text")
+			.style("text-anchor", "start")
+			.attr("x", 12)
+			.attr("y", 20);
 
 			var data1 = quartetData.filter(function(d) { return d.group == 'I'; });
 			var data2 = quartetData.filter(function(d) { return d.group == 'II'; });
@@ -189,7 +194,6 @@
 			.attr("r", 7)
 			.on("mouseenter", function() {
 				var mouseClass = d3.select(this).attr("class").split(" ")[1];
-				console.log(mouseClass);
 				d3.selectAll("." + mouseClass)
 				.style("fill", "#358DE6")
 			})
@@ -201,61 +205,10 @@
 				d3.selectAll(".anscombeCircles")
 				.style("fill","#000")
 			});
-
-
-			// get the x and y values for least squares
-		    var xSeries = data1.map(function(d) { return parseFloat(d['x']); });
-		    var ySeries = data1.map(function(d) { return parseFloat(d['y']); });
 		    
-		    console.log('xSeries: ' + xSeries);
-		    console.log('ySeries: ' + ySeries);
-
-		    var leastSquaresCoeff = leastSquares(xSeries, ySeries);
-
-		    var slope = leastSquaresCoeff[0];
-		    var intercept = leastSquaresCoeff[1];
-		    var rSquare = leastSquaresCoeff[2];
-
-		    console.log("slope: " + slope);
-		    console.log("intercept: " + intercept);
-
-		    var trendline = svg.append("line")
-		        .attr("x1", xScale(0.))
-		        .attr("y1", yScale(intercept))
-		        .attr("x2", xScale(numSteps))
-		        .attr("y2", yScale(numSteps*slope + intercept))
-		        .classed("trendline", true);
-
-		    // d3.select('#eq-text').text("y = " + format2d(slope) 
-		    //                             + "x + " + format2d(intercept));
-
 			
-
-			// returns slope, intercept and r-square of the line
-			function leastSquares(xSeries, ySeries) {
-				var reduceSumFunc = function(prev, cur) { return prev + cur; };
-				
-				var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
-				var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
-
-				var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
-					.reduce(reduceSumFunc);
-				
-				var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
-					.reduce(reduceSumFunc);
-					
-				var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
-					.reduce(reduceSumFunc);
-					
-				var slope = ssXY / ssXX;
-				var intercept = yBar - (xBar * slope);
-				var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
-				
-				return [slope, intercept, rSquare];
-			}
-
-
-
+			updateData(data1);
+			
 			function updateData(currentData) {
 				console.log(currentData)
 
@@ -265,12 +218,73 @@
 				.ease("elastic")
 				.attr("class","anscombeCircleGroup")
 				.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
+
+
+
+				d3.selectAll(".trendline").remove()
+
+				var xSeries = currentData.map(function(d) { return parseFloat(d['x']); });
+			    var ySeries = currentData.map(function(d) { return parseFloat(d['y']); });
+			    
+			    console.log('xSeries: ' + xSeries);
+			    console.log('ySeries: ' + ySeries);
+
+			    var leastSquaresCoeff = leastSquares(xSeries, ySeries);
+
+			    var slope = leastSquaresCoeff[0];
+			    var intercept = leastSquaresCoeff[1];
+			    var rSquare = leastSquaresCoeff[2];
+
+			    console.log("slope: " + slope);
+			    console.log("intercept: " + intercept);
+
+			    var trendline = svg.append("line")
+			    	.attr("class", "trendline")
+			    	.attr("stroke-dasharray", 610 + " " + 610)
+	        		.attr("stroke-dashoffset", 610)
+			        .attr("x1", xScale(0))
+			        .attr("y1", yScale(intercept))
+			        .attr("x2", xScale(numSteps))
+			        .attr("y2", yScale(numSteps*slope + intercept));
+
+			    d3.selectAll(".trendline")
+			        .transition()
+			        .duration(1000)
+			        .ease("cubic")
+			        .style("stroke", "red")
+			        .attr("stroke-dashoffset", 0);
+			        
+
+		        var format2d = d3.format("0.1f");
+
+			    d3.select('#eq-text').text("y = " + format2d(slope) 
+			                                + "x + " + format2d(intercept));
+
+				function leastSquares(xSeries, ySeries) {
+					var reduceSumFunc = function(prev, cur) { return prev + cur; };
+					
+					var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
+					var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+
+					var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
+						.reduce(reduceSumFunc);
+					
+					var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
+						.reduce(reduceSumFunc);
+						
+					var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
+						.reduce(reduceSumFunc);
+						
+					var slope = ssXY / ssXX;
+					var intercept = yBar - (xBar * slope);
+					var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+					
+					return [slope, intercept, rSquare];
+				}
 			}
 
 			d3.select(".buttons")
              .attr("checked","checked")
-
-			//call(function(d) { updateData(d.values)});
 
 		});
 
