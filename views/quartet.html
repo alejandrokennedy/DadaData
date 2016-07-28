@@ -6,9 +6,7 @@
 	body {	
 		width: 600px;
 		margin: 20px auto;
-		font-family: Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
-
-		/*font-family: arial;*/
+		font-family: helvetica;
 		font-size: 16px;
 	}
 
@@ -27,7 +25,8 @@
 
 	.axis text {
 		/*font: 15px sans-serif;*/
-		font-family: Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
+		font-family: helvetica;
+		fill: gray;
 	}
 
 	.axis line {
@@ -37,7 +36,7 @@
 	}
 
 	.buttonsGroup {
-		padding:25px;
+		padding:23px;
 	}
 
 	.buttonsDiv {
@@ -45,12 +44,16 @@
 		margin: 0 auto;
 	}
 
-	.trendline {
+	.dummyline {
+    stroke: none;
+    stroke-width: 0px;
+    /*stroke-opacity: 0.75;*/
+  	}
 
-    stroke: rgba(208,199,198,1);
-    stroke-width: 1px;
-    stroke-opacity: 0.75;
-
+  	.trendline {
+    /*stroke: red;*/
+    stroke-width: 3px;
+    /*stroke-opacity: 0.75;*/
   	}
 
 </style>
@@ -64,10 +67,21 @@
 	<script>
 	//To Do
 	//bring hover-overed elements to fore
-	//
+	//add clickability to radio button labels
+	//add stats display for each dataset
+	//further develop trend line animations
+	//fewer ticks on axis (halve?)
+	//faint grid lines
 
 	//IDEAS
 	//use .on to display exact coordinates on hover over, but display them just outside the tick text of the axes, and in blue
+
+
+		// d3.selection.prototype.moveToFront = function() {
+		// 	return this.each(function(){
+		// 		this.parentNode.appendChild(this);
+		// 	});
+		// };
 
 		var margin = {top: 8, right: 30, bottom: 25, left: 30};
 
@@ -98,6 +112,9 @@
 			.tickPadding(10)
 			.orient("left");
 
+		//delete
+		// d3.select("body").transition().style("color", "red");
+
 		d3.tsv("quartet.tsv", function(error, quartetData) {
 			if (error) return console.warn(error);
 
@@ -124,18 +141,25 @@
 			var buttonsGroup = buttonsDiv.selectAll(".buttonsGroup")
 				.data(nestedQuartetData)
 			  .enter().append("g")
-			  .attr("class", "buttonsGroup")
+			  	.attr("class", "buttonsGroup");
+
+			var colorScale = d3.scale.ordinal()
+			.range(["#377eb8","#4daf4a","#984ea3","#ff7f00"]);;
 
 			var buttons = buttonsGroup.append("input")
 				.attr({
 					type:"radio",
 					class:"buttons",
 					name:"groupNum",
+					ID:(function(d) { return " Group " + d.key }),
 				})
-				.on("change", function (d) { updateData(d.values) });
+				.on("change", function (d) { updateData(d.values) })
 
 			buttonsGroup.append("label")
-				.text(function(d) { return " Group " + d.key })
+				.text(function(d) { return " Group " + d.key + " " })
+				.attr("for", (function(d) { return " Group " + d.key }))
+				.style("background-color", function(d) { return colorScale(d.key) })
+				.style("color", "white");
 
 			var svg = container.append("svg")
 			   .attr("width", width + margin.left + margin.right)
@@ -192,10 +216,15 @@
 			circlegroup.append("circle")
 			.attr("class",function(d,i) { return "anscombeCircles T" + i; })
 			.attr("r", 7)
+			.style("fill", function(d) { return colorScale(d.group) })
+			.on("mouseover",function(){
+				var sel = d3.select(this);
+				sel.moveToFront();
+			})
 			.on("mouseenter", function() {
 				var mouseClass = d3.select(this).attr("class").split(" ")[1];
 				d3.selectAll("." + mouseClass)
-				.style("fill", "#358DE6")
+				.style("fill", "black")
 			})
 			.on("mouseleave", function() {
 				d3.selectAll(".anscombeCircleGroup")
@@ -203,31 +232,24 @@
 				.style("fill", "none")
 
 				d3.selectAll(".anscombeCircles")
-				.style("fill","#000")
+				.style("fill",function(d) { return colorScale(d.group) })
 			});
 		    
 			
 			updateData(data1);
 			
 			function updateData(currentData) {
-				console.log(currentData)
 
-				svg.selectAll(".anscombeCircleGroup")
-				.data(currentData)
-				.transition()
-				.ease("elastic")
-				.attr("class","anscombeCircleGroup")
-				.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
-
-
+				console.log(currentData);
 
 				d3.selectAll(".trendline").remove()
+				// d3.selectAll(".dummyline").remove()
 
 				var xSeries = currentData.map(function(d) { return parseFloat(d['x']); });
 			    var ySeries = currentData.map(function(d) { return parseFloat(d['y']); });
 			    
-			    console.log('xSeries: ' + xSeries);
-			    console.log('ySeries: ' + ySeries);
+			    // console.log('xSeries: ' + xSeries);
+			    // console.log('ySeries: ' + ySeries);
 
 			    var leastSquaresCoeff = leastSquares(xSeries, ySeries);
 
@@ -235,30 +257,67 @@
 			    var intercept = leastSquaresCoeff[1];
 			    var rSquare = leastSquaresCoeff[2];
 
-			    console.log("slope: " + slope);
-			    console.log("intercept: " + intercept);
+			    // console.log("slope: " + slope);
+			    // console.log("intercept: " + intercept);
 
-			    var trendline = svg.append("line")
+			    var dumdumline = svg.selectAll(".dumdumline")
+			    	.data(currentData)
+			      .enter()
+			      	.append("line")
+			      	.attr("class","dumdumline")
+			      	.attr("x1", xScale(0))
+			        .attr("y1", yScale(intercept))
+			        .attr("x2", xScale(numSteps))
+			        .attr("y2", yScale(numSteps*slope + intercept))
+
+			    d3.selectAll(".dumdumline")
+			    	.transition()
+			        .duration(1800)
+			        .delay(800)
+			    	.style("stroke", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) });
+		    	
+		    	var trendline = svg
+			    	.selectAll(".trendline")
+			    	.data(currentData)
+			      .enter()
+			    	.append("line")
 			    	.attr("class", "trendline")
 			    	.attr("stroke-dasharray", 610 + " " + 610)
 	        		.attr("stroke-dashoffset", 610)
 			        .attr("x1", xScale(0))
 			        .attr("y1", yScale(intercept))
 			        .attr("x2", xScale(numSteps))
-			        .attr("y2", yScale(numSteps*slope + intercept));
+			        .attr("y2", yScale(numSteps*slope + intercept))
+			    	.style("stroke", function(d) { return colorScale(d.group) });
 
-			    d3.selectAll(".trendline")
+			   	d3.selectAll(".trendline")
 			        .transition()
-			        .duration(1000)
-			        .ease("cubic")
-			        .style("stroke", "red")
-			        .attr("stroke-dashoffset", 0);
-			        
+			        .duration(900)
+			        .ease("quad")
+			        .attr("stroke-dashoffset", 0)
+			        .transition()
+			    	.delay(950)
+			    	.duration(1200)
+			    	.ease("linear")
+			    	.style("stroke-width", "1px");
+				
+				svg.selectAll(".anscombeCircleGroup")
+					.data(currentData)
+					.transition()
+					.ease("elastic")
+					.attr("class","anscombeCircleGroup")
+					.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" })
+					.select("circle")
+					.style("fill", function(d) { return colorScale(d.group) });
 
 		        var format2d = d3.format("0.1f");
 
 			    d3.select('#eq-text').text("y = " + format2d(slope) 
-			                                + "x + " + format2d(intercept));
+			                                + "x + " + format2d(intercept))
+			    .transition()
+			    .style("color", "red")
+			    // .duration(500)
+			    // .ease("cubic");
 
 				function leastSquares(xSeries, ySeries) {
 					var reduceSumFunc = function(prev, cur) { return prev + cur; };
