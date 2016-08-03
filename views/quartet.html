@@ -56,6 +56,12 @@
     /*stroke-opacity: 0.75;*/
   	}
 
+  	.shadow {
+    stroke: none;
+    stroke-width: 2.5px;
+    opacity: 0.9;
+	}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
@@ -178,7 +184,6 @@
 			var data3 = quartetData.filter(function(d) { return d.group == 'III'; });
 			var data4 = quartetData.filter(function(d) { return d.group == 'IV'; });
 
-
 			var adjustedXMin = d3.min(data3, function(d) { return d.x-1 });
 			var adjustedXMax = d3.max(data3, function(d) { return d.x+1 });
 
@@ -206,6 +211,14 @@
 			.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
 
 			circlegroup.append("text")
+		   .attr("class",function(d,i) { return "T" + i + " shadow" })
+		   .attr("dx", 12)
+		   .attr("dy", 10)
+		   .text(function(d) { return d.x + ", " + d.y; })
+		   .style("fill","none")
+		   .style("font","12px sans-serif")
+
+		   circlegroup.append("text")
 		   .attr("class",function(d,i) { return "T" + i })
 		   .attr("dx", 12)
 		   .attr("dy", 10)
@@ -217,14 +230,14 @@
 			.attr("class",function(d,i) { return "anscombeCircles T" + i; })
 			.attr("r", 7)
 			.style("fill", function(d) { return colorScale(d.group) })
-			.on("mouseover",function(){
-				var sel = d3.select(this);
-				sel.moveToFront();
-			})
 			.on("mouseenter", function() {
 				var mouseClass = d3.select(this).attr("class").split(" ")[1];
 				d3.selectAll("." + mouseClass)
-				.style("fill", "black")
+				.style("fill", "black");
+				this.parentNode.parentNode.appendChild(this.parentNode);
+
+				d3.selectAll("." + mouseClass + ".shadow")
+				.style("stroke", "white");
 			})
 			.on("mouseleave", function() {
 				d3.selectAll(".anscombeCircleGroup")
@@ -233,6 +246,9 @@
 
 				d3.selectAll(".anscombeCircles")
 				.style("fill",function(d) { return colorScale(d.group) })
+
+				d3.selectAll(".shadow")
+				.style("stroke", "none");
 			});
 		    
 			
@@ -274,7 +290,7 @@
 			    	.transition()
 			        .duration(1800)
 			        .delay(800)
-			    	.style("stroke", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) });
+			    	.style("stroke", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) })
 		    	
 		    	var trendline = svg
 			    	.selectAll(".trendline")
