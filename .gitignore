@@ -3,3 +3,4 @@ npm-debug.log
 views/d3_graph.html
 views/quartet.tsv
 views/barley.tsv
+views/d3.min.js

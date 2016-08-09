@@ -17,7 +17,8 @@
 	}
 
 	.axis path {
-		fill:#f2f2f2;
+		fill:#fdfdfd;
+		/*fill:red;*/
 		fill-opacity:.3;
 		stroke:#cccccc;
 		stroke-width:1;
@@ -32,7 +33,8 @@
 	.axis line {
 		stroke: #bfbfbf;
 		stroke-width: 1;
-		stroke-dasharray: 3;
+		stroke-opacity:.8;
+		/*stroke-dasharray: 1;*/
 	}
 
 	.buttonsGroup {
@@ -44,16 +46,8 @@
 		margin: 0 auto;
 	}
 
-	.dummyline {
-    stroke: none;
-    stroke-width: 0px;
-    /*stroke-opacity: 0.75;*/
-  	}
-
   	.trendline {
-    /*stroke: red;*/
     stroke-width: 3px;
-    /*stroke-opacity: 0.75;*/
   	}
 
   	.shadow {
@@ -118,9 +112,6 @@
 			.tickPadding(10)
 			.orient("left");
 
-		//delete
-		// d3.select("body").transition().style("color", "red");
-
 		d3.tsv("quartet.tsv", function(error, quartetData) {
 			if (error) return console.warn(error);
 
@@ -173,12 +164,6 @@
 			   .append("g")
 			   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			var eqText = svg.append("text")
-			.attr("id", "eq-text")
-			.style("text-anchor", "start")
-			.attr("x", 12)
-			.attr("y", 20);
-
 			var data1 = quartetData.filter(function(d) { return d.group == 'I'; });
 			var data2 = quartetData.filter(function(d) { return d.group == 'II'; });
 			var data3 = quartetData.filter(function(d) { return d.group == 'III'; });
@@ -202,79 +187,91 @@
 				.attr("class", "y axis")
 				.call(yAxis);
 			
-			var circlegroup = svg.selectAll(".anscombeCircleGroup")
-			.data(data1)
-
-		  .enter()
-			.append("g")
-			.attr("class","anscombeCircleGroup")
-			.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
-
-			circlegroup.append("text")
-		   .attr("class",function(d,i) { return "T" + i + " shadow" })
-		   .attr("dx", 12)
-		   .attr("dy", 10)
-		   .text(function(d) { return d.x + ", " + d.y; })
-		   .style("fill","none")
-		   .style("font","12px sans-serif")
-
-		   circlegroup.append("text")
-		   .attr("class",function(d,i) { return "T" + i })
-		   .attr("dx", 12)
-		   .attr("dy", 10)
-		   .text(function(d) { return d.x + ", " + d.y; })
-		   .style("fill","none")
-		   .style("font","12px sans-serif")
-
-			circlegroup.append("circle")
-			.attr("class",function(d,i) { return "anscombeCircles T" + i; })
-			.attr("r", 7)
-			.style("fill", function(d) { return colorScale(d.group) })
-			.on("mouseenter", function() {
-				var mouseClass = d3.select(this).attr("class").split(" ")[1];
-				d3.selectAll("." + mouseClass)
-				.style("fill", "black");
-				this.parentNode.parentNode.appendChild(this.parentNode);
-
-				d3.selectAll("." + mouseClass + ".shadow")
-				.style("stroke", "white");
-			})
-			.on("mouseleave", function() {
-				d3.selectAll(".anscombeCircleGroup")
-				.selectAll("text")
-				.style("fill", "none")
-
-				d3.selectAll(".anscombeCircles")
-				.style("fill",function(d) { return colorScale(d.group) })
-
-				d3.selectAll(".shadow")
-				.style("stroke", "none");
-			});
-		    
-			
 			updateData(data1);
 			
 			function updateData(currentData) {
 
-				console.log(currentData);
+				//console.log(currentData);
+
+				var eqTextHalo = svg.append("text")
+				.attr("id", "eq-text-halo")
+				.style("text-anchor", "start")
+				// .style("fill", "none")
+				.style("stroke", "white")
+				.style("stroke-width", "2.5")
+				.attr("x", 12)
+				.attr("y", 23);			
+
+				var eqText = svg.selectAll(".statText")
+				.data(currentData)
+			  .enter()
+				.append("text")
+				.attr("class", "statText")
+				.attr("id", "eq-text")
+				.style("text-anchor", "start")
+				.style("fill", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) })
+				.attr("x", 12)
+				.attr("y", 23);
+
+				var circlegroup = svg.selectAll(".anscombeCircleGroup")
+				.data(currentData)
+			  .enter()
+				.append("g")
+				.attr("class","anscombeCircleGroup")
+				.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
+				
+				circlegroup.append("circle")
+				.attr("class",function(d, i) { return "anscombeCircles T" + i; })
+				.attr("r", 7)
+				.style("fill", function(d) { return colorScale(d.group) })
+				.on("mouseenter", function() {
+					var mouseClass = d3.select(this).attr("class").split(" ")[1];
+					d3.selectAll("." + mouseClass)
+					.style("fill", "262626")
+					this.parentNode.parentNode.appendChild(this.parentNode);
+					console.log(mouseClass);
+
+					d3.selectAll("." + mouseClass + ".shadow")
+					.style("stroke", "white");
+				})
+				.on("mouseleave", function() {
+					d3.selectAll(".anscombeCircleGroup")
+					.selectAll("text")
+					.style("fill", "none")
+
+					d3.selectAll(".anscombeCircles")
+					.style("fill",function(d) { return colorScale(d.group) })
+
+					d3.selectAll(".shadow")
+					.style("stroke", "none");
+				});
+
+				circlegroup.append("text")
+				.attr("class",function(d, i) { return "T" + i + " shadow" })
+				.attr("dx", 12)
+				.attr("dy", 10)
+				.text(function(d) { return d.x + ", " + d.y; })
+				.style("fill","none")
+				.style("font","14px sans-serif")
+
+				circlegroup.append("text")
+				.attr("class",function(d,i) { return "T" + i })
+				.attr("dx", 12)
+				.attr("dy", 10)
+				.text(function(d) { return d.x + ", " + d.y; })
+				.style("fill","none")
+				.style("font","14px sans-serif")
 
 				d3.selectAll(".trendline").remove()
-				// d3.selectAll(".dummyline").remove()
 
 				var xSeries = currentData.map(function(d) { return parseFloat(d['x']); });
 			    var ySeries = currentData.map(function(d) { return parseFloat(d['y']); });
-			    
-			    // console.log('xSeries: ' + xSeries);
-			    // console.log('ySeries: ' + ySeries);
 
 			    var leastSquaresCoeff = leastSquares(xSeries, ySeries);
 
 			    var slope = leastSquaresCoeff[0];
 			    var intercept = leastSquaresCoeff[1];
 			    var rSquare = leastSquaresCoeff[2];
-
-			    // console.log("slope: " + slope);
-			    // console.log("intercept: " + intercept);
 
 			    var dumdumline = svg.selectAll(".dumdumline")
 			    	.data(currentData)
@@ -290,7 +287,7 @@
 			    	.transition()
 			        .duration(1800)
 			        .delay(800)
-			    	.style("stroke", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) })
+			    	.style("stroke", function(d) { return colorScale(d.group) })
 		    	
 		    	var trendline = svg
 			    	.selectAll(".trendline")
@@ -326,14 +323,20 @@
 					.select("circle")
 					.style("fill", function(d) { return colorScale(d.group) });
 
+				svg.selectAll(".statText")
+					.data(currentData)
+					// .transition()
+					// .ease()
+					// .attr("class", "statText")
+					.style("fill", function(d) { return colorScale(d.group) });
+
 		        var format2d = d3.format("0.1f");
 
+			    d3.select('#eq-text-halo').text("y = " + format2d(slope) 
+			                                + " x + " + format2d(intercept))
+
 			    d3.select('#eq-text').text("y = " + format2d(slope) 
-			                                + "x + " + format2d(intercept))
-			    .transition()
-			    .style("color", "red")
-			    // .duration(500)
-			    // .ease("cubic");
+			                                + " x + " + format2d(intercept))
 
 				function leastSquares(xSeries, ySeries) {
 					var reduceSumFunc = function(prev, cur) { return prev + cur; };
