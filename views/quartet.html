@@ -50,7 +50,7 @@
 
   	.shadow {
     stroke: none;
-    stroke-width: 2.5px;
+    stroke-width: 4px;
     opacity: 0.9;
 	}
 
@@ -64,7 +64,7 @@
 
 	<script>
 	//To Do
-	//fix update labels
+	//understand why selectAll("text") wasn't updating xy data
 	//add stat text transition / more descriptive stat text
 	//new line for each group's stats
 
@@ -249,6 +249,7 @@
 			    	.ease("linear")
 			    	.style("stroke-width", "1px");
 
+			    //create circlegroup
 				circlegroup = svg.selectAll(".anscombeCircleGroup")
 					.data(currentData)
 				  .enter()
@@ -256,14 +257,23 @@
 					.attr("class", "anscombeCircleGroup")
 					.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
 				
+				//append circles
 				circlegroup.append("circle")
-					.attr("class",function(d, i) { return "anscombeCircles T" + i; })
+					.attr("class",function(d, i) {
+						// console.log("anscombeCircles T" + i);
+						return "anscombeCircles T" + i; })
 					.attr("r", 7)
 					.style("fill", function(d) { return colorScale(d.group) })
 					.on("mouseenter", function() {
 						var mouseClass = d3.select(this).attr("class").split(" ")[1];
-						d3.selectAll("." + mouseClass)
-						.style("fill", "262626")
+						console.log(mouseClass);
+						d3.selectAll("." + mouseClass + ".test")
+						// .style("fill", "404040")
+						.style("fill", function(d) { return colorScale(d.group) })
+						d3.selectAll("." + mouseClass + ".anscombeCircles")
+						.style("fill", "white")
+						.style("stroke", function(d) { return colorScale(d.group) })
+						.style("stroke-width", 2)
 						this.parentNode.parentNode.appendChild(this.parentNode);
 
 						d3.selectAll("." + mouseClass + ".shadow")
@@ -273,14 +283,14 @@
 						d3.selectAll(".anscombeCircleGroup")
 						.selectAll("text")
 						.style("fill", "none")
+						.style("stroke", "none")
 
 						d3.selectAll(".anscombeCircles")
 						.style("fill",function(d) { return colorScale(d.group) })
-
-						d3.selectAll(".shadow")
-						.style("stroke", "none");
+						.style("stroke", "none")
 					});
 
+				//append label text
 				circlegroup.append("text")
 					.attr("class",function(d, i) { return "T" + i + " shadow" })
 					.attr("dx", 12)
@@ -289,15 +299,16 @@
 					.style("fill","none")
 					.style("font","14px sans-serif")
 
+				//append shadow text
 				circlegroup.append("text")
-					.attr("class",function(d,i) { return "T" + i })
+					.attr("class",function(d,i) { return "T" + i + " test" })
 					.attr("dx", 12)
 					.attr("dy", 10)
 					.text(function(d) { return d.x + ", " + d.y; })
-					.style("fill","red")
-					// .style("fill","none")
+					.style("fill","none")
 					.style("font","14px sans-serif")
 				
+				//update circlegroup
 				svg.selectAll(".anscombeCircleGroup")
 					.data(currentData)
 					.transition()
@@ -305,15 +316,27 @@
 					.attr("class","anscombeCircleGroup")
 					.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" })
 					.select("circle")
-					//class necessary?
-					// .attr("class", function(d, i) { return "anscombeCircles T" + i; })
 					.style("fill", function(d) { return colorScale(d.group) });
 
+				// update label text
 				svg.selectAll(".anscombeCircleGroup")
-					.select("text")
-					.text(function(d) { return d.x + ", " + d.y; })
-					.style("fill", "red");
+					.select(".test")
+					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
+					console.log(svg.select(".anscombeCircleGroup")
+					.data(currentData)
+					.selectAll("text"));
 
+				// update shadow text
+				svg.selectAll(".anscombeCircleGroup")
+					.select(".shadow")
+					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
+					console.log(svg.select(".anscombeCircleGroup")
+					.data(currentData)
+					.selectAll("text"));
+
+
+
+				//stat text
 				svg.selectAll(".statText")
 					.data(currentData)
 					// .transition()
