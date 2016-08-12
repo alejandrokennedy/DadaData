@@ -17,17 +17,15 @@
 	}
 
 	.axis path {
-		fill:#fdfdfd;
-		/*fill:red;*/
+		fill:#f9f9f9;
 		fill-opacity:.3;
 		stroke:#cccccc;
 		stroke-width:1;
 	}
 
 	.axis text {
-		/*font: 15px sans-serif;*/
 		font-family: helvetica;
-		fill: gray;
+		fill: #a6a6a6;
 	}
 
 	.axis line {
@@ -66,24 +64,11 @@
 
 	<script>
 	//To Do
-	//bring hover-overed elements to fore
-	//add clickability to radio button labels
-	//add stats display for each dataset
-	//further develop trend line animations
-	//fewer ticks on axis (halve?)
-	//faint grid lines
+	//fix update labels
+	//add stat text transition / more descriptive stat text
+	//new line for each group's stats
 
-	//IDEAS
-	//use .on to display exact coordinates on hover over, but display them just outside the tick text of the axes, and in blue
-
-
-		// d3.selection.prototype.moveToFront = function() {
-		// 	return this.each(function(){
-		// 		this.parentNode.appendChild(this);
-		// 	});
-		// };
-
-		var margin = {top: 8, right: 30, bottom: 25, left: 30};
+		var margin = {top: 8, right: 40, bottom: 25, left: 30};
 
 		var width = 600 - margin.left - margin.right,
 			height = 600 - margin.top - margin.bottom;
@@ -196,7 +181,6 @@
 				var eqTextHalo = svg.append("text")
 				.attr("id", "eq-text-halo")
 				.style("text-anchor", "start")
-				// .style("fill", "none")
 				.style("stroke", "white")
 				.style("stroke-width", "2.5")
 				.attr("x", 12)
@@ -209,58 +193,9 @@
 				.attr("class", "statText")
 				.attr("id", "eq-text")
 				.style("text-anchor", "start")
-				.style("fill", function(d) { console.log(colorScale(d.group)); return colorScale(d.group) })
+				.style("fill", function(d) { return colorScale(d.group) })
 				.attr("x", 12)
 				.attr("y", 23);
-
-				var circlegroup = svg.selectAll(".anscombeCircleGroup")
-				.data(currentData)
-			  .enter()
-				.append("g")
-				.attr("class","anscombeCircleGroup")
-				.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
-				
-				circlegroup.append("circle")
-				.attr("class",function(d, i) { return "anscombeCircles T" + i; })
-				.attr("r", 7)
-				.style("fill", function(d) { return colorScale(d.group) })
-				.on("mouseenter", function() {
-					var mouseClass = d3.select(this).attr("class").split(" ")[1];
-					d3.selectAll("." + mouseClass)
-					.style("fill", "262626")
-					this.parentNode.parentNode.appendChild(this.parentNode);
-					console.log(mouseClass);
-
-					d3.selectAll("." + mouseClass + ".shadow")
-					.style("stroke", "white");
-				})
-				.on("mouseleave", function() {
-					d3.selectAll(".anscombeCircleGroup")
-					.selectAll("text")
-					.style("fill", "none")
-
-					d3.selectAll(".anscombeCircles")
-					.style("fill",function(d) { return colorScale(d.group) })
-
-					d3.selectAll(".shadow")
-					.style("stroke", "none");
-				});
-
-				circlegroup.append("text")
-				.attr("class",function(d, i) { return "T" + i + " shadow" })
-				.attr("dx", 12)
-				.attr("dy", 10)
-				.text(function(d) { return d.x + ", " + d.y; })
-				.style("fill","none")
-				.style("font","14px sans-serif")
-
-				circlegroup.append("text")
-				.attr("class",function(d,i) { return "T" + i })
-				.attr("dx", 12)
-				.attr("dy", 10)
-				.text(function(d) { return d.x + ", " + d.y; })
-				.style("fill","none")
-				.style("font","14px sans-serif")
 
 				d3.selectAll(".trendline").remove()
 
@@ -304,15 +239,64 @@
 			    	.style("stroke", function(d) { return colorScale(d.group) });
 
 			   	d3.selectAll(".trendline")
-			        .transition()
-			        .duration(900)
-			        .ease("quad")
-			        .attr("stroke-dashoffset", 0)
-			        .transition()
+			    	.transition()
+			    	.duration(900)
+			    	.ease("quad")
+			    	.attr("stroke-dashoffset", 0)
+			    	.transition()
 			    	.delay(950)
 			    	.duration(1200)
 			    	.ease("linear")
 			    	.style("stroke-width", "1px");
+
+				circlegroup = svg.selectAll(".anscombeCircleGroup")
+					.data(currentData)
+				  .enter()
+					.append("g")
+					.attr("class", "anscombeCircleGroup")
+					.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" });
+				
+				circlegroup.append("circle")
+					.attr("class",function(d, i) { return "anscombeCircles T" + i; })
+					.attr("r", 7)
+					.style("fill", function(d) { return colorScale(d.group) })
+					.on("mouseenter", function() {
+						var mouseClass = d3.select(this).attr("class").split(" ")[1];
+						d3.selectAll("." + mouseClass)
+						.style("fill", "262626")
+						this.parentNode.parentNode.appendChild(this.parentNode);
+
+						d3.selectAll("." + mouseClass + ".shadow")
+						.style("stroke", "white");
+					})
+					.on("mouseleave", function() {
+						d3.selectAll(".anscombeCircleGroup")
+						.selectAll("text")
+						.style("fill", "none")
+
+						d3.selectAll(".anscombeCircles")
+						.style("fill",function(d) { return colorScale(d.group) })
+
+						d3.selectAll(".shadow")
+						.style("stroke", "none");
+					});
+
+				circlegroup.append("text")
+					.attr("class",function(d, i) { return "T" + i + " shadow" })
+					.attr("dx", 12)
+					.attr("dy", 10)
+					.text(function(d) { return d.x + ", " + d.y; })
+					.style("fill","none")
+					.style("font","14px sans-serif")
+
+				circlegroup.append("text")
+					.attr("class",function(d,i) { return "T" + i })
+					.attr("dx", 12)
+					.attr("dy", 10)
+					.text(function(d) { return d.x + ", " + d.y; })
+					.style("fill","red")
+					// .style("fill","none")
+					.style("font","14px sans-serif")
 				
 				svg.selectAll(".anscombeCircleGroup")
 					.data(currentData)
@@ -321,7 +305,14 @@
 					.attr("class","anscombeCircleGroup")
 					.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")" })
 					.select("circle")
+					//class necessary?
+					// .attr("class", function(d, i) { return "anscombeCircles T" + i; })
 					.style("fill", function(d) { return colorScale(d.group) });
+
+				svg.selectAll(".anscombeCircleGroup")
+					.select("text")
+					.text(function(d) { return d.x + ", " + d.y; })
+					.style("fill", "red");
 
 				svg.selectAll(".statText")
 					.data(currentData)
@@ -362,7 +353,7 @@
 			}
 
 			d3.select(".buttons")
-             .attr("checked","checked")
+            	.attr("checked","checked")
 
 		});
 
