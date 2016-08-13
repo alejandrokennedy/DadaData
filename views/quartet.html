@@ -66,7 +66,10 @@
 	//To Do
 	//understand why selectAll("text") wasn't updating xy data
 	//add stat text transition / more descriptive stat text
-	//new line for each group's stats
+	//new line for each group's stats — in fact, maybe a table
+	//provide dropdown options that labels axes with measurement units of real things (not just abstract 1-20[nothing])
+	//write description of what Anscombe's quartet is
+	//photo of Anscombe?
 
 		var margin = {top: 8, right: 40, bottom: 25, left: 30};
 
@@ -264,7 +267,7 @@
 						return "anscombeCircles T" + i; })
 					.attr("r", 7)
 					.style("fill", function(d) { return colorScale(d.group) })
-					.on("mouseenter", function() {
+					.on("mouseover", function() {
 						var mouseClass = d3.select(this).attr("class").split(" ")[1];
 						console.log(mouseClass);
 						d3.selectAll("." + mouseClass + ".test")
@@ -289,6 +292,7 @@
 						.style("fill",function(d) { return colorScale(d.group) })
 						.style("stroke", "none")
 					});
+					console.log("mouseout!");
 
 				//append label text
 				circlegroup.append("text")
@@ -322,17 +326,15 @@
 				svg.selectAll(".anscombeCircleGroup")
 					.select(".test")
 					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
-					console.log(svg.select(".anscombeCircleGroup")
 					.data(currentData)
-					.selectAll("text"));
+					.selectAll("text");
 
 				// update shadow text
 				svg.selectAll(".anscombeCircleGroup")
 					.select(".shadow")
 					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
-					console.log(svg.select(".anscombeCircleGroup")
 					.data(currentData)
-					.selectAll("text"));
+					.selectAll("text");
 
 
 
