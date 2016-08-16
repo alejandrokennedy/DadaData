@@ -54,6 +54,12 @@
     opacity: 0.9;
 	}
 
+	.labels {
+		padding: 2px;
+		padding-right: 4px;
+		padding-left: 4px;
+	}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
@@ -70,6 +76,8 @@
 	//provide dropdown options that labels axes with measurement units of real things (not just abstract 1-20[nothing])
 	//write description of what Anscombe's quartet is
 	//photo of Anscombe?
+	//margin around radio button labels
+	//fix ticks/axis overlap
 
 		var margin = {top: 8, right: 40, bottom: 25, left: 30};
 
@@ -141,7 +149,8 @@
 				.on("change", function (d) { updateData(d.values) })
 
 			buttonsGroup.append("label")
-				.text(function(d) { return " Group " + d.key + " " })
+				.text(function(d) { return "Group " + d.key })
+				.attr("class", "labels")
 				.attr("for", (function(d) { return " Group " + d.key }))
 				.style("background-color", function(d) { return colorScale(d.key) })
 				.style("color", "white");
@@ -269,7 +278,6 @@
 					.style("fill", function(d) { return colorScale(d.group) })
 					.on("mouseover", function() {
 						var mouseClass = d3.select(this).attr("class").split(" ")[1];
-						console.log(mouseClass);
 						d3.selectAll("." + mouseClass + ".test")
 						// .style("fill", "404040")
 						.style("fill", function(d) { return colorScale(d.group) })
@@ -292,7 +300,6 @@
 						.style("fill",function(d) { return colorScale(d.group) })
 						.style("stroke", "none")
 					});
-					console.log("mouseout!");
 
 				//append label text
 				circlegroup.append("text")
@@ -325,14 +332,14 @@
 				// update label text
 				svg.selectAll(".anscombeCircleGroup")
 					.select(".test")
-					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
+					.text(function(d) { return d.x + ", " + d.y; })
 					.data(currentData)
 					.selectAll("text");
 
 				// update shadow text
 				svg.selectAll(".anscombeCircleGroup")
 					.select(".shadow")
-					.text(function(d) { console.log(d.x + ", " + d.y); return d.x + ", " + d.y; })
+					.text(function(d) { return d.x + ", " + d.y; })
 					.data(currentData)
 					.selectAll("text");
 
