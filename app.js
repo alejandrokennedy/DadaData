@@ -22,7 +22,7 @@ app.set('views', __dirname + '/views');
 app.get('/', function (req, res) {
 
 	// by default, ejs is trying to render templates from views folder
-  	res.render('start.html');
+  	res.render('index.html');
 });
 
 app.get('/quartet', function (req, res) {
