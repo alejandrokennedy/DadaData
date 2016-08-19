@@ -11,6 +11,8 @@ circle {
 
 <body>
 
+<h1>Change!</h1>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 
 <script>
@@ -18,7 +20,8 @@ circle {
   var width = 200,
       height = 800;
 
-  var colorScale = d3.scale.category20c()
+  var colorScale = d3.scale.ordinal()
+			.range(["#ffffcc","#d9f0a3","#addd8e","#78c679","#31a354","#006837"]);
 
   var svg = d3.select("body")
               .append("svg")
