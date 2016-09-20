@@ -14,10 +14,11 @@
 		text-align: center;
 		font-family: Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
 		font-size: 44px;
-	}
+/*		color: #a6a6a6;
+*/	}
 
 	.axis path {
-		fill:#f9f9f9;
+		fill:white;
 		fill-opacity:.3;
 		stroke:#cccccc;
 		stroke-width:1;
@@ -58,6 +59,17 @@
 		padding: 2px;
 		padding-right: 4px;
 		padding-left: 4px;
+	}
+
+	.blurb {
+		position: element(#target);
+		position: absolute;
+		visibility: visible;
+		width: 250px;
+		transform: translateX(-120%);
+		top: 135px;
+		/*z-index: 200;*/
+		color: #a6a6a6;
 	}
 
 </style>
@@ -122,6 +134,10 @@
 
 			window.nestedQuartetData = nestedQuartetData
 
+			var blurb = d3.select("body").append("p")
+				.text("Anscombe's Quartet is a fictional dataset created in 1973 by the statistician Francis Anscombe. It was created to illustrate the importance of visualizing data. When each group is analyzed using summary statistics, it appears identical to the others (each group has the same mean, variance, correlation coefficient, and linear regression line). When plotted on a grid, however, each group tells a very different story. Switch between groups and notice the difference in what the data communicate.")
+				.attr("class", "blurb");
+
 			var title = d3.select("body").append("h2")
 				.text("Anscombe's Quartet")
 				.attr("class","title");
@@ -129,7 +145,8 @@
 			var buttonsDiv = d3.select("body").append("div")
 				.attr("class","buttonsDiv");
 
-			var container = d3.select("body").append("div");
+			var container = d3.select("body").append("div")
+				.attr("id", "target");
 
 			var buttonsGroup = buttonsDiv.selectAll(".buttonsGroup")
 				.data(nestedQuartetData)
