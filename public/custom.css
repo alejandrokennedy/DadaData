@@ -1,0 +1,33 @@
+/*Set your CSS Styles*/
+
+body {
+  text-align: center;
+	}
+
+.navbar {
+	margin-bottom: 0;
+}
+
+.cover {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.cover-heading {
+	text-shadow: #ffffff 0 0 10px;
+}
+
+.blurb {
+	text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+}
+
+.full {
+  /*background: url('http://placehold.it/1920x1080') no-repeat center center fixed;*/
+  background: url('tapetunnel-lg.png') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
