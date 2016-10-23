@@ -30,4 +30,8 @@ body {
   -moz-background-size: cover;
   background-size: cover;
   -o-background-size: cover;
+  /* attempts to fix android malalignment */
+  background-position: center center;
+  height: 100%;
+  overflow: hidden;
 }
