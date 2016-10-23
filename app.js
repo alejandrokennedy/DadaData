@@ -25,6 +25,22 @@ app.get('/', function (req, res) {
   	res.render('index.html');
 });
 
+app.get('/index', function (req, res) {
+  	res.render('index.html');
+});
+
+app.get('/visualizations', function (req, res) {
+  	res.render('visualizations.html');
+});
+
+app.get('/about', function (req, res) {
+  	res.render('about.html');
+});
+
+app.get('/contact', function (req, res) {
+  	res.render('contact.html');
+});
+
 app.get('/quartet', function (req, res) {
   	res.render('quartet.html');
 });
