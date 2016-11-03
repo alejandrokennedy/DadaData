@@ -21,6 +21,12 @@ body {
 	text-shadow: #ffffff 0 0 10px;
 }
 
+.boxed {
+  padding: 10px;
+  background: rgba(256, 256, 256, 0.8)
+
+}
+
 .blurb {
 	text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
 }
