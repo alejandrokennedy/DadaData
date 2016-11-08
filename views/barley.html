@@ -16,22 +16,44 @@
 
   	.axis path {
   		fill: none;
-	    stroke: #000;
+	    stroke: #bababa;
 	    stroke-width: 1;
+  	}
+
+  	.axis text {
+  		fill: #bababa;
+  	}
+
+  	.title{
+  		text-align: center;
+  		font-size: 28px;
+  		
+  	}
+
+  	.titleText {
+  		margin-top:15px;
+  		margin-bottom:0px;
   	}
 
 </style>
 
-<body></body>
+<body>
+	
+	<div class=title>
+		<p class=titleText>Minesota Barley Trial</p>
+	</div>
+
+</body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<!-- <script src="d3.min.js"></script> -->
 
 <script>
 
-	var margin = {top: 50, right: 50, bottom: 50, left: 50};
+	var margin = {top: 30, right: 30, bottom: 30, left: 30};
 
 	var width = 250 - margin.left - margin.right,
-	    height = 380 - margin.top - margin.bottom;
+	    height = 340 - margin.top - margin.bottom;
 
 	var xScale = d3.scale.ordinal()
 		.domain(['1931', '1932'])
@@ -42,7 +64,10 @@
 	var yScale = d3.scale.linear()
 		.range([height, 0+25]);
 
-	var colorScale = d3.scale.category10()
+	var DotColorScale = d3.scale.category10()
+	var colorScale = d3.scale.linear()
+		.range(["green", "orange"])
+		.domain([-10, 10])
 
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
@@ -92,6 +117,7 @@
 		   		.attr("dy", 10)
 				.text(function(d) { return d.key })
 				.style("font-size", "18")
+				.style("fill", "#bababa")
 
 
 			d3.select(this)
@@ -104,17 +130,6 @@
 				.attr("class","x axis")
 				.attr("transform","translate(0, " + height + ")")
 				.call(xAxis);
-
-			var circles = d3.select(this)
-				.selectAll(".circles")
-				.data(function(d) { return d.values})
-			  .enter().append("g")
-			  	.attr("class", function(d) {
-			  		// console.log("circles " + d.variety);
-			  		return "circles " + d.variety
-			  	})
-			  	.attr("transform", function(d) { return "translate( " + (xScale(d.year) + offset) + ", " + yScale(d.yield) + " )" });
-			
 
 			var varietyNestedData = d3.nest()
 				.key(function(d) { return d.variety })
@@ -131,7 +146,10 @@
 			  	.attr("x2", function(d) { return xScale(d.values[1].year) + offset;  })
 			  	.attr("y1", function(d) { return yScale(d.values[0].yield);  })
 			  	.attr("y2", function(d) { return yScale(d.values[1].yield);  })
-			  	.style("stroke", function(d) { return colorScale(d.key); })
+			  	// .style("stroke", function(d) { return colorScale(d.key); })
+			  	.style("stroke", function(d) {
+			  		console.log(d.values[0].yield - d.values[1].yield); 
+			  		return colorScale(d.values[0].yield - d.values[1].yield); })
 		  		.style("stroke-width", 2.5)
 		  		.on("mouseenter", function(d) {
 					var varietyClass = d.key;
@@ -147,10 +165,21 @@
 					d3.selectAll("line").style("stroke-opacity", 1)
 				});
 
-		  	 circles.append("circle")
-				.attr("r", 5)
-				.style("fill", function(d) { return colorScale(d.variety); })
-				.style("fill",function(d) { return colorScale(d.variety); })
+
+			var circles = d3.select(this)
+				.selectAll(".circles")
+				.data(function(d) { return d.values})
+			  .enter().append("g")
+			  	.attr("class", function(d) {
+			  		// console.log("circles " + d.variety);
+			  		return "circles " + d.variety
+			  	})
+			  	.attr("transform", function(d) { return "translate( " + (xScale(d.year) + offset) + ", " + yScale(d.yield) + " )" });
+
+		  	circles.append("circle")
+				.attr("r", 4.5)
+				.style("fill", function(d) { return DotColorScale(d.variety); })
+				.style("fill",function(d) { return DotColorScale(d.variety); })
 				.on("mouseenter", function(d) {
 					var varietyClass = d.variety;
 					d3.selectAll("circle").style("fill-opacity", .1)
