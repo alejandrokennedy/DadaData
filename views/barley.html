@@ -150,7 +150,7 @@
 			  	.style("stroke", function(d) {
 			  		console.log(d.values[0].yield - d.values[1].yield); 
 			  		return colorScale(d.values[0].yield - d.values[1].yield); })
-		  		.style("stroke-width", 2.5)
+		  		.style("stroke-width", 1.5)
 		  		.on("mouseenter", function(d) {
 					var varietyClass = d.key;
 					d3.selectAll("circle").style("fill-opacity", .1)
@@ -177,7 +177,7 @@
 			  	.attr("transform", function(d) { return "translate( " + (xScale(d.year) + offset) + ", " + yScale(d.yield) + " )" });
 
 		  	circles.append("circle")
-				.attr("r", 4.5)
+				.attr("r", 4.25)
 				.style("fill", function(d) { return DotColorScale(d.variety); })
 				.style("fill",function(d) { return DotColorScale(d.variety); })
 				.on("mouseenter", function(d) {
