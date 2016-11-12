@@ -8,7 +8,16 @@ body {
 
 .navbar {
 	margin-bottom: 0;
+  /*background-image: linear-gradient(to bottom,#bcf3ff 0,#ccf6ff 100%);*/
 }
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.open>a {
+  background-image: linear-gradient(to bottom,#bcf3ff 0,#ccf6ff 100%);
+}
+
+/*.navbar-default.navbar-nav>li>a {
+  color: #000;
+}*/
 
 .cover {
 	position: fixed;
@@ -23,12 +32,16 @@ body {
 
 .boxed {
   padding: 10px;
-  background: rgba(256, 256, 256, 0.8)
-
+  line-height: 200%;
+  background: rgba(188, 243, 255, .9)
 }
 
 .blurb {
-	text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+  text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+}
+
+.blurb.boxed {
+	text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;
 }
 
 .full {
