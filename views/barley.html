@@ -5,23 +5,77 @@
 
 	body {
 		font: 14px sans-serif;
-		width: 750px;
-	    margin: 0px auto;
+	}
+
+	#bigContainer {
+		height:100%;
+		width:100%;
+		font-size: 0;
+	}
+
+	#container {
+		font: 14px sans-serif;
+		width: 58%;
+		/*width: 750px;*/
+	    /*margin: 0px auto;*/
+	}
+
+	.divs {
+		display: inline-block;
+		*display: inline;
+		zoom: 1;
+		vertical-align: top;
+	}
+
+	.sideDivs {
+		margin-right: 3%;
+		margin-left: 3%;
+		width: 25%;
+		height: 500px;
+		font-size: 14px;
+		margin-top: 60px;
+		/*display: block;*/
+		/*margin-left: auto;
+		margin-right: auto;*/
+	}
+
+	#blurb {
+		float:left;
+		color: #a6a6a6;
+		font-size: 16px;
+
+	}
+
+	#varietySVGContainer {
+		height: 50%;
+		width: 100%;
+		/*background-color: #a6a6a6;*/
+		margin-top: 20%;
+	}
+
+	#variety {
+		/*position: element(#container);
+		visibility: visible;
+		background-color: #a6a6a6;*/
+		/*position: absolute;*/
+		/*float:right;*/
 	}
 
 	.myDiv {
-  		display: inline-block;
-  		/*background-color: #ccc;*/
+  		margin: 0 auto;
+  		/*display: inline-block;*/
+  		/*background-color: #ddd;*/
+  		width: 750px;
   	}
 
   	.axis path {
   		fill: none;
-	    stroke: #bababa;
+	    stroke: #a6a6a6;
 	    stroke-width: 1;
   	}
 
   	.axis text {
-  		fill: #bababa;
+  		fill: #a6a6a6;
   	}
 
   	.title{
@@ -42,6 +96,26 @@
 	<div class=title>
 		<p class=titleText>Minesota Barley Trial</p>
 	</div>
+
+	<div id=bigContainer>
+
+		<!-- sources: http://www.genetics.org/content/28/5/419.abstract
+		http://blog.revolutionanalytics.com/2014/07/theres-no-mistake-in-the-barley-data.html
+		https://github.com/thisismetis/nyc16_dataviz5/blob/master/class3/README.md
+		https://www.r-bloggers.com/presenting-immer%E2%80%99s-barley-data/
+		-->
+	
+		<div id=blurb class="sideDivs divs">In the early 1930s, a team of agronomists led by F.R. Immer studied ten varieties of barley in order to better understand genetic differences between the strains. All ten varieties were grown at six locations throughout Minnesota: Duluth, Grand Rapids, Crookston, Morris, Waseca, and the farm at the university of Minnesota, where the researchers were based. Notice that in all locations except Morris, average barley yields fell between 1931 and 1932. An early hypothesis chalked the outlier up to an error in data reporting. Recent analysis, however, shows that it is most likely explained by differences in local weather patterns (e.g. drought), insect populations, and disease. Hover over the different strains to see how they fared in each location. <div id=varietySVGContainer></div>
+
+		</div>
+
+		<div id=container class="divs"></div>
+
+		<!-- <div id="variety" class="sideDivs divs"></div> -->
+
+	</div>
+
+	
 
 </body>
 
@@ -96,8 +170,14 @@
 
 			window.nestedData = nestedData;
 
-		var svgContainer = d3.select("body").append("div")
+		var svgContainer = d3.select("#container").append("div")
 			.attr("class", "myDiv");
+
+		// Legend SVG
+		var varietySVG = d3.select("#varietySVGContainer").append("svg")
+		.attr("preserveAspectRatio", "xMinYMin meet")
+		.attr("viewBox", "0 0 300 300")
+		.classed("svg-content", true);
 
 		svgContainer.selectAll("svg")
 			.data(nestedData)
