@@ -16,8 +16,6 @@
 	#container {
 		font: 14px sans-serif;
 		width: 58%;
-		/*width: 750px;*/
-	    /*margin: 0px auto;*/
 	}
 
 	.divs {
@@ -25,18 +23,12 @@
 		*display: inline;
 		zoom: 1;
 		vertical-align: top;
-	}
-
-	.sideDivs {
 		margin-right: 3%;
 		margin-left: 3%;
 		width: 25%;
 		height: 500px;
 		font-size: 14px;
-		margin-top: 60px;
-		/*display: block;*/
-		/*margin-left: auto;
-		margin-right: auto;*/
+		margin-top: 25px;
 	}
 
 	#blurb {
@@ -49,17 +41,12 @@
 	#varietySVGContainer {
 		height: 50%;
 		width: 100%;
-		/*background-color: #a6a6a6;*/
-		margin-top: 20%;
+		margin-top: 8%;
 	}
 
-	#variety {
-		/*position: element(#container);
-		visibility: visible;
-		background-color: #a6a6a6;*/
-		/*position: absolute;*/
-		/*float:right;*/
-	}
+	/*.svg-content {
+		background-color: #f2f2f2;
+	}*/
 
 	.myDiv {
   		margin: 0 auto;
@@ -111,16 +98,14 @@
 
 		<div id=container class="divs"></div>
 
-		<!-- <div id="variety" class="sideDivs divs"></div> -->
-
 	</div>
 
 	
 
 </body>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
-<!-- <script src="d3.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script> -->
+<script src="d3.min.js"></script>
 
 <script>
 
@@ -170,14 +155,75 @@
 
 			window.nestedData = nestedData;
 
+		var firstVarietyNestedData = d3.nest()
+			.key(function(d) { return d.variety })
+			.entries(nestedData[1].values);
+
+			window.firstVarietyNestedData = firstVarietyNestedData;
+
 		var svgContainer = d3.select("#container").append("div")
 			.attr("class", "myDiv");
 
 		// Legend SVG
 		var varietySVG = d3.select("#varietySVGContainer").append("svg")
-		.attr("preserveAspectRatio", "xMinYMin meet")
-		.attr("viewBox", "0 0 300 300")
-		.classed("svg-content", true);
+			.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("viewBox", "0 0 300 300")
+			.classed("svg-content", true);
+
+		var variYScale = d3.scale.ordinal()
+			// .domain( function(d) { return d.key } )
+			.domain(["Manchuria", "Glabron", "Svansota", "Velvet", "Trebi", "No457", "No462", "Peatland", "No475", "WisconsinNo38", ])
+			.rangeRoundBands([280, 0]);
+
+		var variCircles = d3.select(".svg-content")
+			.selectAll(".variCircles")
+			.data(firstVarietyNestedData)
+		  .enter().append("g")
+			.attr("class", function(d) {
+			console.log("circle " + d.key) 
+			return "circle " + d.key })
+			.attr("transform", function(d) { return "translate( " + 20 + ", " + (variYScale(d.key) + 20) + " )" });
+
+		variCircles.append("circle")
+			.attr("r", 14)
+			.style("fill", function(d) { return DotColorScale(d.key); })
+			.on("mouseenter", function(d) {
+				var varietyClass = d.key;
+				d3.selectAll("circle").style("fill-opacity", .1)
+				d3.selectAll("line").style("stroke-opacity", .1)
+				d3.selectAll("text").style("fill-opacity", .1)
+				d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
+				d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
+				d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
+
+			})
+			.on("mouseleave", function(d) {
+				d3.selectAll("circle").style("fill-opacity", 1)
+				d3.selectAll("line").style("stroke-opacity", 1)
+				d3.selectAll("text").style("fill-opacity", 1)
+			});
+
+		variCircles.append("text")
+			.attr("dx", 18)
+			.attr("dy", 6)
+			.text(function(d) { return d.key; })
+			.style("fill", "#a6a6a6")
+			.on("mouseenter", function(d) {
+				var varietyClass = d.key;
+				d3.selectAll("circle").style("fill-opacity", .1)
+				d3.selectAll("line").style("stroke-opacity", .1)
+				d3.selectAll("text").style("fill-opacity", .1)
+				d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
+				d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
+				d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
+
+			})
+			.on("mouseleave", function(d) {
+				d3.selectAll("circle").style("fill-opacity", 1)
+				d3.selectAll("line").style("stroke-opacity", 1)
+				d3.selectAll("text").style("fill-opacity", 1)
+			});
+
 
 		svgContainer.selectAll("svg")
 			.data(nestedData)
@@ -215,6 +261,8 @@
 				.key(function(d) { return d.variety })
 				.entries(nestedData.values);
 
+				window.varietyNestedData = varietyNestedData;
+
 			var lines = d3.select(this)
 				.selectAll(".lines")
 				.data(varietyNestedData)
@@ -226,23 +274,22 @@
 			  	.attr("x2", function(d) { return xScale(d.values[1].year) + offset;  })
 			  	.attr("y1", function(d) { return yScale(d.values[0].yield);  })
 			  	.attr("y2", function(d) { return yScale(d.values[1].yield);  })
-			  	// .style("stroke", function(d) { return colorScale(d.key); })
-			  	.style("stroke", function(d) {
-			  		console.log(d.values[0].yield - d.values[1].yield); 
-			  		return colorScale(d.values[0].yield - d.values[1].yield); })
+			  	.style("stroke", function(d) { return colorScale(d.values[0].yield - d.values[1].yield); })
 		  		.style("stroke-width", 1.5)
 		  		.on("mouseenter", function(d) {
 					var varietyClass = d.key;
 					d3.selectAll("circle").style("fill-opacity", .1)
 					d3.selectAll("line").style("stroke-opacity", .1)
+					d3.selectAll("text").style("fill-opacity", .1)
 					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
-
+					d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
 
 				})
 				.on("mouseleave", function(d) {
 					d3.selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("line").style("stroke-opacity", 1)
+					d3.selectAll("text").style("fill-opacity", 1)
 				});
 
 
@@ -250,27 +297,26 @@
 				.selectAll(".circles")
 				.data(function(d) { return d.values})
 			  .enter().append("g")
-			  	.attr("class", function(d) {
-			  		// console.log("circles " + d.variety);
-			  		return "circles " + d.variety
-			  	})
+			  	.attr("class", function(d) { return "circles " + d.variety })
 			  	.attr("transform", function(d) { return "translate( " + (xScale(d.year) + offset) + ", " + yScale(d.yield) + " )" });
 
 		  	circles.append("circle")
 				.attr("r", 4.25)
 				.style("fill", function(d) { return DotColorScale(d.variety); })
-				.style("fill",function(d) { return DotColorScale(d.variety); })
 				.on("mouseenter", function(d) {
 					var varietyClass = d.variety;
 					d3.selectAll("circle").style("fill-opacity", .1)
 					d3.selectAll("line").style("stroke-opacity", .1)
+					d3.selectAll("text").style("fill-opacity", .1)
 					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
+					d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
 
 				})
 				.on("mouseleave", function(d) {
 					d3.selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("line").style("stroke-opacity", 1)
+					d3.selectAll("text").style("fill-opacity", 1)
 				});
 
 
