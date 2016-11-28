@@ -191,7 +191,7 @@
 				var varietyClass = d.key;
 				d3.selectAll("circle").style("fill-opacity", .1)
 				d3.selectAll("line").style("stroke-opacity", .1)
-				d3.selectAll("text").style("fill-opacity", .1)
+				d3.selectAll(".variText").style("fill-opacity", .1)
 				d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 				d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
 				d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
@@ -206,13 +206,14 @@
 		variCircles.append("text")
 			.attr("dx", 18)
 			.attr("dy", 6)
+			.attr("class", "variText")
 			.text(function(d) { return d.key; })
 			.style("fill", "#a6a6a6")
 			.on("mouseenter", function(d) {
 				var varietyClass = d.key;
 				d3.selectAll("circle").style("fill-opacity", .1)
 				d3.selectAll("line").style("stroke-opacity", .1)
-				d3.selectAll("text").style("fill-opacity", .1)
+				d3.selectAll(".variText").style("fill-opacity", .1)
 				d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 				d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
 				d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
@@ -280,7 +281,7 @@
 					var varietyClass = d.key;
 					d3.selectAll("circle").style("fill-opacity", .1)
 					d3.selectAll("line").style("stroke-opacity", .1)
-					d3.selectAll("text").style("fill-opacity", .1)
+					d3.selectAll(".variText").style("fill-opacity", .1)
 					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
 					d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
@@ -307,7 +308,7 @@
 					var varietyClass = d.variety;
 					d3.selectAll("circle").style("fill-opacity", .1)
 					d3.selectAll("line").style("stroke-opacity", .1)
-					d3.selectAll("text").style("fill-opacity", .1)
+					d3.selectAll(".variText").style("fill-opacity", .1)
 					d3.selectAll("." + varietyClass).selectAll("circle").style("fill-opacity", 1)
 					d3.selectAll("." + varietyClass).style("stroke-opacity", 1)
 					d3.selectAll("." + varietyClass).selectAll("text").style("fill-opacity", 1)
@@ -318,7 +319,6 @@
 					d3.selectAll("line").style("stroke-opacity", 1)
 					d3.selectAll("text").style("fill-opacity", 1)
 				});
-
 
 		};
 
