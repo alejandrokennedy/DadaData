@@ -27,7 +27,9 @@ body {
 }
 
 .cover-heading {
-	text-shadow: #ffffff 0 0 10px;
+	/*text-shadow: #ffffff 0 0 10px;*/
+  text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+  margin-bottom: 30px;
 }
 
 .boxed {
@@ -38,10 +40,12 @@ body {
 
 .blurb {
   text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+  /*font-weight: 400;*/
 }
 
 .blurb.boxed {
 	text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;
+  /*font-weight: 400;*/
 }
 
 .full {
@@ -55,4 +59,24 @@ body {
   background-position: center center;
   height: 100%;
   overflow: hidden;
+}
+
+.caption {
+  /*color: #f2f2f2;*/
+  color: #333;
+  /*text-shadow: #ffffff 0 0 15px;*/
+  text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+}
+
+h3 > a {
+  color: #333;
+}
+
+h3 > a:hover {
+  color: white;
+  /*text-shadow: #bcf3ff 0 0 10px;*/
+  text-decoration: none;
+  transition: all ease-in-out .1s;
+  /*text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;*/
+  text-shadow: #333 0 0 15px, #333 0 0 10px, #333 0 0 4px;
 }
