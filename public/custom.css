@@ -30,15 +30,6 @@ body {
 	transform: translate(-50%, -50%);
 }
 
-@media only screen and (max-width: 540px) {
-  .cover {
-    position: relative;
-    top: 0%;
-    left: 0%;
-    transform: translate(0%, 0%);
-  }
-}
-
 .cover-heading {
 	/*text-shadow: #ffffff 0 0 10px;*/
   text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
@@ -71,7 +62,7 @@ body {
   /* attempts to fix android malalignment */
   background-position: center center;
   height: 100%;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .caption {
