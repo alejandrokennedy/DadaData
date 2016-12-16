@@ -27,10 +27,6 @@ body {
   color: #000;
 }*/
 
-.of-all {
-  /*margin-top: 300px;*/
-}
-
 .cover {
 	position: fixed;
 	top: 50%;
@@ -52,12 +48,18 @@ body {
 
 .blurb {
   text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
-  /*font-weight: 400;*/
+  /*font-size: 20px;*/
 }
 
 .blurb.boxed {
 	text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;
   /*font-weight: 400;*/
+}
+
+@media only screen and (max-width: 540px) {
+  .tagline {
+    font-size: 24px;
+  }
 }
 
 .full {
