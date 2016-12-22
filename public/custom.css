@@ -72,7 +72,7 @@ body {
   /* attempts to fix android malalignment */
   background-position: center center;
   height: 100%;
-  /*overflow: hidden;*/
+  overflow: hidden;
 }
 
 .caption {
