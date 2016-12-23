@@ -56,12 +56,6 @@ body {
   /*font-weight: 400;*/
 }
 
-@media only screen and (max-width: 540px) {
-  .tagline {
-    font-size: 24px;
-  }
-}
-
 .full {
   /*background: url('http://placehold.it/1920x1080') no-repeat center center fixed;*/
   background: url('tapetunnel-web.jpg') no-repeat center center fixed;
@@ -93,4 +87,14 @@ h3 > a:hover {
   transition: all ease-in-out .1s;
   /*text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;*/
   text-shadow: #333 0 0 15px, #333 0 0 10px, #333 0 0 4px;
+}
+
+@media only screen and (max-width: 540px) {
+  .tagline {
+    font-size: 24px;
+  }
+
+  .full {
+    overflow: visible;
+  }
 }
