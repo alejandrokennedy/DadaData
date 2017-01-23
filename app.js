@@ -49,6 +49,10 @@ app.get('/barley', function (req, res) {
   	res.render('barley.html');
 });
 
+app.get('/weekly-viz', function (req, res) {
+    res.render('weekly-viz.html');
+});
+
 app.get('/test', function (req, res) {
   	res.render('test.html');
 });
