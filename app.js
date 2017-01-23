@@ -53,6 +53,10 @@ app.get('/weekly-viz', function (req, res) {
     res.render('weekly-viz.html');
 });
 
+app.get('/trumpland1', function (req, res) {
+    res.render('trumpland1');
+});
+
 app.get('/test', function (req, res) {
   	res.render('test.html');
 });

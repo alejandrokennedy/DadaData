@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title>Lost in the MTA</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js" charset="utf-8"></script>
+</head>
+
+<style type="text/css">
+
+	/* Attempt to have body, html occupy full height of page. New problem: scroll bar appears*/
+	/*body, html {
+		min-height: 100% !important;
+    height: 100%;
+	}*/
+
+	body {
+		font-family: helvetica;
+		font-size: 12px;
+	}
+
+	#svgDiv {
+		border-style: solid;
+		border-color: #0000ff #ff0000;
+		/*height 100% doesn't work unless body and HTML are also 100%*/
+		/*height: 100%;*/
+		width: 80%;
+		/*center within div*/
+		margin: 0 auto;
+	}
+
+	#svg {
+		border: 1px solid #f0f;
+		display: block;
+		margin: auto;
+	}
+
+	.links {
+		stroke: blue;
+		stroke-width: 2px;
+	}
+
+	.nodes circle {
+	  fill: #ccc;
+	  stroke: #000;
+}
+
+</style>
+
+<body>
+
+	<!-- <div id=svgDiv> -->
+	<svg id=svg width="960" height="600"></svg>
+	<!-- </div> -->
+
+	<script>
+	//To Do
+	// global temp dataset form
+	// d3 office hours
+
+		var svg = d3.select("#svg"),
+			width = +svg.attr("width")
+			height = +svg.attr("height")
+
+		var simulation = d3.forceSimulation()
+			.force("charge", d3.forceManyBody().strength(-50))
+	    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+	    .force("x", d3.forceX(width / 2))
+	    .force("y", d3.forceY(height / 2));
+
+		d3.csv("TrumpWorldData.csv", function(error, dataset) {
+			// dataset.forEach(function(d) {	
+			// });
+			// console.log(dataset);
+
+			var orgAs = dataset.map(function(d) { return d["Organization A"]; });
+			var orgBs = dataset.map(function(d) { return d["Organization B"]; });
+
+			var orgABs = orgAs.concat(orgBs);
+
+			var orgSet = d3.set(orgABs).values();
+
+			// console.log(orgABs);
+			// console.log(orgSet);
+
+			var nodes = [],
+					links = [];
+
+			orgSet.forEach(function(orgs) {
+				nodes.push({"id" : orgs })
+			});
+
+			dataset.forEach(function(d) {
+				links.push({
+					"source" : d["Organization A"],
+					"target" : d["Organization B"]
+				})
+			});
+
+			var graph = {
+				"nodes": nodes,
+				"links": links
+			}
+			console.log(graph);
+
+			var link = svg.append("g")
+				.attr("class", "links")
+				.selectAll("line")
+				.data(graph.links)
+			 .enter().append("line");
+
+			var node = svg.append("g")
+				.attr("class", "nodes")
+				.selectAll("circle")
+				.data(graph.nodes)
+			 .enter().append("circle")
+			 	.attr("r", 10);
+
+		 	simulation
+		 		.nodes(graph.nodes)
+		 		.on("tick", ticked);
+
+	 		simulation.force("link")
+	 			.links(graph.links);
+
+	 		function ticked() {
+	 			link
+	        .attr("x1", function(d) { return d.source.x; })
+	        .attr("y1", function(d) { return d.source.y; })
+	        .attr("x2", function(d) { return d.target.x; })
+	        .attr("y2", function(d) { return d.target.y; });
+
+    		node
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+	 		}
+
+		}); // d3.csv callback
+
+	</script>
+
+</body>
