@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title>Trump Land</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+</head>
+
+<style type="text/css">
+
+	/* Attempt to have body, html occupy full height of page. New problem: scroll bar appears*/
+	/*body, html {
+		min-height: 100% !important;
+    height: 100%;
+	}*/
+
+	body {
+		font-family: helvetica;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	#svgDiv {
+		border-style: solid;
+		border-color: #0000ff #ff0000;
+		/*height 100% doesn't work unless body and HTML are also 100%*/
+		/*height: 100%;*/
+		width: 80%;
+		/*center within div*/
+		margin: 0 auto;
+	}
+
+	svg {
+		/*border: 1px solid #f0f;*/
+		display: block;
+		margin: auto;
+	}
+
+	.links {
+		stroke: grey;
+		stroke-width: 2px;
+	}
+
+	.nodes circle {
+	  fill: #ccc;
+	  stroke: #000;
+	}
+
+	.nodes text {
+	  display: none;
+	  font: 25px sans-serif;
+	}
+
+	.nodes:hover text {
+	  display: inline;
+	}
+	
+	.nodes text.labelShadow {
+	  display: none;
+	  font: 25px sans-serif;
+	}
+
+	.nodes:hover text.labelShadow {
+	  display: inline;
+	  stroke: white;
+	  stroke-width: 4;
+	}
+
+</style>
+
+<body>
+
+	<script>
+	// To Do
+	// node buffer: http://bl.ocks.org/taktran/6677833
+
+	// global temp dataset form
+	// d3 office hours
+
+		var margin = {top: 50, right: 50, bottom: 50, left: 50},
+			width = window.innerWidth - margin.left - margin.right,
+			height = window.innerHeight - margin.top - margin.bottom;
+
+		var zoom = d3.zoom().scaleExtent([0.3, 5]).on("zoom", function () {
+			gContainer.attr("transform", d3.event.transform)
+			});
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.call(zoom);
+
+		var gContainer = svg.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+ 		zoom.scaleTo(svg, .44);
+
+		var simulation = d3.forceSimulation()
+			.force("charge", d3.forceManyBody().strength(-50))
+	    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+	    .force("x", d3.forceX(width / 2))
+	    .force("y", d3.forceY(height / 2));
+
+	  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	  var voronoi = d3.voronoi()
+	  	.x(function(d) { return d.x; })
+	  	.y(function(d) { return d.y; })
+	  	.extent([[-1, -1], [width + 1, height + 1]]);
+
+	  // var voronoi = d3.geom.voronoi()
+   //  .x(function(d) { return d.x; })
+   //  .y(function(d) { return d.y; })
+   //  .clipExtent([[0, 0], [width, height]]);
+
+	  queue()
+	  	.defer(d3.csv, "org-org-connections.csv")
+	  	.defer(d3.csv, "person-org-connections.csv")
+	  	.defer(d3.csv, "person-person-connections.csv")
+	  	.await(ready);
+
+	  function ready (error, orgOrg, personOrg, personPerson) {
+	  	if (error) throw error;
+
+			var orgAs = orgOrg.map(function(d) { return d["Organization A"]; });
+			var orgBs = orgOrg.map(function(d) { return d["Organization B"]; });
+
+			var organizations = personOrg.map(function(d) { return d.Organization; });
+			var people = personOrg.map(function(d) { return d.Person; });
+
+			var peepAs = personPerson.map(function(d) { return d["Person A"]; });
+			var peepBs = personPerson.map(function(d) { return d["Person B"]; });
+
+			var allOrgs = orgAs.concat(orgBs).concat(organizations);
+			var allPeeps = people.concat(peepAs).concat(peepBs);
+
+			var allOrgsSet = d3.set(allOrgs).values();
+			var allPeepsSet = d3.set(allPeeps).values();
+
+			var nodes = [],
+					links = [];
+
+			allOrgsSet.forEach(function(orgs) {
+				nodes.push({
+					"id" : orgs,
+					"type" : "organization"
+				})
+			});
+
+			allPeepsSet.forEach(function(peeps) {
+				nodes.push({
+					"id" : peeps,
+					"type" : "person"
+				})
+			});
+
+			orgOrg.forEach(function(d) {
+				links.push({
+					"source" : d["Organization A"],
+					"target" : d["Organization B"]
+				})
+			});
+
+			personOrg.forEach(function(d) {
+				links.push({
+					"source" : d.Organization,
+					"target" : d.Person
+				})
+			});
+
+			personPerson.forEach(function(d) {
+				links.push({
+					"source" : d["Person A"],
+					"target" : d["Person B"]
+				})
+			});
+
+			var graph = {
+				"nodes": nodes,
+				"links": links
+			}
+			console.log(graph);
+
+			var link = gContainer.append("g")
+				.attr("class", "links")
+				.selectAll("line")
+				.data(graph.links)
+			 .enter().append("line");
+
+			var node = gContainer.selectAll(".nodes")
+				.data(graph.nodes)
+			 .enter().append("g")
+				.attr("class", "nodes")
+				.call(d3.drag()
+			 		.on("start", dragstarted)
+			 		.on("drag", dragged)
+			 		.on("end", dragended))
+				.on("mouseover", function() {
+						this.parentNode.appendChild(this);
+					})
+
+			var circle = node.append("circle")
+			 	.attr("r", 9)
+			 	.style("fill", function(d) { return color(d.type); });
+
+			var labelShadow = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.attr("class", "labelShadow")
+		 		.text(function(d) { return d.id; });
+
+		 	var label = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.text(function(d) { return d.id; });
+
+		 	simulation
+		 		.nodes(graph.nodes)
+		 		.on("tick", ticked);
+
+	 		simulation.force("link")
+	 			.links(graph.links);
+
+	 		function ticked() {
+	 			// cell
+	    //     .data(voronoi(graph.nodes))
+	    //     .attr("d", function(d) { return d.length ? "M" + d.join("L") : null; });
+
+	 			link
+	        .attr("x1", function(d) { return d.source.x; })
+	        .attr("y1", function(d) { return d.source.y; })
+	        .attr("x2", function(d) { return d.target.x; })
+	        .attr("y2", function(d) { return d.target.y; });
+
+    		node
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+				
+				circle
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+
+				label
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+				
+				labelShadow
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+	 		}
+
+		}; // ready function callback
+
+		function dragstarted(d) {
+		  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+		  d.fx = d.x;
+		  d.fy = d.y;
+		}
+
+		function dragged(d) {
+		  d.fx = d3.event.x;
+		  d.fy = d3.event.y;
+		}
+
+		function dragended(d) {
+		  if (!d3.event.active) simulation.alphaTarget(0);
+		  d.fx = null;
+		  d.fy = null;
+		}
+
+	</script>
+
+</body>

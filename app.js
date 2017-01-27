@@ -57,6 +57,10 @@ app.get('/trumpland1', function (req, res) {
     res.render('trumpland1');
 });
 
+app.get('/trumpland2', function (req, res) {
+    res.render('trumpland2');
+});
+
 app.get('/test', function (req, res) {
   	res.render('test.html');
 });
