@@ -65,6 +65,14 @@ app.get('/van-airbnb1', function (req, res) {
     res.render('van-airbnb1');
 });
 
+app.get('/van-airbnb2', function (req, res) {
+    res.render('van-airbnb2');
+});
+
+app.get('/van-airbnb3', function (req, res) {
+    res.render('van-airbnb3');
+});
+
 app.get('/nothing', function (req, res) {
     res.render('nothing');
 });
