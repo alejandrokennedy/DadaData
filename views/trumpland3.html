@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title>Trump Land</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+	<script src="https://rawgit.com/Kcnarf/d3-distanceLimitedVoronoi/d3v4/distance-limited-voronoi.js"></script>
+</head>
+
+<style type="text/css">
+
+	/* Attempt to have body, html occupy full height of page. New problem: scroll bar appears*/
+	/*body, html {
+		min-height: 100% !important;
+    height: 100%;
+	}*/
+
+	body {
+		font-family: helvetica;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	svg {
+		border: 1px solid #f0f;
+		display: block;
+		margin: auto;
+	}
+
+	.links {
+		stroke: grey;
+		stroke-width: 2px;
+	}
+
+	.nodes circle {
+	  fill: #ccc;
+	  stroke: #000;
+	}
+
+	.nodes text {
+	  display: none;
+	  font: 25px sans-serif;
+	}
+
+	.nodes:hover text {
+	  display: inline;
+	}
+	
+	.nodes text.labelShadow {
+	  display: none;
+	  font: 25px sans-serif;
+	}
+
+	.nodes:hover text.labelShadow {
+	  display: inline;
+	  stroke: white;
+	  stroke-width: 5;
+	}
+
+	.clip-path-circle {
+		/*stroke: crimson;*/
+	  fill: none;
+	  /*fill-opacity: 0;*/
+	  pointer-events: all;
+	}
+
+</style>
+
+<body>
+
+	<script>
+	// To Do
+	// node buffer: http://bl.ocks.org/taktran/6677833
+
+		var margin = {top: 0, right: 0, bottom: 0, left: 0},
+			width = window.innerWidth - margin.left - margin.right,
+			height = window.innerHeight - margin.top - margin.bottom;
+
+	  var voronoi = d3.voronoi()
+	    .x(function(d) { return d.x; })
+	    .y(function(d) { return d.y; })
+	    .extent([[-width, -height], [width + width, height + height]]);
+
+		var zoom = d3.zoom().scaleExtent([0.3, 7]).on("zoom", function () {
+			gContainer.attr("transform", d3.event.transform)
+			});
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.call(zoom);
+
+		var gContainer = svg.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+ 		zoom.scaleTo(svg, .44);
+
+		var simulation = d3.forceSimulation()
+			.force("charge", d3.forceManyBody().strength(-50))
+	    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+	    .force("x", d3.forceX(width / 2))
+	    .force("y", d3.forceY(height / 2));
+
+	  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	  queue()
+	  	.defer(d3.csv, "org-org-connections.csv")
+	  	.defer(d3.csv, "person-org-connections.csv")
+	  	.defer(d3.csv, "person-person-connections.csv")
+	  	.await(ready);
+
+	  function slug (id) {
+			return id.replace(/,/g,"")
+							 .replace(/\./g,"")
+							 .replace(/'/g,"")
+							 .replace(/"/g,"")
+							 .replace(/\(/g,"")
+							 .replace(/\)/g,"")
+						 	 .replace(/ /g,"");
+	  };
+
+	  function ready (error, orgOrg, personOrg, personPerson) {
+	  	if (error) throw error;
+
+			var orgAs = orgOrg.map(function(d) { return d["Organization A"]; });
+			var orgBs = orgOrg.map(function(d) { return d["Organization B"]; });
+
+			var organizations = personOrg.map(function(d) { return d.Organization; });
+			var people = personOrg.map(function(d) { return d.Person; });
+
+			var peepAs = personPerson.map(function(d) { return d["Person A"]; });
+			var peepBs = personPerson.map(function(d) { return d["Person B"]; });
+
+			var allOrgs = orgAs.concat(orgBs).concat(organizations);
+			var allPeeps = people.concat(peepAs).concat(peepBs);
+
+			var allOrgsSet = d3.set(allOrgs).values();
+			var allPeepsSet = d3.set(allPeeps).values();
+
+			var nodes = [],
+					links = [];
+
+			allOrgsSet.forEach(function(orgs) {
+				nodes.push({
+					"id" : orgs,
+					"type" : "organization"
+				})
+			});
+
+			allPeepsSet.forEach(function(peeps) {
+				nodes.push({
+					"id" : peeps,
+					"type" : "person"
+				})
+			});
+
+			orgOrg.forEach(function(d) {
+				links.push({
+					"source" : d["Organization A"],
+					"target" : d["Organization B"]
+				})
+			});
+
+			personOrg.forEach(function(d) {
+				links.push({
+					"source" : d.Organization,
+					"target" : d.Person
+				})
+			});
+
+			personPerson.forEach(function(d) {
+				links.push({
+					"source" : d["Person A"],
+					"target" : d["Person B"]
+				})
+			});
+
+			var graph = {
+				"nodes": nodes,
+				"links": links
+			}
+
+			var link = gContainer.append("g")
+				.attr("class", "links")
+				.selectAll("line")
+				.data(graph.links)
+			 .enter().append("line");
+
+			var node = gContainer.selectAll(".nodes")
+				.data(graph.nodes)
+			 .enter().append("g")
+				.attr("class", "nodes")
+				.call(d3.drag()
+			 		.on("start", dragstarted)
+			 		.on("drag", dragged)
+			 		.on("end", dragended))
+				.on("mouseover", function() {
+						this.parentNode.appendChild(this);
+					})
+
+			var circle = node.append("circle")
+			 	.attr("r", 7)
+			 	.style("fill", function(d) { return color(d.type); });
+
+			var labelShadow = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.attr("class", "labelShadow")
+		 		.text(function(d) { return d.id; });
+
+		 	var label = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.text(function(d) { return d.id; });
+
+		 	simulation
+		 		.nodes(graph.nodes)
+		 		.on("tick", ticked);
+
+	 		simulation.force("link")
+	 			.links(graph.links);
+
+	 		var clipPath = node.append("clipPath")
+	 			.attr("class", "clip")
+	 			.attr("id", function(d) { return "clip-" + slug(d.id); })
+	 			.append("path")
+	 			.attr("class", "clip-path-circle");
+
+	 		// var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+
+	 		var circleCatcher = node.append("circle")
+	 			.attr("r", 30)
+	 			// .style("fill", function(d, i) { return colorScale(i); })
+	 			// .style("fill", "green")
+	 			.style("fill-opacity", 0.0)
+	 			.style("stroke", "none")
+	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
+
+	 		function ticked() {
+
+	 			clipPath
+	        .data(voronoi.polygons(graph.nodes))
+	        .attr("d", function(d) { 
+	        	return d ? "M" + d.join("L") : null; 
+	        });
+
+	      circleCatcher
+	      	.attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+
+	 			link
+	        .attr("x1", function(d) { return d.source.x; })
+	        .attr("y1", function(d) { return d.source.y; })
+	        .attr("x2", function(d) { return d.target.x; })
+	        .attr("y2", function(d) { return d.target.y; });
+
+    		node
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+				
+				circle
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+
+				label
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+				
+				labelShadow
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+	 		}
+
+		}; // ready function callback
+
+		function dragstarted(d) {
+		  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+		  d.fx = d.x;
+		  d.fy = d.y;
+		}
+
+		function dragged(d) {
+		  d.fx = d3.event.x;
+		  d.fy = d3.event.y;
+		}
+
+		function dragended(d) {
+		  if (!d3.event.active) simulation.alphaTarget(0);
+		  d.fx = null;
+		  d.fy = null;
+		}
+
+	</script>
+
+</body>
