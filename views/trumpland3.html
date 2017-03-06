@@ -71,8 +71,7 @@
 
 	<script>
 	// To Do
-	// node buffer: http://bl.ocks.org/taktran/6677833
-
+	
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
 			height = window.innerHeight - margin.top - margin.bottom;
@@ -97,10 +96,10 @@
  		zoom.scaleTo(svg, .44);
 
 		var simulation = d3.forceSimulation()
-			.force("charge", d3.forceManyBody().strength(-50))
-	    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-	    .force("x", d3.forceX(width / 2))
-	    .force("y", d3.forceY(height / 2));
+			.force("charge", d3.forceManyBody().strength(-40))
+			.force("link", d3.forceLink().id(function(d) { return d.id; }))
+			.force("x", d3.forceX(width / 2))
+			.force("y", d3.forceY(height / 2));
 
 	  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -191,10 +190,10 @@
 				.data(graph.nodes)
 			 .enter().append("g")
 				.attr("class", "nodes")
-				.call(d3.drag()
-			 		.on("start", dragstarted)
-			 		.on("drag", dragged)
-			 		.on("end", dragended))
+				// .call(d3.drag()
+			 // 		.on("start", dragstarted)
+			 // 		.on("drag", dragged)
+			 // 		.on("end", dragended))
 				.on("mouseover", function() {
 						this.parentNode.appendChild(this);
 					})
@@ -214,7 +213,8 @@
 
 		 	simulation
 		 		.nodes(graph.nodes)
-		 		.on("tick", ticked);
+		 		// do I need the following '"tick", ticked' for the visualization to run?
+		 		// .on("tick", ticked);
 
 	 		simulation.force("link")
 	 			.links(graph.links);
@@ -235,9 +235,21 @@
 	 			.style("stroke", "none")
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
 
-	 		function ticked() {
+	 		var loading = svg.append("text")
+		    .attr("dy", "0.35em")
+		    .attr("text-anchor", "middle")
+		    .attr("font-family", "sans-serif")
+		    .attr("font-size", 10)
+		    .text("Simulating. One moment please…");
 
-	 			clipPath
+			d3.timeout(function() {
+			  loading.remove();
+
+			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+			    simulation.tick();
+			  }
+
+			  clipPath
 	        .data(voronoi.polygons(graph.nodes))
 	        .attr("d", function(d) { 
 	        	return d ? "M" + d.join("L") : null; 
@@ -268,26 +280,26 @@
 				labelShadow
 	        .attr("x", function(d) { return d.x + 11; })
 	        .attr("y", function(d) { return d.y; });
-	 		}
+			});
 
 		}; // ready function callback
 
-		function dragstarted(d) {
-		  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-		  d.fx = d.x;
-		  d.fy = d.y;
-		}
+		// function dragstarted(d) {
+		//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+		//   d.fx = d.x;
+		//   d.fy = d.y;
+		// }
 
-		function dragged(d) {
-		  d.fx = d3.event.x;
-		  d.fy = d3.event.y;
-		}
+		// function dragged(d) {
+		//   d.fx = d3.event.x;
+		//   d.fy = d3.event.y;
+		// }
 
-		function dragended(d) {
-		  if (!d3.event.active) simulation.alphaTarget(0);
-		  d.fx = null;
-		  d.fy = null;
-		}
+		// function dragended(d) {
+		//   if (!d3.event.active) simulation.alphaTarget(0);
+		//   d.fx = null;
+		//   d.fy = null;
+		// }
 
 	</script>
 
