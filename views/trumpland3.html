@@ -10,12 +10,6 @@
 
 <style type="text/css">
 
-	/* Attempt to have body, html occupy full height of page. New problem: scroll bar appears*/
-	/*body, html {
-		min-height: 100% !important;
-    height: 100%;
-	}*/
-
 	body {
 		font-family: helvetica;
 		font-size: 12px;
@@ -23,7 +17,7 @@
 	}
 
 	svg {
-		border: 1px solid #f0f;
+		/*border: 1px solid #f0f;*/
 		display: block;
 		margin: auto;
 	}
@@ -71,7 +65,7 @@
 
 	<script>
 	// To Do
-	
+
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
 			height = window.innerHeight - margin.top - margin.bottom;
@@ -81,7 +75,7 @@
 	    .y(function(d) { return d.y; })
 	    .extent([[-width, -height], [width + width, height + height]]);
 
-		var zoom = d3.zoom().scaleExtent([0.3, 7]).on("zoom", function () {
+		var zoom = d3.zoom().scaleExtent([0.1, 7]).on("zoom", function () {
 			gContainer.attr("transform", d3.event.transform)
 			});
 
@@ -90,13 +84,23 @@
 			.attr("height", height + margin.top + margin.bottom)
 			.call(zoom);
 
+ 		var loading = svg.append("text")
+ 			.attr("class", "loading")
+	    .attr("dy", "0.35em")
+	    .attr("text-anchor", "middle")
+	    .attr("transform", "translate(" + 1/2 * width + "," + 1/2 * height + ")")
+	    .attr("font-family", "sans-serif")
+	    .attr("font-size", 20)
+	    .text("Loading. One moment, please…");
+
 		var gContainer = svg.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
- 		zoom.scaleTo(svg, .44);
+ 		zoom.scaleTo(svg, .40);
 
 		var simulation = d3.forceSimulation()
-			.force("charge", d3.forceManyBody().strength(-40))
+			.force("charge", d3.forceManyBody().strength(-50))
+			// .force("link", d3.forceLink(links).distance(20).strength(1).iterations(10))
 			.force("link", d3.forceLink().id(function(d) { return d.id; }))
 			.force("x", d3.forceX(width / 2))
 			.force("y", d3.forceY(height / 2));
@@ -190,10 +194,6 @@
 				.data(graph.nodes)
 			 .enter().append("g")
 				.attr("class", "nodes")
-				// .call(d3.drag()
-			 // 		.on("start", dragstarted)
-			 // 		.on("drag", dragged)
-			 // 		.on("end", dragended))
 				.on("mouseover", function() {
 						this.parentNode.appendChild(this);
 					})
@@ -235,16 +235,8 @@
 	 			.style("stroke", "none")
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
 
-	 		var loading = svg.append("text")
-		    .attr("dy", "0.35em")
-		    .attr("text-anchor", "middle")
-		    .attr("font-family", "sans-serif")
-		    .attr("font-size", 10)
-		    .text("Simulating. One moment please…");
-
 			d3.timeout(function() {
 			  loading.remove();
-
 			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
 			    simulation.tick();
 			  }
@@ -283,23 +275,6 @@
 			});
 
 		}; // ready function callback
-
-		// function dragstarted(d) {
-		//   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-		//   d.fx = d.x;
-		//   d.fy = d.y;
-		// }
-
-		// function dragged(d) {
-		//   d.fx = d3.event.x;
-		//   d.fy = d3.event.y;
-		// }
-
-		// function dragended(d) {
-		//   if (!d3.event.active) simulation.alphaTarget(0);
-		//   d.fx = null;
-		//   d.fy = null;
-		// }
 
 	</script>
 
