@@ -65,6 +65,10 @@ app.get('/trumpland3', function (req, res) {
     res.render('trumpland3');
 });
 
+app.get('/trumpland4', function (req, res) {
+    res.render('trumpland4');
+});
+
 app.get('/van-airbnb1', function (req, res) {
     res.render('van-airbnb1');
 });
@@ -79,6 +83,10 @@ app.get('/van-airbnb3', function (req, res) {
 
 app.get('/nothing', function (req, res) {
     res.render('nothing');
+});
+
+app.get('/mta', function (req, res) {
+    res.render('mta');
 });
 
 app.get('/test', function (req, res) {

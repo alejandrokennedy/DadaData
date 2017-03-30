@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title>Trump Land</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+</head>
+
+<style type="text/css">
+
+	body {
+		font-family: helvetica;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	svg {
+		border: 1px solid #f0f;
+		display: block;
+		margin: auto;
+	}
+
+	.links {
+		stroke: grey;
+		stroke-width: 2px;
+	}
+
+	.nodes circle {
+	  fill: #ccc;
+	  stroke: white;
+	  /*stroke-opacity: .3;*/
+	}
+
+	.nodes text {
+	  display: none;
+	  font: sans-serif;
+	}
+
+	.nodes:hover text {
+	  display: inline;
+	}
+	
+	.nodes text.labelShadow {
+	  display: none;
+	  font: sans-serif;
+	}
+
+	.nodes:hover text.labelShadow {
+	  display: inline;
+	  stroke: white;
+	  stroke-width: 20;
+	}
+
+	.clip-path-circle {
+		/*stroke: crimson;*/
+	  fill: none;
+	  /*fill-opacity: 0;*/
+	  pointer-events: all;
+	}
+
+</style>
+
+<body>
+
+	<script>
+	// To Do
+	// highlight connected links and nodes
+	// label connected links and nodes (possible to prevent labels from overlapping?)
+		// maybe have D3 draw a second network graph on click/hover - additional nodes are labels (w/ voronoi), links to existing circles they are meant to label?
+	//label links
+	// searchable side bar with alphabetical/connected sort
+	// add some transitions / change colors
+	// Find other rich people to compare this vis with
+	// Fix zoom label stroke
+
+		var margin = {top: 0, right: 0, bottom: 0, left: 0},
+			width = window.innerWidth - margin.left - margin.right,
+			height = window.innerHeight - margin.top - margin.bottom;
+
+	  var voronoi = d3.voronoi()
+	    .x(function(d) { return d.x; })
+	    .y(function(d) { return d.y; })
+	    .extent([[-(width * 2), -(height * 3)], [width * 3 , height * 4]]);
+
+	  var nominal_text_size = 60;
+	  var max_text_size = 16;
+
+	  var nominal_stroke = 1.25;
+	  var nominal_labelStroke = 10
+	  var max_labelStroke = 20
+		var max_stroke = 3.5;
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom);
+
+		var gContainer = svg.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+ 		var loading = svg.append("text")
+ 			.attr("class", "loading")
+	    .attr("dy", "0.35em")
+	    .attr("text-anchor", "middle")
+	    .attr("transform", "translate(" + 1/2 * width + "," + 1/2 * height + ")")
+	    .attr("font-family", "sans-serif")
+	    .attr("font-size", 20)
+	    .text("Loading. One moment, please…");
+
+		var simulation = d3.forceSimulation()
+			.force("charge", d3.forceManyBody().strength(-200))
+			// .force("link", d3.forceLink(links).distance(20).strength(1).iterations(10))
+			.force("link", d3.forceLink().id(function(d) { return d.id; }))
+			.force("x", d3.forceX(width / 2))
+			.force("y", d3.forceY(height / 2));
+
+	  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	  queue()
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/org-org-connections.csv")
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/person-org-connections.csv")
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/person-person-connections.csv")
+	  	.await(ready);
+
+	  // queue()
+	  // 	.defer(d3.csv, "org-org-connections.csv")
+	  // 	.defer(d3.csv, "person-org-connections.csv")
+	  // 	.defer(d3.csv, "person-person-connections.csv")
+	  // 	.await(ready);
+
+	  function slug (id) {
+			return id.replace(/,/g,"")
+							 .replace(/\./g,"")
+							 .replace(/'/g,"")
+							 .replace(/"/g,"")
+							 .replace(/\(/g,"")
+							 .replace(/\)/g,"")
+						 	 .replace(/ /g,"");
+	  };
+
+	  function ready (error, orgOrg, personOrg, personPerson) {
+	  	if (error) throw error;
+
+			var orgAs = orgOrg.map(function(d) { return d["Organization A"]; });
+			var orgBs = orgOrg.map(function(d) { return d["Organization B"]; });
+
+			var organizations = personOrg.map(function(d) { return d.Organization; });
+			var people = personOrg.map(function(d) { return d.Person; });
+
+			var peepAs = personPerson.map(function(d) { return d["Person A"]; });
+			var peepBs = personPerson.map(function(d) { return d["Person B"]; });
+
+			var allOrgs = orgAs.concat(orgBs).concat(organizations);
+			var allPeeps = people.concat(peepAs).concat(peepBs);
+
+			var allOrgsSet = d3.set(allOrgs).values();
+			var allPeepsSet = d3.set(allPeeps).values();
+
+			var nodes = [],
+					links = [];
+
+			allOrgsSet.forEach(function(orgs) {
+				nodes.push({
+					"id" : orgs,
+					"type" : "organization"
+				})
+			});
+
+			allPeepsSet.forEach(function(peeps) {
+				nodes.push({
+					"id" : peeps,
+					"type" : "person"
+				})
+			});
+
+			orgOrg.forEach(function(d) {
+				links.push({
+					"source" : d["Organization A"],
+					"target" : d["Organization B"]
+				})
+			});
+
+			personOrg.forEach(function(d) {
+				links.push({
+					"source" : d.Organization,
+					"target" : d.Person
+				})
+			});
+
+			personPerson.forEach(function(d) {
+				links.push({
+					"source" : d["Person A"],
+					"target" : d["Person B"]
+				})
+			});
+
+			var graph = {
+				"nodes": nodes,
+				"links": links
+			}
+
+			var link = gContainer.append("g")
+				.attr("class", "links")
+				.selectAll("line")
+				.data(graph.links)
+			 .enter().append("line");
+
+			var node = gContainer.selectAll(".nodes")
+				.data(graph.nodes)
+			 .enter().append("g")
+				.attr("class", "nodes")
+				.on("mouseover", function() {
+						this.parentNode.appendChild(this);
+					})
+
+			var circle = node.append("circle")
+			 	.attr("r", 7)
+			 	.style("fill", function(d) { return color(d.type); });
+
+			var labelShadow = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.attr("class", "labelShadow")
+		 		.style("font-size", nominal_text_size + "px")
+		 		.text(function(d) { return d.id; });
+
+		 	var label = node.append("text")
+		 		.attr("dy", ".35em")
+		 		.style("font-size", nominal_text_size + "px")
+		 		.text(function(d) { return d.id; });
+
+			var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
+				gContainer.attr("transform", d3.event.transform)
+
+				// console.log(d3.event.transform);
+				// console.log(max_text_size);
+
+				var stroke = nominal_stroke;
+			    if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
+			    link.style("stroke-width",stroke);
+			    circle.style("stroke-width",stroke);
+			    // labelShadow.style("stroke-width",stroke);
+
+				// var labelStroke = nominal_labelStroke;
+			 //    if (nominal_labelStroke * d3.event.transform.k > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+			    // labelShadow.style("stroke-width", text_size / );
+
+				// var labelStroke = nominal_labelStroke;
+			 //    if (nominal_labelStroke * d3.event.transform.k > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+			 //    labelShadow.style("stroke-width", labelStroke);
+
+				var text_size = nominal_text_size ;
+					if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
+					label.style("font-size",text_size + "px");
+					labelShadow.style("font-size",text_size + "px");
+
+					// console.log(text_size);
+					console.log(text_size / 10);
+
+				}); // zoom function callback
+
+			svg.call(zoomEvent);
+
+	 		zoomEvent.scaleTo(svg, .2);
+
+		 	simulation
+		 		.nodes(graph.nodes)
+		 		// do I need the following '"tick", ticked' for the visualization to run?
+		 		// .on("tick", ticked);
+
+	 		simulation.force("link")
+	 			.links(graph.links);
+
+	 		var clipPath = node.append("clipPath")
+	 			.attr("class", "clip")
+	 			.attr("id", function(d) { return "clip-" + slug(d.id); })
+	 			.append("path")
+	 			.attr("class", "clip-path-circle");
+
+	 		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+
+	 		var circleCatcher = node.append("circle")
+	 			.attr("r", 30)
+	 			.style("fill", function(d, i) { return colorScale(i); })
+	 			// .style("fill", "green")
+	 			.style("fill-opacity", 0.2)
+	 			.style("stroke", "none")
+	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
+
+			d3.timeout(function() {
+			  loading.remove();
+			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+			    simulation.tick();
+			  }
+
+			  clipPath
+	        .data(voronoi.polygons(graph.nodes))
+	        .attr("d", function(d) { 
+	        	return d ? "M" + d.join("L") : null; 
+	        });
+
+	      circleCatcher
+	      	.attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+
+	 			link
+	        .attr("x1", function(d) { return d.source.x; })
+	        .attr("y1", function(d) { return d.source.y; })
+	        .attr("x2", function(d) { return d.target.x; })
+	        .attr("y2", function(d) { return d.target.y; });
+
+    		node
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+				
+				circle
+	        .attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+
+				label
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+				
+				labelShadow
+	        .attr("x", function(d) { return d.x + 11; })
+	        .attr("y", function(d) { return d.y; });
+			});
+
+		}; // ready function callback
+
+	</script>
+
+</body>
