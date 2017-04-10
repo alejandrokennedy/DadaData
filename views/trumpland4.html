@@ -73,6 +73,7 @@
 	// add some transitions / change colors
 	// Find other rich people to compare this vis with
 	// Fix zoom label stroke
+	// Indicate date that the data was last updated
 
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
@@ -87,9 +88,12 @@
 	  var max_text_size = 16;
 
 	  var nominal_stroke = 1.25;
-	  var nominal_labelStroke = 10
-	  var max_labelStroke = 20
 		var max_stroke = 3.5;
+
+		// console.log(d3.event.transform.k);
+
+	  var nominal_labelStroke = 1
+	  var max_labelStroke = 20
 
 		var svg = d3.select("body").append("svg")
 			.attr("width", width + margin.left + margin.right)
@@ -238,20 +242,16 @@
 			    if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
 			    link.style("stroke-width",stroke);
 			    circle.style("stroke-width",stroke);
-			    // labelShadow.style("stroke-width",stroke);
-
-				// var labelStroke = nominal_labelStroke;
-			 //    if (nominal_labelStroke * d3.event.transform.k > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
-			    // labelShadow.style("stroke-width", text_size / );
-
-				// var labelStroke = nominal_labelStroke;
-			 //    if (nominal_labelStroke * d3.event.transform.k > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
-			 //    labelShadow.style("stroke-width", labelStroke);
 
 				var text_size = nominal_text_size ;
 					if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
 					label.style("font-size",text_size + "px");
 					labelShadow.style("font-size",text_size + "px");
+
+				var labelStroke = text_size / 8;
+			    if (text_size / 10 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+			    labelShadow.style("stroke-width", labelStroke);
+			    console.log("labelStroke: " + labelStroke);
 
 					// console.log(text_size);
 					console.log(text_size / 10);
@@ -280,9 +280,9 @@
 
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
-	 			.style("fill", function(d, i) { return colorScale(i); })
+	 			// .style("fill", function(d, i) { return colorScale(i); })
 	 			// .style("fill", "green")
-	 			.style("fill-opacity", 0.2)
+	 			.style("fill-opacity", 0)
 	 			.style("stroke", "none")
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
 
