@@ -121,25 +121,11 @@
 
 			  // sort the data
 		  jsonData.forEach( function(d) {
-
 		  	d.subcategories.sort( function(a, b) { return a.count-b.count });
-			
 			});
 
-		  jsonData.sort( function(a, b) { 
-		  	// console.log(a.subcategories.length-1);
-		  	// console.log(a.Category + " " + (a.subcategories.length-1));
-		  	// console.log(a.subcategories[0]);
-		  	// console.log(a.subcategories[0].count);
-		  	// console.log(a.subcategories[2].count);
-
-		  	// let aIndex = a.subcategories.length-1;
-		  	// // console.log("aIndex " + aIndex);
-		  	// let bIndex = b.subcategories.length-1;
-		  	// // console.log("bIndex " + bIndex);
-		  	// // return a.subcategories[aIndex].count-b.subcategories[bIndex].count;
+		  jsonData.sort( function(a, b) {
 		  	return a.subcategories[a.subcategories.length-1].count-b.subcategories[b.subcategories.length-1].count;
-		  	// return a.subcategories[5].count-b.subcategories[5].count;
 		  });
 
 		  jsonData.forEach(function(d) {
