@@ -78,6 +78,9 @@
 	// subcategory title
 	// axis labels
 	// base margins on data (esp bottom and right)
+	// least to greatest sort
+	// within each chart - least to greatest
+	// y ticks cut through bars with white line
 
 		var marginVal = 10
 
@@ -110,6 +113,35 @@
 
 		  console.log(jsonData);
 
+		  // var aIndex = jsonData[0].subcategories.length;
+		  // console.log(aIndex);
+
+		  // console.log(jsonData.length - 1);
+
+
+			  // sort the data
+		  jsonData.forEach( function(d) {
+
+		  	d.subcategories.sort( function(a, b) { return a.count-b.count });
+			
+			});
+
+		  jsonData.sort( function(a, b) { 
+		  	// console.log(a.subcategories.length-1);
+		  	// console.log(a.Category + " " + (a.subcategories.length-1));
+		  	// console.log(a.subcategories[0]);
+		  	// console.log(a.subcategories[0].count);
+		  	// console.log(a.subcategories[2].count);
+
+		  	// let aIndex = a.subcategories.length-1;
+		  	// // console.log("aIndex " + aIndex);
+		  	// let bIndex = b.subcategories.length-1;
+		  	// // console.log("bIndex " + bIndex);
+		  	// // return a.subcategories[aIndex].count-b.subcategories[bIndex].count;
+		  	return a.subcategories[a.subcategories.length-1].count-b.subcategories[b.subcategories.length-1].count;
+		  	// return a.subcategories[5].count-b.subcategories[5].count;
+		  });
+
 		  jsonData.forEach(function(d) {
 		  	drawChart(d)
 		  })
@@ -129,7 +161,7 @@
 					.append("g")
 					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-		  	console.log(category);
+		  	// console.log(category);
 
 			  // format the data
 			  category.subcategories.forEach(function(d) {

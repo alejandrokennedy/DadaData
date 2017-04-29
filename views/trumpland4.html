@@ -128,16 +128,9 @@
 	  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 	  queue()
-	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/org-org-connections.csv")
-	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/person-org-connections.csv")
-	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/person-person-connections.csv")
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
+	  	// .defer(d3.csv, "trumpworld.csv")
 	  	.await(ready);
-
-	  // queue()
-	  // 	.defer(d3.csv, "org-org-connections.csv")
-	  // 	.defer(d3.csv, "person-org-connections.csv")
-	  // 	.defer(d3.csv, "person-person-connections.csv")
-	  // 	.await(ready);
 
 	  function slug (id) {
 			return id.replace(/,/g,"")
@@ -149,11 +142,11 @@
 						 	 .replace(/ /g,"");
 	  };
 
-	  function ready (error, orgOrg, personOrg, personPerson) {
+	  function ready (error, trumpworld) {
 	  	if (error) throw error;
 
-			var orgAs = orgOrg.map(function(d) { return d["Organization A"]; });
-			var orgBs = orgOrg.map(function(d) { return d["Organization B"]; });
+			var orgAs = trumpworld.map(function(d) { return d["Organization A"]; });
+			var orgBs = trumpworld.map(function(d) { return d["Organization B"]; });
 
 			var organizations = personOrg.map(function(d) { return d.Organization; });
 			var people = personOrg.map(function(d) { return d.Person; });
