@@ -3,7 +3,7 @@
 
 <head>
 	<title>Trump Land</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js" charset="utf-8"></script>
+	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
 </head>
 
@@ -16,7 +16,7 @@
 	}
 
 	svg {
-		border: 1px solid #f0f;
+		/*border: 1px solid #f0f;*/
 		display: block;
 		margin: auto;
 	}
@@ -81,6 +81,7 @@
 	// Indicate date that the data was last updated
 	// Way to handle lone nodes
 	// Have label halo like on text in my website
+	// Write javascript function to automatically add any new "entity" categories to the viz
 
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
@@ -144,60 +145,91 @@
 
 	  function ready (error, trumpworld) {
 	  	if (error) throw error;
+	  	console.log("Entity Count: " + trumpworld.length);
 
-			var orgAs = trumpworld.map(function(d) { return d["Organization A"]; });
-			var orgBs = trumpworld.map(function(d) { return d["Organization B"]; });
+	  	var orgAs = trumpworld
+	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
+	  		.map(function(d) { return d["Entity A"]});
 
-			var organizations = personOrg.map(function(d) { return d.Organization; });
-			var people = personOrg.map(function(d) { return d.Person; });
+	  	var peepAs = trumpworld
+	  		.filter( function(d) { return d["Entity A Type"] === "Person"})
+	  		.map(function(d) { return d["Entity A"]});
 
-			var peepAs = personPerson.map(function(d) { return d["Person A"]; });
-			var peepBs = personPerson.map(function(d) { return d["Person B"]; });
+	  	var fedAs = trumpworld
+	  		.filter( function(d) { return d["Entity A Type"] === "Federal Agency"})
+	  		.map(function(d) { return d["Entity A"]});
 
-			var allOrgs = orgAs.concat(orgBs).concat(organizations);
-			var allPeeps = people.concat(peepAs).concat(peepBs);
+	  	var orgBs = trumpworld
+	  		.filter( function(d) { return d["Entity B Type"] === "Organization"})
+	  		.map(function(d) { return d["Entity B"]});
 
-			var allOrgsSet = d3.set(allOrgs).values();
-			var allPeepsSet = d3.set(allPeeps).values();
+	  	var peepBs = trumpworld
+	  		.filter( function(d) { return d["Entity B Type"] === "Person"})
+	  		.map(function(d) { return d["Entity B"]});
+
+	  	var fedBs = trumpworld
+	  		.filter( function(d) { return d["Entity B Type"] === "Federal Agency"})
+	  		.map(function(d) { return d["Entity B"]});
+
+	  	var orgs = orgAs.concat(orgBs);
+	  	var peeps = peepAs.concat(peepBs);
+	  	var feds = fedAs.concat(fedBs);
+
+	  	var allOrgs = d3.set(orgs).values();
+	  	var allPeeps = d3.set(peeps).values();
+	  	var allFeds = d3.set(feds).values();
+
+	  	var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
+	  	console.log("nodeCount: " + nodeCount);
+
+	  	// // NODES REFERENCE
+	  	// var entityAs = trumpworld.map(function(d) { return d["Entity A"]; });
+	  	// var entityBs = trumpworld.map(function(d) { return d["Entity B"]; });
+	  	// var allEntities = entityAs.concat(entityBs);
+	  	// var allEntitiesSet = d3.set(allEntities).values();
+	  	// console.log("allEntitiesSet length: " + allEntitiesSet.length);
 
 			var nodes = [],
 					links = [];
 
-			allOrgsSet.forEach(function(orgs) {
+			// NODES (NEW)
+			allOrgs.forEach(function(orgs) {
 				nodes.push({
 					"id" : orgs,
 					"type" : "organization"
 				})
 			});
-
-			allPeepsSet.forEach(function(peeps) {
+			allPeeps.forEach(function(peeps) {
 				nodes.push({
 					"id" : peeps,
 					"type" : "person"
 				})
 			});
-
-			orgOrg.forEach(function(d) {
-				links.push({
-					"source" : d["Organization A"],
-					"target" : d["Organization B"]
+			allFeds.forEach(function(feds) {
+				nodes.push({
+					"id" : feds,
+					"type" : "federal agency"
 				})
 			});
 
-			personOrg.forEach(function(d) {
+			// // NODES REFERENCE
+			// allEntitiesSet.forEach(function(orgs) {
+			// 	nodes.push({
+			// 		"id" : orgs,
+			// 		"type" : "organization"
+			// 	})
+			// });
+
+			// LINKS
+			trumpworld.forEach(function(d) {
 				links.push({
-					"source" : d.Organization,
-					"target" : d.Person
+					"source" : d["Entity A"],
+					"target" : d["Entity B"]
 				})
 			});
+			console.log("linkCount: " + links.length)
 
-			personPerson.forEach(function(d) {
-				links.push({
-					"source" : d["Person A"],
-					"target" : d["Person B"]
-				})
-			});
-
+			// GRAPH
 			var graph = {
 				"nodes": nodes,
 				"links": links
@@ -215,7 +247,7 @@
 				.attr("class", "nodes")
 				.on("mouseover", function() {
 						this.parentNode.appendChild(this);
-						console.log(this);
+						// console.log(this);
 						// this.circle.style("stroke", function(d) { return color(d.type); });
 					});
 
@@ -263,7 +295,7 @@
 
 			svg.call(zoomEvent);
 
-	 		zoomEvent.scaleTo(svg, .2);
+	 		zoomEvent.scaleTo(svg, .185);
 
 		 	simulation
 		 		.nodes(graph.nodes)
@@ -279,7 +311,7 @@
 	 			.append("path")
 	 			.attr("class", "clip-path-circle");
 
-	 		var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+	 		// var colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
 
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
