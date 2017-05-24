@@ -9,6 +9,13 @@
 
 <style type="text/css">
 
+	h1 {
+		color: gold;
+		margin-left: 20px;
+		position: absolute;
+		text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+	}
+
 	body {
 		font-family: helvetica;
 		font-size: 12px;
@@ -23,7 +30,7 @@
 
 	.links {
 		stroke: grey;
-		stroke-width: 2px;
+		stroke-width: 1px;
 	}
 
 	.nodes circle {
@@ -49,12 +56,13 @@
 	.nodes text.labelShadow {
 	  display: none;
 	  font: sans-serif;
+	  text-shadow: #ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px;
 	}
 
 	.nodes:hover text.labelShadow {
 	  display: inline;
 	  stroke: white;
-	  stroke-width: 20;
+	  /*stroke-width: 20;*/
 	}
 
 	.clip-path-circle {
@@ -67,6 +75,9 @@
 </style>
 
 <body>
+
+	<h1>Trump World</h1>
+	
 
 	<script>
 	// To Do
@@ -82,6 +93,7 @@
 	// Way to handle lone nodes
 	// Have label halo like on text in my website
 	// Write javascript function to automatically add any new "entity" categories to the viz
+	// Stroke for the links thiner as one zooms in more
 
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
@@ -93,7 +105,7 @@
 	    .extent([[-(width * 2), -(height * 3)], [width * 3 , height * 4]]);
 
 	  var nominal_text_size = 60;
-	  var max_text_size = 16;
+	  var max_text_size = 14;
 
 	  var nominal_stroke = 1.25;
 		var max_stroke = 3.5;
@@ -145,7 +157,16 @@
 
 	  function ready (error, trumpworld) {
 	  	if (error) throw error;
-	  	console.log("Entity Count: " + trumpworld.length);
+	  	// console.log("Entity Count: " + trumpworld.length);
+
+	  	var entityTypeList = d3.set(
+	  		trumpworld.map(function(d) {return d["Entity A Type"] })
+	  		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })))
+	  		.values();
+	  	console.log("entityTypeList: " + entityTypeList)
+
+	  	// // function to filter/map/set for each unique entry in either Entity A or Entity B columns 
+	  	// entityTypeList.forEach(function(mungeType) {})
 
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
@@ -247,14 +268,12 @@
 				.attr("class", "nodes")
 				.on("mouseover", function() {
 						this.parentNode.appendChild(this);
-						// console.log(this);
-						// this.circle.style("stroke", function(d) { return color(d.type); });
 					});
 
 			var circle = node.append("circle")
 			 	.attr("r", 7)
 			 	.attr("class", "nodeCircle")
-			 	.style("fill", function(d) { return color(d.type); })
+			 	.style("fill", function(d) { return color(d.type); });
 
 			var labelShadow = node.append("text")
 		 		.attr("dy", ".35em")
@@ -276,15 +295,15 @@
 				var stroke = nominal_stroke;
 			    if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
 			    link.style("stroke-width",stroke);
-			    circle.style("stroke-width",stroke);
+			    circle.style("stroke-width",stroke * 1.5);
 
 				var text_size = nominal_text_size ;
 					if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
 					label.style("font-size",text_size + "px");
 					labelShadow.style("font-size",text_size + "px");
 
-				var labelStroke = text_size / 8;
-			    if (text_size / 8 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+				var labelStroke = text_size / 7.5;
+			    if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
 			    labelShadow.style("stroke-width", labelStroke);
 			    // console.log("labelStroke: " + labelStroke);
 
@@ -319,7 +338,19 @@
 	 			// .style("fill", "green")
 	 			.style("fill-opacity", 0)
 	 			.style("stroke", "none")
-	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; });
+	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; })
+	 			.on("mouseover", function () {
+	 				// var circleSelection = d3.select(this.parentNode).select("nodeCircle");
+	 				d3.select(this.parentNode).select(".nodeCircle")
+	 				.style("fill", "white")
+					.style("stroke", function(d) { return color(d.type) })
+					// .style("stroke-width", 5)
+	 			})
+	 			.on("mouseleave", function () {
+	 				d3.select(this.parentNode).select(".nodeCircle")
+	 				.style("stroke", "white")
+					.style("fill", function(d) { return color(d.type) })
+	 			});
 
 			d3.timeout(function() {
 			  loading.remove();
