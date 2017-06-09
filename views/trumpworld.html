@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 
 <head>
-	<title>Trump Land</title>
+	<title>Trump World</title>
 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
 </head>
@@ -56,12 +56,13 @@
 	.nodes text.labelShadow {
 	  display: none;
 	  font: sans-serif;
-	  text-shadow: #ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px;
 	}
 
 	.nodes:hover text.labelShadow {
 	  display: inline;
 	  stroke: white;
+		text-shadow: #ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px;
+
 	  /*stroke-width: 20;*/
 	}
 
@@ -81,10 +82,11 @@
 
 	<script>
 	// To Do
-	// highlight connected links and nodes
-	// label connected links and nodes (possible to prevent labels from overlapping?)
-		// maybe have D3 draw a second network graph on click/hover - additional nodes are labels (w/ voronoi), links to existing circles they are meant to label?
-	//label links
+	// highlight connected links
+	// See if using heroku I can speed up load time of visualization (watch Paul's final video on that)
+	// label connected links and nodes (have simulation run on only connected links/nodes)
+	// label links
+	// use dynamic updates to solve label problem: https://bl.ocks.org/rofrischmann/0de01de85296591eb45a1dde2040c5a1
 	// searchable side bar with alphabetical/connected sort
 	// add some transitions / change colors
 	// Find other rich people to compare this vis with
@@ -141,8 +143,8 @@
 	  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 	  queue()
-	  	// .defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
-	  	.defer(d3.csv, "trumpworld.csv")
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
+	  	// .defer(d3.csv, "trumpworld.csv")
 	  	.await(ready);
 
 	  function slug (id) {
@@ -163,7 +165,7 @@
 	  		trumpworld.map(function(d) {return d["Entity A Type"] })
 	  		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })))
 	  		.values();
-	  	console.log("entityTypeList: " + entityTypeList)
+	  	// console.log("entityTypeList: " + entityTypeList)
 
 	  	// // function to filter/map/set for each unique entry in either Entity A or Entity B columns 
 	  	// entityTypeList.forEach(function(mungeType) {})
@@ -201,7 +203,7 @@
 	  	var allFeds = d3.set(feds).values();
 
 	  	var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
-	  	console.log("nodeCount: " + nodeCount);
+	  	// console.log("nodeCount: " + nodeCount);
 
 	  	// // NODES REFERENCE
 	  	// var entityAs = trumpworld.map(function(d) { return d["Entity A"]; });
@@ -245,10 +247,12 @@
 			trumpworld.forEach(function(d) {
 				links.push({
 					"source" : d["Entity A"],
-					"target" : d["Entity B"]
+					"target" : d["Entity B"],
+					"connection" : d["Connection"]
+					// "source" : d["Source(s)"]
 				})
 			});
-			console.log("linkCount: " + links.length)
+			// console.log("linkCount: " + links.length)
 
 			// GRAPH
 			var graph = {
@@ -260,7 +264,8 @@
 				.attr("class", "links")
 				.selectAll("line")
 				.data(graph.links)
-			 .enter().append("line");
+			 .enter().append("line")
+			 	.attr("class", "lines");
 
 			var node = gContainer.selectAll(".nodes")
 				.data(graph.nodes)
@@ -283,6 +288,7 @@
 
 		 	var label = node.append("text")
 		 		.attr("dy", ".35em")
+		 		.attr("class", "label")
 		 		.style("font-size", nominal_text_size + "px")
 		 		.text(function(d) { return d.id; });
 
@@ -332,6 +338,9 @@
 
 	 		// var colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
 
+	 		var clickHilightColor = "rgb(52, 255, 38)"
+	 		var clickHilightColor = "purple"
+
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
 	 			// .style("fill", function(d, i) { return colorScale(i); })
@@ -340,17 +349,83 @@
 	 			.style("stroke", "none")
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; })
 	 			.on("mouseover", function () {
-	 				// var circleSelection = d3.select(this.parentNode).select("nodeCircle");
+
+	 				console.log(d3.select(this.parentNode).attr("class").split(" ").includes("neighbouringNodeCircles"));
+	 				console.log(typeof d3.select(this.parentNode).attr("class"));
+
 	 				d3.select(this.parentNode).select(".nodeCircle")
 	 				.style("fill", "white")
 					.style("stroke", function(d) { return color(d.type) })
 					// .style("stroke-width", 5)
 	 			})
 	 			.on("mouseleave", function () {
-	 				d3.select(this.parentNode).select(".nodeCircle")
+	 				if (d3.select(this.parentNode).attr("class").split(" ").includes("neighbouringNodeCircles")) {
+	 					d3.select(this.parentNode).select(".nodeCircle")
+	 					.style("stroke", clickHilightColor)
+	 					.style("fill", function(d) { return color(d.type) });
+	 				} else {
+	 					d3.select(this.parentNode).select(".nodeCircle")
 	 				.style("stroke", "white")
-					.style("fill", function(d) { return color(d.type) })
-	 			});
+					.style("fill", function(d) { return color(d.type) });
+	 				}
+	 			})
+	 			.on("click", function(d) { 
+
+	 				// clear any "onClick" styles for nodes
+	 				d3.selectAll(".nodes")
+	 					.select(".nodeCircle")
+	 					.style("stroke", "white");
+
+	 				// clear any "onClick" styles for links
+	 				d3.selectAll(".lines")
+	 					.style("stroke", "grey");
+
+	 				var isNeighbour = links.reduce(function (neighbours, link) {
+	 					if (link.target.id === d.id) {
+	 						neighbours.push(link.source.id)
+	 					} else if (link.source.id === d.id) {
+	 						neighbours.push(link.target.id)
+	 					} return neighbours;
+	 				}, [d.id])
+	 				// console.log(isNeighbour);
+
+	 				d3.selectAll(".nodes")
+	 					.classed("neighbouringNodeCircles", function(e) {
+	 						if (isNeighbour.includes(e.id)) { 
+	 							// console.log(e.id + " has been classed true");
+	 							return true;
+	 						}
+	 					});
+
+ 					d3.selectAll(".neighbouringNodeCircles")
+ 						.select(".nodeCircle")
+ 						.style("stroke", clickHilightColor);
+
+ 					// d3.selectAll(".neighbouringNodeCircles")
+ 					// 	.select(".label")
+ 					// 	.style("display", "inline")
+ 					// 	.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px")
+	 				// 	// .classed(".nodes:hover text");
+
+ 					// d3.selectAll(".neighbouringNodeCircles")
+ 					// 	.select(".labelShadow")
+ 					// 	.style("display", "inline")
+ 					// 	.style("stroke", "white");
+ 					// 	// .classed(".nodes:hover text.labelShadow");
+
+	 				d3.selectAll(".lines")
+	 					.classed("neighbouringLines", function(e) {
+	 						if (e.source.id === d.id) {
+	 							return true;
+	 						} else if (e.target.id === d.id) {
+	 							return true;
+	 						};
+	 					});
+	 					
+	 					d3.selectAll(".neighbouringLines")
+	 					.style("stroke", clickHilightColor);
+
+	 			}); // on click callback
 
 			d3.timeout(function() {
 			  loading.remove();

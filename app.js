@@ -25,6 +25,10 @@ app.get('/', function (req, res) {
   	res.render('index.html');
 });
 
+app.get('/d3_graph.html', function (req, res) {
+    res.render('d3_graph.html');
+});
+
 app.get('/index', function (req, res) {
   	res.render('index.html');
 });
