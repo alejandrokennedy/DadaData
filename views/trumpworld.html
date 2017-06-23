@@ -331,7 +331,6 @@
 				// .attr("class", "nodes")
 				.attr("class", function(d) { return "nodes T" + slug(d.id); })
 				.on("mouseover", function() {
-					console.log("g element (this): ",this)
 						this.parentNode.appendChild(this);
 					});
 
@@ -422,14 +421,78 @@
 	 			.on("mouseleave", function () {
 	 				var mouseClass = d3.select(this).attr("class");
 					d3.selectAll("." + mouseClass).selectAll(".nodeCircle")
-						.style("fill", function(d) { return color(d.type) });
+						.style("fill", function(d) { return color(d.type) })
+						.style("stroke", "white");
 					d3.selectAll("." + mouseClass).select(".label")
  						.style("display", "none")
  						.style("text-shadow", "none");
 					d3.selectAll("." + mouseClass).select(".labelShadow")
  						.style("display", "none")
  						.style("stroke", "white");
-	 			});
+	 			})
+
+	 			////////////////
+
+	 			.on("click", function(d) {
+	 				var clickClass = d3.select(this).attr("class");
+	 				var correspondingNodeSelection = d3.selectAll("." + clickClass);
+	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
+	 				// clear any "onClick" styles for nodes
+	 				d3.selectAll(".nodes")
+	 					.select(".nodeCircle")
+	 					.style("stroke", "white")
+	 					.style("fill-opacity", .2);
+	 				// clear any "onClick" styles for links
+	 				d3.selectAll(".lines")
+	 					.style("stroke", "grey")
+	 					.style("stroke-opacity", .2);
+
+	 				// console.log(d);
+
+	 				var isNeighbour = links.reduce(function (neighbours, link) {
+	 					if (link.target.id === d) {
+	 						neighbours.push(link.source.id);
+	 							 						// console.log("n1", neighbours);
+	 					} else if (link.source.id === d) {
+	 						neighbours.push(link.target.id);
+	 						// console.log("n2", neighbours);
+	 					} return neighbours;
+	 				}, [d]);
+
+	 				d3.selectAll(".nodes")
+	 					// .selectAll(".nodeCircle")
+	 					// .style("fill", "#000000");
+	 					.classed("neighbouringNodeCircles", function(e) {
+	 						// console.log(e.id);
+	 						if (isNeighbour.includes(e.id)) { 
+	 							console.log(e.id, " is classed true");
+	 							return true;
+	 						}
+	 					});
+
+	 				d3.select(correspondingNode).select(".nodeCircle")
+	 					.style("stroke", function(d) { return color(d.type) });
+
+ 					d3.selectAll(".neighbouringNodeCircles")
+ 						.select(".nodeCircle")
+ 						.style("fill-opacity", 1);
+
+	 				d3.selectAll(".lines")
+	 					.classed("neighbouringLines", function(e) {
+	 						if (e.source.id === d) {
+	 							return true;
+	 						} else if (e.target.id === d) {
+	 							return true;
+	 						};
+	 					});
+	 					
+	 					d3.selectAll(".neighbouringLines")
+	 					// .style("stroke", clickHilightColor);
+	 					.style("stroke-opacity", 1);
+
+	 			}); // on click callback
+
+	 			////////////////
 
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
@@ -483,7 +546,8 @@
 
 	 				var isNeighbour = links.reduce(function (neighbours, link) {
 	 					if (link.target.id === d.id) {
-	 						neighbours.push(link.source.id)
+	 						neighbours.push(link.source.id);
+	 						// console.log(neighbours);
 	 					} else if (link.source.id === d.id) {
 	 						neighbours.push(link.target.id)
 	 					} return neighbours;
@@ -498,6 +562,7 @@
 
 	 				d3.select(this.parentNode).select(".nodeCircle")
 	 					.style("stroke", function(d) { return color(d.type) });
+	 					// .style("stroke", clickHilightColor);
 
  					d3.selectAll(".neighbouringNodeCircles")
  						.select(".nodeCircle")
