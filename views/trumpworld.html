@@ -26,8 +26,41 @@
 
 	svg {
 		/*border: 1px solid #f0f;*/
-		display: block;
-		margin: auto;
+		/*display: block;*/
+		/*margin: auto;*/
+	}
+
+	.d1 {
+		display: inline-block;
+		width: 20%;
+		right: 0px;
+		height: 100%;
+		overflow: hidden;
+		box-sizing: border-box;
+		position: absolute;
+		top:0;
+		background-color: #e5e5e5;
+	}
+
+	.d2 {
+		position:relative;
+		max-height: 100%;
+		overflow:auto;
+	}
+
+	#listDiv {
+		/*display: inline-block;*/
+		/*top: 5px;*/
+		/*vertical-align: middle;*/
+	}
+
+	ul {
+		padding-left: 12px;
+	}
+
+	li {
+  	margin: 10px;
+  	list-style-type: none;
 	}
 
 	.links {
@@ -40,12 +73,7 @@
 	  stroke: white;
 	  /*stroke-opacity: .3;*/
 	}
-/*
-	.nodes:hover circle {
-		fill: white;
-		stroke: black;
-	}
-*/
+
 	.nodes text {
 	  display: none;
 	  font: sans-serif;
@@ -80,8 +108,11 @@
 <body>
 
 	<h1>Trump World</h1>
-	
-
+	<div class=d1>
+		<div class =d2>
+			<div id=listDiv></div>
+		</div>
+	</div>
 	<script>
 	// To Do
 	// highlight connected links
@@ -98,9 +129,13 @@
 	// Have label halo like on text in my website
 	// Write javascript function to automatically add any new "entity" categories to the viz
 	// Stroke for the links thiner as one zooms in more
-	// tidy up code related to "click away" functionality to celar selection
+	// Limit ul div to some pixel size if on a large screen
 
-		var margin = {top: 0, right: 0, bottom: 0, left: 0},
+		var marginRightSize = (20 / 100) * window.innerWidth;
+
+		var margin = {top: 0, right: marginRightSize, bottom: 0, left: 0},
+			// width = window.innerWidth - margin.left - margin.right,
+			// height = window.innerHedth - margin.left - margin.right,
 			width = window.innerWidth - margin.left - margin.right,
 			height = window.innerHeight - margin.top - margin.bottom;
 
@@ -119,7 +154,7 @@
 	  var max_labelStroke = 20
 
 		var svg = d3.select("body").attr("id", "body").append("svg")
-			.attr("width", width + margin.left + margin.right)
+			.attr("width", width)
 			.attr("height", height + margin.top + margin.bottom)
 			.on("click", function(){
 				if (d3.event.target === this) {
@@ -137,10 +172,7 @@
 
 		var gContainer = svg.append("g")
 			.attr("id", "gContainer")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-			.on("click", function() {
-			});
-
+			.attr("transform", "translate(" + 300 + "," + margin.top + ")")
 
  		var loading = svg.append("text")
  			.attr("class", "loading")
@@ -161,8 +193,8 @@
 	  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 	  queue()
-	  	// .defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
-	  	.defer(d3.csv, "trumpworld.csv")
+	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
+	  	// .defer(d3.csv, "trumpworld.csv")
 	  	.await(ready);
 
 	  function slug (id) {
@@ -170,8 +202,10 @@
 							 .replace(/\./g,"")
 							 .replace(/'/g,"")
 							 .replace(/"/g,"")
+							 .replace(/&/g,"")
 							 .replace(/\(/g,"")
 							 .replace(/\)/g,"")
+							 .replace(/\//g,"")
 						 	 .replace(/ /g,"");
 	  };
 
@@ -219,6 +253,8 @@
 	  	var allOrgs = d3.set(orgs).values();
 	  	var allPeeps = d3.set(peeps).values();
 	  	var allFeds = d3.set(feds).values();
+	  	var entitiesList = allOrgs.concat(allPeeps).concat(allFeds).sort();
+	  	// console.log(entitiesList);
 
 	  	// var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
 	  	// console.log("nodeCount: " + nodeCount);
@@ -229,6 +265,7 @@
 	  	// var allEntities = entityAs.concat(entityBs);
 	  	// var allEntitiesSet = d3.set(allEntities).values();
 	  	// console.log("allEntitiesSet length: " + allEntitiesSet.length);
+	  	// console.log("allEntitiesSet: " + allEntitiesSet);
 
 			var nodes = [],
 					links = [];
@@ -288,8 +325,10 @@
 			var node = gContainer.selectAll(".nodes")
 				.data(graph.nodes)
 			 .enter().append("g")
-				.attr("class", "nodes")
+				// .attr("class", "nodes")
+				.attr("class", function(d) { return "nodes T" + slug(d.id); })
 				.on("mouseover", function() {
+					console.log("g element (this): ",this)
 						this.parentNode.appendChild(this);
 					});
 
@@ -356,6 +395,38 @@
 
 	 		var clickHilightColor = "rgb(52, 255, 38)"
 
+	 		var ul = d3.select("#listDiv").append("ul")
+	 			.selectAll("li")
+	 			.data(entitiesList)
+	 			.enter().append("li")
+	 			.attr("class", function(d) { return "T" + slug(d) })
+	 			.html(String)
+	 			.on("mouseover", function() {
+	 				var mouseClass = d3.select(this).attr("class");
+	 				var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
+					correspondingNode.parentNode.appendChild(correspondingNode);
+					d3.selectAll("." + mouseClass).selectAll(".nodeCircle")
+						.style("fill", clickHilightColor);
+					d3.selectAll("." + mouseClass).select(".label")
+ 						.style("display", "inline")
+ 						.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
+					d3.selectAll("." + mouseClass).select(".labelShadow")
+ 						.style("display", "inline")
+ 						.style("stroke", "white");
+	 			})
+	 			.on("mouseleave", function () {
+	 				var mouseClass = d3.select(this).attr("class");
+					d3.selectAll("." + mouseClass).selectAll(".nodeCircle")
+						.style("fill", function(d) { return color(d.type) });
+					d3.selectAll("." + mouseClass).select(".label")
+ 						.style("display", "none")
+ 						.style("text-shadow", "none");
+					d3.selectAll("." + mouseClass).select(".labelShadow")
+ 						.style("display", "none")
+ 						.style("stroke", "white");
+	 			});
+
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
 	 			// .style("fill", function(d, i) { return colorScale(i); })
@@ -366,7 +437,7 @@
 	 			.on("mouseover", function () {
 
 	 				d3.select(this.parentNode).select(".nodeCircle")
-	 				.style("fill", "white")
+	 				.style("fill", clickHilightColor)
 					.style("stroke", function(d) { return color(d.type) })
 					// .style("stroke-width", 5)
 	 			})
