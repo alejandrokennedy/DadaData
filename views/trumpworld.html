@@ -126,10 +126,13 @@
 	// Fix zoom label stroke
 	// Indicate date that the data was last updated
 	// Way to handle lone nodes
-	// Have label halo like on text in my website
 	// Write javascript function to automatically add any new "entity" categories to the viz
 	// Stroke for the links thiner as one zooms in more
 	// Limit ul div to some pixel size if on a large screen
+	// on click, have lines be 2nd to last element drawn on canvas (1st is the node)
+	// on hover over neighbouring node: show relationship label
+	// on hover over beighbour of neighbouring node: show additional relationship
+
 
 		var marginRightSize = (20 / 100) * window.innerWidth;
 
@@ -407,7 +410,8 @@
 	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
 					correspondingNode.parentNode.appendChild(correspondingNode);
 					d3.selectAll("." + mouseClass).selectAll(".nodeCircle")
-						.style("fill", clickHilightColor);
+						.style("fill", "white")
+						.style("stroke", function(d) { return color(d.type) });
 					d3.selectAll("." + mouseClass).select(".label")
  						.style("display", "inline")
  						.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
@@ -436,12 +440,26 @@
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; })
 	 			.on("mouseover", function () {
 
+	 				d3.select(this.parentNode).select(".label")
+	 					.style("display", "inline")
+ 						.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
+
+	 				d3.select(this.parentNode).select(".labelShadow")
+	 					.style("display", "inline")
+ 						.style("stroke", "white");
+
 	 				d3.select(this.parentNode).select(".nodeCircle")
-	 				.style("fill", clickHilightColor)
-					.style("stroke", function(d) { return color(d.type) })
+	 					.style("fill", "white")
+						.style("stroke", function(d) { return color(d.type) })
 					// .style("stroke-width", 5)
 	 			})
 	 			.on("mouseleave", function () {
+	 				d3.select(this.parentNode).select(".label")
+	 					.style("display", "none")
+ 						.style("text-shadow", "none");
+	 				d3.select(this.parentNode).select(".labelShadow")
+	 					.style("display", "none")
+ 						.style("stroke", "white");
 	 				if (d3.select(this.parentNode).attr("class").split(" ").includes("neighbouringNodeCircles")) {
 	 					d3.select(this.parentNode).select(".nodeCircle")
 	 					.style("stroke", "white")
@@ -453,13 +471,11 @@
 	 				}
 	 			})
 	 			.on("click", function(d) { 
-
 	 				// clear any "onClick" styles for nodes
 	 				d3.selectAll(".nodes")
 	 					.select(".nodeCircle")
 	 					.style("stroke", "white")
 	 					.style("fill-opacity", .2);
-
 	 				// clear any "onClick" styles for links
 	 				d3.selectAll(".lines")
 	 					.style("stroke", "grey")
@@ -488,18 +504,6 @@
  						// .style("stroke", function(d) { return color(d.type) })
  						// .style("stroke", clickHilightColor)
  						.style("fill-opacity", 1);
-
- 					// // show labels on hover
- 					// d3.selectAll(".neighbouringNodeCircles")
- 					// 	.select(".label")
- 					// 	.style("display", "inline")
- 					// 	.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px")
-	 				// 	// .classed(".nodes:hover text");
- 					// d3.selectAll(".neighbouringNodeCircles")
- 					// 	.select(".labelShadow")
- 					// 	.style("display", "inline")
- 					// 	.style("stroke", "white");
- 					// 	// .classed(".nodes:hover text.labelShadow");
 
 	 				d3.selectAll(".lines")
 	 					.classed("neighbouringLines", function(e) {
