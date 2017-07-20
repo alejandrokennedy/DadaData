@@ -500,25 +500,27 @@
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; })
 
 	 			.on("mouseover", function (d) {
-
 	 				var hoveredNode = d
 	 				var hoveredNodeID = "T" + slug(hoveredNode.id)
 
 	 				// add selectConnect class to links connecting hovered node with slected node
-	 				d3.selectAll(".neighbouringLines")
-	 					.classed("selectConnect", function(d) {
-	 						var selectedNodeID = d3.selectAll(".selectedNode").attr("class").split(" ")[1]
-	 						var linkSource = "T" + slug(d.source.id)
-	 						var linkTarget = "T" + slug(d.target.id)
-	 					if (selectedNodeID === linkSource && hoveredNodeID === linkTarget) {
-	 						return true;
-	 					} else if (selectedNodeID === linkTarget && hoveredNodeID === linkSource) {
-	 						return true;
-	 					}	 						
-	 				});
+	 				// find out how to improve performance of this
+	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
+		 				d3.selectAll(".neighbouringLines")
+		 					.classed("selectConnect", function(d) {
+		 						var selectedNodeID = d3.selectAll(".selectedNode").attr("class").split(" ")[1]
+		 						var linkSource = "T" + slug(d.source.id)
+		 						var linkTarget = "T" + slug(d.target.id)
+			 					if (selectedNodeID === linkSource && hoveredNodeID === linkTarget) {
+			 						return true;
+			 					} else if (selectedNodeID === linkTarget && hoveredNodeID === linkSource) {
+			 						return true;
+			 					}	 						
+		 				});
+	 				}
 
 	 				// style selectConnect link
-	 				d3.selectAll(".selectConnect")
+	 				d3.select(".selectConnect")
 	 					.style("stroke", clickHilightColor)
 	 					.each(
 	 						function(d) {
@@ -551,6 +553,9 @@
 	 					d3.select(this.parentNode).select(".nodeCircle")
 	 						.style("stroke", clickHilightColor)
 	 						.style("fill", function(d) { return color(d.type) });
+
+	 					// console.log("connection: ", d3.select(".selectConnect").attr("class"))
+	 					// console.log("hovered node: ", hoveredNodeID)
 	 				}
 	 			}) // on mouseover callback
 
@@ -604,7 +609,8 @@
 	 				d3.select(this.parentNode)
 	 					.classed("selectedNode", true)
 	 					.select(".nodeCircle")
-	 					.style("stroke", clickHilightColor);
+	 					.style("stroke", clickHilightColor)
+	 					.style("fill", function(d) { return color(d.type) });
 
  					d3.selectAll(".neighbouringNodeCircles")
  						.select(".nodeCircle")
