@@ -502,13 +502,14 @@
 	 			.on("mouseover", function (d) {
 	 				var hoveredNode = d
 	 				var hoveredNodeID = "T" + slug(hoveredNode.id)
+	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
+		 				var selectedNodeID = d3.selectAll(".selectedNode").attr("class").split(" ")[1]
+		 			}
 
 	 				// add selectConnect class to links connecting hovered node with slected node
-	 				// find out how to improve performance of this
 	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
 		 				d3.selectAll(".neighbouringLines")
 		 					.classed("selectConnect", function(d) {
-		 						var selectedNodeID = d3.selectAll(".selectedNode").attr("class").split(" ")[1]
 		 						var linkSource = "T" + slug(d.source.id)
 		 						var linkTarget = "T" + slug(d.target.id)
 			 					if (selectedNodeID === linkSource && hoveredNodeID === linkTarget) {
@@ -524,6 +525,10 @@
 	 					.style("stroke", clickHilightColor)
 	 					.each(
 	 						function(d) {
+	 							console.log("source: ", d.source.id);
+	 							console.log(d.connection);
+	 							console.log("target: ", d.target.id);
+	 							console.log("==================");
 	 							var slugSource = "T" + slug(d.source.id);
 	 							var slugTarget = "T" + slug(d.target.id);
 	 							var selCon = d3.select(".selectConnect");
