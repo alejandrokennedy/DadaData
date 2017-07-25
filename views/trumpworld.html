@@ -112,21 +112,27 @@
 	</div>
 	<script>
 	//// To Do
-	// on hover over neighbouring node: show relationship label
-	// on hover over beighbour of neighbouring node: show additional relationship
+	// style relationship label
+	// on hover over neighbour of neighbouring node: show additional relationship?
 	// See if using heroku I can speed up load time of visualization (watch Paul's final video on that)
 	// add some transitions / change colors
 	// Fix zoom label stroke
+	// update connection info label on click
+	// add "about" section to say more about data
+	// add instructions
+
 	// searchable side bar with alphabetical/connected sort
 	//// color labels by entity type
+
 	// make sure lines connected to neighbouring nodes aren't covered by non-neighbouring node circles
-	//// on click, have lines be 2nd to last element drawn on canvas (1st is the node)
+	//// on click, have lines be 2nd to last element drawn on canvas (1st is the node)?
+
 	// Stroke for the links thiner as one zooms in more
 	// zoom to selection
 	// fix listing for W.E.“ED” BOSARGE
 	// fix no circle catcher for INVESTCOLTD (update: there's a duplicate)
-	// fill color of hovered node (whie another node is selected) should indicate entity type
-	//
+	// enhance mouseover performance somehow
+
 	// use dynamic updates to solve label problem: https://bl.ocks.org/rofrischmann/0de01de85296591eb45a1dde2040c5a1
 	// Write javascript function to automatically add any new "entity" categories to the viz
 	// Find other rich people to compare this vis with
@@ -502,8 +508,11 @@
 	 			.on("mouseover", function (d) {
 	 				var hoveredNode = d
 	 				var hoveredNodeID = "T" + slug(hoveredNode.id)
+
+	 				// declare selectedNodeSlugID
 	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
-		 				var selectedNodeID = d3.selectAll(".selectedNode").attr("class").split(" ")[1]
+		 				var selectedNodeSlugID = d3.selectAll(".selectedNode").attr("class").split(" ")[1];
+		 				var selectedNodeID = d3.selectAll(".selectedNode").data()[0].id;
 		 			}
 
 	 				// add selectConnect class to links connecting hovered node with slected node
@@ -512,23 +521,24 @@
 		 					.classed("selectConnect", function(d) {
 		 						var linkSource = "T" + slug(d.source.id)
 		 						var linkTarget = "T" + slug(d.target.id)
-			 					if (selectedNodeID === linkSource && hoveredNodeID === linkTarget) {
+			 					if (selectedNodeSlugID === linkSource && hoveredNodeID === linkTarget) {
 			 						return true;
-			 					} else if (selectedNodeID === linkTarget && hoveredNodeID === linkSource) {
+			 					} else if (selectedNodeSlugID === linkTarget && hoveredNodeID === linkSource) {
 			 						return true;
 			 					}	 						
 		 				});
 	 				}
+
+	 				// declare entityConnection
+	 				if (d3.select(".selectConnect")["_groups"][0][0] !== null) {
+		 				var entityConnection = d3.select(".selectConnect").data()[0].connection;
+		 			}
 
 	 				// style selectConnect link
 	 				d3.select(".selectConnect")
 	 					.style("stroke", clickHilightColor)
 	 					.each(
 	 						function(d) {
-	 							console.log("source: ", d.source.id);
-	 							console.log(d.connection);
-	 							console.log("target: ", d.target.id);
-	 							console.log("==================");
 	 							var slugSource = "T" + slug(d.source.id);
 	 							var slugTarget = "T" + slug(d.target.id);
 	 							var selCon = d3.select(".selectConnect");
@@ -545,23 +555,35 @@
 	 					.style("display", "inline")
  						.style("stroke", "white");
 
- 					// style hovered nodes conditionally
+ 					// conditionally style hovered nodes and add connection text
  					if (d3.select(this.parentNode).attr("class").split(" ").includes("selectedNode")) {
-	 						d3.select(this.parentNode).select(".nodeCircle")
+ 						d3.select(this.parentNode).select(".nodeCircle")
 	 						.style("stroke", clickHilightColor)
 	 						.style("fill", function(d) { return color(d.type) });
+	 					d3.select(this.parentNode).select(".label")
+	 						.text(function(d) { return d.id } );
+	 					d3.select(this.parentNode).select(".labelShadow")
+	 						.text(function(d) { return d.id } );
 	 				} else if (d3.select(".selectConnect")["_groups"][0][0] === null) {
 	 					d3.select(this.parentNode).select(".nodeCircle")
 	 						.style("stroke", function(d) { return color(d.type) })
 	 						.style("fill", "white");
+	 					d3.select(this.parentNode).select(".label")
+	 						.text(function(d) { return d.id } );
+	 					d3.select(this.parentNode).select(".labelShadow")
+	 						.text(function(d) { return d.id } );
 	 				} else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredNodeID)) {
 	 					d3.select(this.parentNode).select(".nodeCircle")
 	 						.style("stroke", clickHilightColor)
 	 						.style("fill", function(d) { return color(d.type) });
 
-	 					// console.log("connection: ", d3.select(".selectConnect").attr("class"))
-	 					// console.log("hovered node: ", hoveredNodeID)
+ 						// update connection info label on click
+	 					d3.select(this.parentNode).select(".label")
+	 						.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
+	 					d3.select(this.parentNode).select(".labelShadow")
+	 						.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
 	 				}
+
 	 			}) // on mouseover callback
 
 	 			.on("mouseleave", function () {
