@@ -453,6 +453,7 @@
 	 			})
 
 	 			.on("click", function(d) {
+ 					// variables for use in if statements below
 	 				var clickClass = d3.select(this).attr("class");
 	 				var correspondingNodeSelection = d3.selectAll("." + clickClass);
 	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
@@ -578,10 +579,34 @@
 	 						.style("fill", function(d) { return color(d.type) });
 
  						// update connection info label on click
-	 					d3.select(this.parentNode).select(".label")
-	 						.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
-	 					d3.select(this.parentNode).select(".labelShadow")
-	 						.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
+	 				// 	d3.select(this.parentNode).select(".label")
+	 				// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
+	 				// 	d3.select(this.parentNode).select(".labelShadow")
+	 				// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
+	 				// }
+
+		 				var getLabel = d3.select(this.parentNode).select(".label");
+		 				var getLabelShadow = d3.select(this.parentNode).select(".labelShadow");
+		 				
+		 				getLabel.text(function(d) { return d.id; } )
+	 						.append("tspan")
+	 						.attr("dy", "1.4em")
+	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
+	 						.text(function(d) { return "connection with " + selectedNodeID + ":" } )
+ 							.append("tspan")
+	 						.attr("dy", "1.4em")
+	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
+	 						.text(function(d) { return entityConnection; } );
+
+	 					getLabelShadow.text(function(d) { return d.id; } )
+	 						.append("tspan")
+	 						.attr("dy", "1.4em")
+	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
+	 						.text(function(d) { return "connection with " + selectedNodeID + ":" } )
+ 							.append("tspan")
+	 						.attr("dy", "1.4em")
+	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
+	 						.text(function(d) { return entityConnection; } );
 	 				}
 
 	 			}) // on mouseover callback
