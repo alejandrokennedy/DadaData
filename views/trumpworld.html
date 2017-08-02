@@ -3,10 +3,10 @@
 
 <head>
 	<title>Trump World</title>
-<!-- 	<script src="d3.js" charset="utf-8"></script>
-	<script src="queue.min.js"></script> -->
-	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+	<script src="d3.js" charset="utf-8"></script>
+	<script src="queue.min.js"></script>
+<!-- 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> -->
 </head>
 
 <style type="text/css">
@@ -120,6 +120,9 @@
 	// update connection info label on click
 	// add "about" section to say more about data
 	// add instructions
+	// fix SOCI�T� G�N�RALE
+	// fix W.E.�ED� BOSARGE
+
 
 	// searchable side bar with alphabetical/connected sort
 	//// color labels by entity type
@@ -201,8 +204,8 @@
 	  // console.log(d3.schemeCategory10);
 
 	  queue()
-	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
-	  	// .defer(d3.csv, "trumpworld.csv")
+	  	// .defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
+	  	.defer(d3.csv, "trumpworld.csv")
 	  	.await(ready);
 
 	  function slug (id) {
@@ -276,7 +279,8 @@
 	  	// console.log("allEntitiesSet: " + allEntitiesSet);
 
 			var nodes = [],
-					links = [];
+					links = [],
+					listItems = [];
 
 			// NODES (NEW)
 			allOrgs.forEach(function(orgs) {
@@ -311,8 +315,8 @@
 				links.push({
 					"source" : d["Entity A"],
 					"target" : d["Entity B"],
-					"connection" : d["Connection"]
-					// "source" : d["Source(s)"]
+					"connection" : d["Connection"],
+					"reference" : d["Source(s)"]
 				})
 			});
 			// console.log("linkCount: " + links.length)
@@ -398,14 +402,14 @@
 	 			.attr("class", "clip-path-circle");
 
 	 		var clickHilightColor = "rgb(52, 255, 38)"
-	 		// var clickHilightColor = "purple"
 
 	 		var ul = d3.select("#listDiv").append("ul")
 	 			.selectAll("li")
-	 			.data(entitiesList)
+	 			.data(nodes)
 	 			.enter().append("li")
-	 			.attr("class", function(d) { return "T" + slug(d) })
-	 			.html(String)
+	 			.attr("class", function(d) { return "T" + slug(d.id) })
+	 			.html(function(d) { return d.id } )
+	 			.style("color", function(d) { return color(d.type) })
 
 	 			.on("mouseover", function() {
 	 				var mouseClass = d3.select(this).attr("class");
@@ -453,6 +457,10 @@
 	 			})
 
 	 			.on("click", function(d) {
+	 				console.log(d)
+	 				console.log(this)
+	 				console.log(d3.select(this))
+	 				console.log(d3.select(this).attr("class"))
  					// variables for use in if statements below
 	 				var clickClass = d3.select(this).attr("class");
 	 				var correspondingNodeSelection = d3.selectAll("." + clickClass);
@@ -467,12 +475,12 @@
 	 					.style("stroke", "grey")
 	 					.style("stroke-opacity", .15);
 	 				var isNeighbour = links.reduce(function (neighbours, link) {
-	 					if (link.target.id === d) {
+	 					if (link.target.id === d.id) {
 	 						neighbours.push(link.source.id);
-	 					} else if (link.source.id === d) {
+	 					} else if (link.source.id === d.id) {
 	 						neighbours.push(link.target.id);
 	 					} return neighbours;
-	 				}, [d]);
+	 				}, [d.id]);
 
 	 				d3.selectAll(".nodes")
 	 					.classed("neighbouringNodeCircles", function(e) {
@@ -488,9 +496,9 @@
  						.style("fill-opacity", 1);
 	 				d3.selectAll(".lines")
 	 					.classed("neighbouringLines", function(e) {
-	 						if (e.source.id === d) {
+	 						if (e.source.id === d.id) {
 	 							return true;
-	 						} else if (e.target.id === d) {
+	 						} else if (e.target.id === d.id) {
 	 							return true;
 	 						};
 	 					});
@@ -542,6 +550,10 @@
 	 						function(d) {
 	 							var slugSource = "T" + slug(d.source.id);
 	 							var slugTarget = "T" + slug(d.target.id);
+
+	 							var reference = d.reference;
+	 							console.log("reference: ", reference);
+	 							
 	 							var selCon = d3.select(".selectConnect");
 	 							selCon.classed(slugSource, true);
 	 							selCon.classed(slugTarget, true);
