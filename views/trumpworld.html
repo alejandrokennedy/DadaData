@@ -315,7 +315,7 @@
 
 			var connectionCountList = {};
 
-			// Get Nodes' connection count
+			// get nodes' connection count
 			links.forEach(function(d) {
 				if (!connectionCountList[d.source]) {
 					connectionCountList[d.source] = 1
@@ -330,7 +330,10 @@
 				};
 			});
 
-			// console.log(connectionCountList);
+			// add count value to nodes
+			nodes.forEach(function(d) {
+				d.count = connectionCountList[d.id];
+			});
 
 			// // NODES REFERENCE
 			// allEntitiesSet.forEach(function(orgs) {
@@ -423,19 +426,19 @@
 
 	 		var clickHilightColor = "rgb(52, 255, 38)"
 
-	 		// var buttonDiv = d3.select("#listDiv").append("div").attr("class", "buttonDiv");
-
-	 		// var button = d3.select(".buttonDiv").append("button")
+	 		var buttonDiv = d3.select("#listDiv").append("div").attr("class", "buttonDiv");
+	 		var buttonAlpha = d3.select(".buttonDiv").append("button").text("Sort Alphabetically");
+	 		var buttonCount = d3.select(".buttonDiv").append("button").text("Sort by Connectivity");
 
 	 		var ul = d3.select("#listDiv").append("ul")
 	 			.selectAll("li")
 	 			.data(nodes)
 	 			.enter().append("li")
 	 			.sort( function(a, b) {
-	 					if (a.id > b.id) {
-	 						return 1;
-	 					} else if (a.id < b.id) {
+	 					if (a.count > b.count) {
 	 						return -1;
+	 					} else if (a.count < b.count) {
+	 						return 1;
 	 					} else { return 0; }
 	 				})
 	 			.attr("class", function(d) { return "T" + slug(d.id) })
@@ -533,16 +536,32 @@
 	 					.style("stroke-opacity", 1);
 	 			}); // on click callback
 
-	 			// // sort button
-	 			// button.on("click", function() {
-	 			// 	d3.selectAll("li").sort( function(a, b) {
-	 			// 		if (a.id > b.id) {
-	 			// 			return 1;
-	 			// 		} else if (a.id < b.id) {
-	 			// 			return -1;
-	 			// 		} else { return 0; }
-	 			// 	});
-	 			// })
+	 			// sort button 1
+	 			buttonAlpha.on("click", function() {
+	 				d3.selectAll("li").sort( function(a, b) {
+	 					if (a.id > b.id) {
+	 						return 1;
+	 					} else if (a.id < b.id) {
+	 						return -1;
+	 					} else { return 0; }
+	 				});
+	 			})
+
+	 			buttonCount.on("click", function() {
+	 				d3.selectAll("li").sort( function(a, b) {
+	 					if (a.count > b.count) {
+	 						return -1;
+	 					} else if (a.count < b.count) {
+	 						return 1;
+	 					} else { 
+	 							if (a.id > b.id) {
+		 						return 1;
+		 					} else if (a.id < b.id) {
+		 						return -1;
+		 					} else { return 0; }; 
+ 						}
+	 				});
+	 			})
 
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
