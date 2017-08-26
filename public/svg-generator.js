@@ -38,7 +38,7 @@ jsdom.env({
 			  .style("fill", function(d, i) { return colorScale(i); });
 
 		// Save result to an html file
-		fs.writeFile('./views/d3_graph.html', window.document.documentElement.innerHTML, function(err) {
+		fs.writeFile('../views/d3_graph.html', window.document.documentElement.innerHTML, function(err) {
 			if(err) {
 				console.log('error saving document', err)
 			} else {

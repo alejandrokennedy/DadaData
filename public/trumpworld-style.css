@@ -1,0 +1,88 @@
+	h1 {
+		color: gold;
+		margin-left: 20px;
+		position: absolute;
+		text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+	}
+
+	body {
+		font-family: helvetica;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	svg {
+		/*border: 1px solid #f0f;*/
+		/*display: block;*/
+		/*margin: auto;*/
+	}
+
+	.d1 {
+		display: inline-block;
+		width: 20%;
+		min-width: 250px;
+		max-width: 350px;
+		right: 0px;
+		height: 100%;
+		overflow: hidden;
+		box-sizing: border-box;
+		position: absolute;
+		top:0;
+		background-color: #e5e5e5;
+	}
+
+	.d2 {
+		position:relative;
+		max-height: 100%;
+		overflow:auto;
+	}
+
+	ul {
+		padding-left: 12px;
+	}
+
+	li {
+  	padding-top: 10px;
+  	padding-bottom: 10px;
+  	margin-left: 10px;
+  	list-style-type: none;
+	}
+
+	.links {
+		stroke: grey;
+		stroke-width: 1px;
+	}
+
+	.nodes circle {
+	  fill: #ccc;
+	  stroke: white;
+	  /*stroke-opacity: .3;*/
+	}
+
+	.nodes text {
+	  display: none;
+	  font: sans-serif;
+	}
+
+	.nodes:hover text {
+	  display: inline;
+	}
+	
+	.nodes text.labelShadow {
+	  display: none;
+	  font: sans-serif;
+	}
+
+	.nodes:hover text.labelShadow {
+	  display: inline;
+	  stroke: white;
+		text-shadow: #ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px;
+	  /*stroke-width: 20;*/
+	}
+
+	.clip-path-circle {
+		/*stroke: crimson;*/
+	  fill: none;
+	  /*fill-opacity: 0;*/
+	  pointer-events: all;
+	}
