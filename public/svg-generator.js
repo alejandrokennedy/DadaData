@@ -1,4 +1,4 @@
-var d3 = require('d3');
+var d3 = require('d3v3');
 var jsdom = require('jsdom');
 var fs = require('fs');
 
@@ -26,6 +26,7 @@ jsdom.env({
 		    
 		var svg = d3.select(el)
 			.append("svg")
+				.attr("class", "theCanvas")
 				.attr("height", height)
 				.attr("width", width);
 				
