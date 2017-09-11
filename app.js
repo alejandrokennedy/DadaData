@@ -3,7 +3,8 @@ var express = require('express');
 var app = express();
 var port = process.env.PORT || 5000
 var d3 = require('d3');
-var svg = require('./public/svg-generator');
+// var svg = require('./public/svg-generator');
+// var svg = require('./public/trumpworld-svg-generator');
 
 // ejs is a way to make html from static file to a template.
 // This can be used to change from html to jade (now pug)
