@@ -149,8 +149,10 @@ var ul = d3.select("ul");
 // var d2 = d3.select(".d2");
 // console.log(d2.nodes());
 
-var svgsus = d3.select("svg");
-console.log(svgsus.nodes());
+var theSelection = d3.selectAll("#gContainer");
+console.log(theSelection);
+console.log(theSelection.node());
+console.log(theSelection.nodes());
 
 // CIRCLECATCHER SECTION
 
