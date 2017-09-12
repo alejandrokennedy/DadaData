@@ -7,6 +7,8 @@ var htmlStub = '<html><head> \
 	<link rel="stylesheet" type="text/css" href="trumpworld-style.css"> \
 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script> \
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
+	<body> \
+	<div id="dataviz-container"></div> \
 	<h1>Trump World</h1> \
 	<div class=d1> \
 		<div class =d2> \
@@ -17,7 +19,6 @@ var htmlStub = '<html><head> \
 	<script src="trumpworld-interaction.js" charset="utf-8"></script> \
 	</html>'
 
-	// </head><body><div id="dataviz-container"></div> \
 
 // here we combine our htmlStub with D3
 jsdom.env({
@@ -29,8 +30,10 @@ jsdom.env({
  
 	  var body = window.document.querySelector('body')
 		  , listDiv = window.document.querySelector('#listDiv')
+		  , el = window.document.querySelector('#dataviz-container')
 
 		//////////////// Original Trump World code:
+
 
 		var marginRightSize = (20 / 100) * window.innerWidth;
 
@@ -56,7 +59,7 @@ jsdom.env({
 	  var nominal_labelStroke = 1
 	  var max_labelStroke = 20
 
-		var svg = d3.select(body).attr("id", "body").append("svg")
+		var svg = d3.select(el).attr("id", "dataviz-container").append("svg")
 			.attr("width", width)
 			.attr("height", height + margin.top + margin.bottom)
 			.on("click", function(){
@@ -72,6 +75,9 @@ jsdom.env({
 	 					.style("stroke-opacity", 1);
 				};
 			});
+
+		// var divExperiment = d3.select("body").attr("id", "divExperiment").append("div");
+		// console.log(divExperiment);
 
 // delete this once solved
 			// console.log(svg["_groups"]);

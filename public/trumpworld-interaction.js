@@ -44,6 +44,7 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 
 
 
+
 // UL SECTION
 
 var ul = d3.select("ul");
@@ -149,10 +150,17 @@ var ul = d3.select("ul");
 // var d2 = d3.select(".d2");
 // console.log(d2.nodes());
 
+// var liTry = d3.selectAll("li");
+// console.log(liTry);
+
+var gs = d3.selectAll("g");
+console.log(gs);
+
+
 var theSelection = d3.selectAll("#gContainer");
-console.log(theSelection);
-console.log(theSelection.node());
-console.log(theSelection.nodes());
+// console.log(theSelection);
+// console.log(theSelection.node());
+// console.log(theSelection.nodes());
 
 // CIRCLECATCHER SECTION
 
