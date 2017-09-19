@@ -8,8 +8,8 @@ var htmlStub = '<html><head> \
 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script> \
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
 	<body> \
-	<div id="dataviz-container"></div> \
 	<h1>Trump World</h1> \
+	<div id="dataviz-container"></div> \
 	<div class=d1> \
 		<div class =d2> \
 			<div id=listDiv></div> \
@@ -252,6 +252,14 @@ jsdom.env({
 				"nodes": nodes,
 				"links": links
 			}
+
+			fs.writeFile('../public/trumpworld-graph.json', JSON.stringify(graph), function(err) {
+				if(err) {
+					console.log('error saving document', err)
+				} else {
+					console.log('trumpworld-graph.json was saved!')
+				}
+			} );
 
 			var link = gContainer.append("g")
 				.attr("class", "links")

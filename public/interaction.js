@@ -6,10 +6,5 @@ selection
 		  .remove()
 	});
 
-console.log(selection);
-// console.log(selection.data());
-console.log(selection.node());
-console.log(selection.size());
-
-var svgsus = d3.selectAll(".theCanvas");
-console.log(svgsus);
+var data = d3.selectAll("circle");
+console.log(data.data());
