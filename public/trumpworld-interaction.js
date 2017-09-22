@@ -1,14 +1,52 @@
+// get size of sidebar
+var sidebarSize = d3.select(".d1").style("width");
+
+// margin convention
+var margin = {top: 0, right: parseInt(sidebarSize), bottom: 0, left: 0},
+	width = window.innerWidth - margin.left - margin.right,
+	height = window.innerHeight - margin.top - margin.bottom;
+
+// resize the SVG
+function resizeSVG() {
+	d3.select("svg")
+	.attr("width", width)
+	.attr("height", height);
+}
+resizeSVG.call();
+
+// queue up the data
 d3.queue()
 	.defer(d3.json, "trumpworld-graph.json")
 	.await(ready);
 
-
+// load data
 function ready (error, trumpJSON) {
 	if (error) throw error;
-
-// console.log(trumpJSON.links);
+	// console.log(trumpJSON);
+	// console.log(trumpJSON.nodes[0].id);
 
 // re-define variables and functions from generator file
+var nominal_text_size = 60;
+var max_text_size = 14;
+
+var nominal_stroke = 1.25;
+var max_stroke = 3.5;
+
+var nominal_labelStroke = 1
+var max_labelStroke = 20
+
+function slug (id) {
+	return id.replace(/,/g,"")
+					 .replace(/\./g,"")
+					 .replace(/'/g,"")
+					 .replace(/"/g,"")
+					 .replace(/&/g,"")
+					 .replace(/\(/g,"")
+					 .replace(/\)/g,"")
+					 .replace(/\//g,"")
+				 	 .replace(/ /g,"");
+};
+
 var svg = d3.select("svg")
 	.on("click", function(){
 					if (d3.event.target === this) {
@@ -26,41 +64,47 @@ var svg = d3.select("svg")
 
 var gContainer = d3.select("#gContainer");
 var clickHilightColor = "rgb(52, 255, 38)";
-var color = d3.scaleOrdinal(d3.schemeCategory10);
+var color = d3.scaleOrdinal(d3.schemeCategory10).domain(["organization", "person", "federal agency"]);
 var links = trumpJSON.links;
+var label = d3.selectAll(".label");
+var labelShadow = d3.selectAll(".labelShadow");
 
-function slug (id) {
-	return id.replace(/,/g,"")
-					 .replace(/\./g,"")
-					 .replace(/'/g,"")
-					 .replace(/"/g,"")
-					 .replace(/&/g,"")
-					 .replace(/\(/g,"")
-					 .replace(/\)/g,"")
-					 .replace(/\//g,"")
-				 	 .replace(/ /g,"");
-};
+// nodes re-bind
+var nodes = d3.selectAll(".nodes");
+nodes.data(trumpJSON.nodes)
+.on("mouseover", function() {
+						this.parentNode.appendChild(this);
+					});
+var circle = nodes.selectAll(".nodeCircle");
 
-var marginRightSize = (20 / 100) * window.innerWidth;
-var margin = {top: 0, right: marginRightSize, bottom: 0, left: 0},
-	width = window.innerWidth - margin.left - margin.right,
-	height = window.innerHeight - margin.top - margin.bottom;
+// clipPath re-bind
+var clipPath = d3.selectAll(".clip");
+clipPath.data(trumpJSON.nodes);
 
-// have to wait before resizing the SVG
-setTimeout(function() {
-d3.select("svg")
-	.attr("width", width)
-	.attr("height", height);
-}, .001);
+// circleCatcher re-bind
+var circleCatcher = d3.selectAll(".circleCatcher")
+.data(trumpJSON.nodes);
 
+// links re-bind
+var lines = d3.selectAll(".lines");
+lines.data(trumpJSON.links);
 
-// attempted zoom section... doesn't seem to be doing anything
+// li re-bind
+var li = d3.selectAll("li");
+// .data(data, function(d) { return d ? d.name : this.id; })
+li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
+// li.data(trumpJSON.nodes);
+
+// console.log(li);
+// console.log(li.data())
+
+// zoom function
 var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 	gContainer.attr("transform", d3.event.transform);
 
 	var stroke = nominal_stroke;
     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
-    link.style("stroke-width",stroke);
+    lines.style("stroke-width",stroke);
     circle.style("stroke-width",stroke * 1.5);
 
 	var text_size = nominal_text_size ;
@@ -71,51 +115,37 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 	var labelStroke = text_size / 7.5;
     if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
     labelShadow.style("stroke-width", labelStroke);
-
 }); // zoom function callback
 
-// nodes bind
-var nodes = d3.selectAll(".nodes");
-nodes.data(trumpJSON.nodes);
+// call zoom
+svg.call(zoomEvent);
+zoomEvent.scaleTo(svg, .185);
 
-// clipPath bind
-var clipPath = d3.selectAll(".clip");
-clipPath.data(trumpJSON.nodes);
+// li SECTION
 
-// circleCatcher bind
-var circleCatcher = d3.selectAll(".circleCatcher")
-.data(trumpJSON.nodes);
-
-// links bind
-var lines = d3.selectAll(".lines");
-// console.log(lines);
-lines.data(trumpJSON.links);
-// console.log(lines.data());
-
-// UL SECTION
-var ul = d3.select("ul");
-
-// ul.on("mouseover", function() {
-// 		var mouseClass = d3.select(this).attr("class");
-// 		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-// 		var correspondingNode = correspondingNodeSelection.nodes()[1];
-// 	correspondingNode.parentNode.appendChild(correspondingNode);
-// 	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-// 		d3.select(correspondingNode).select(".nodeCircle")
-// 			.style("stroke", clickHilightColor)
-// 			.style("fill", "white");
-// 	} else {
-// 		d3.select(correspondingNode).select(".nodeCircle")
-// 			.style("stroke", function(d) { return color(d.type) })
-// 			.style("fill", "white");
-// 	}
-// 	d3.selectAll("." + mouseClass).select(".label")
-// 			.style("display", "inline")
-// 			.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
-// 	d3.selectAll("." + mouseClass).select(".labelShadow")
-// 			.style("display", "inline")
-// 			.style("stroke", "white");
-// 	});
+li
+	.on("mouseover", function(d) {
+		// console.log(d.id);
+	// 	var mouseClass = d3.select(this).attr("class");
+	// 	var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+	// 	var correspondingNode = correspondingNodeSelection.nodes()[1];
+	// correspondingNode.parentNode.appendChild(correspondingNode);
+	// if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+	// 	d3.select(correspondingNode).select(".nodeCircle")
+	// 		.style("stroke", clickHilightColor)
+	// 		.style("fill", "white");
+	// } else {
+	// 	d3.select(correspondingNode).select(".nodeCircle")
+	// 		.style("stroke", function(d) { return color(d.type) })
+	// 		.style("fill", "white");
+	// }
+	// d3.selectAll("." + mouseClass).select(".label")
+	// 		.style("display", "inline")
+	// 		.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
+	// d3.selectAll("." + mouseClass).select(".labelShadow")
+	// 		.style("display", "inline")
+	// 		.style("stroke", "white");
+	});
 
 
 
@@ -191,11 +221,8 @@ var ul = d3.select("ul");
 // CIRCLECATCHER SECTION
 circleCatcher
 	.on("mouseover", function (d) {
-		// console.log(d);
 		var hoveredNode = d;
 		var hoveredNodeID = "T" + slug(hoveredNode.id);
-		// console.log(hoveredNode);
-		// console.log(hoveredNodeID);
 
 		// declare selectedNodeSlugID
 		if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
@@ -207,8 +234,6 @@ circleCatcher
 		if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
 			d3.selectAll(".neighbouringLines")
 				.classed("selectConnect", function(d) {
-// console.log(d.source.id);
-// remove "id"?
 					var linkSource = "T" + slug(d.source)
 					var linkTarget = "T" + slug(d.target)
 					if (selectedNodeSlugID === linkSource && hoveredNodeID === linkTarget) {

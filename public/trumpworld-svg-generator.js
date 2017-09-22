@@ -34,10 +34,7 @@ jsdom.env({
 
 		//////////////// Original Trump World code:
 
-
-		var marginRightSize = (20 / 100) * window.innerWidth;
-
-		var margin = {top: 0, right: marginRightSize, bottom: 0, left: 0},
+		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
 			height = window.innerHeight - margin.top - margin.bottom;
 
@@ -102,7 +99,7 @@ jsdom.env({
 			.force("x", d3.forceX(width / 2))
 			.force("y", d3.forceY(height / 2));
 
-	  var color = d3.scaleOrdinal(d3.schemeCategory10);
+		var color = d3.scaleOrdinal(d3.schemeCategory10).domain(["organization", "person", "federal agency"]);
 	  // console.log(d3.schemeCategory10);
 
 	  d3.queue()
@@ -357,6 +354,7 @@ jsdom.env({
 	 					} else { return 0; }
 	 				})
 	 			.attr("class", function(d) { return "T" + slug(d.id) })
+	 			.attr("id", function(d) { return "T" + slug(d.id) })
 	 			.html(function(d) { return d.id } )
 	 			.style("color", function(d) { return color(d.type) })
 
