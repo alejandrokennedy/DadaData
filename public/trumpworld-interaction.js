@@ -1,3 +1,8 @@
+// TODO
+// Conditional data binding of nodes (works now but is it a fluke?)
+// Fix styling for selectConnect and hoveredNode when invoked by corresponding li element
+// 
+
 // get size of sidebar
 var sidebarSize = d3.select(".d1").style("width");
 
@@ -22,10 +27,7 @@ d3.queue()
 // load data
 function ready (error, trumpJSON) {
 	if (error) throw error;
-	// console.log(trumpJSON);
-	// console.log(trumpJSON.nodes[0].id);
 
-// re-define variables and functions from generator file
 var nominal_text_size = 60;
 var max_text_size = 14;
 
@@ -93,10 +95,6 @@ lines.data(trumpJSON.links);
 var li = d3.selectAll("li");
 // .data(data, function(d) { return d ? d.name : this.id; })
 li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
-// li.data(trumpJSON.nodes);
-
-// console.log(li);
-// console.log(li.data())
 
 // zoom function
 var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
@@ -121,102 +119,192 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 svg.call(zoomEvent);
 zoomEvent.scaleTo(svg, .185);
 
+// selection sort logic
+var listSelector = d3.select("#listSelect")
+	.on("change", onChange);
+
+function onChange() {
+	var selectedValue = listSelector.property("value");
+	console.log(selectedValue);
+
+	if (selectedValue === "Alphabetically") {
+
+		function alpha() {
+			d3.selectAll("li").sort( function(a, b) {
+				console.log("A: ", a.id);
+				console.log("B: ", b.id);
+				if (a.id > b.id) {
+					return 1;
+				} else if (a.id < b.id) {
+					return -1;
+				} else { return 0; }
+			});
+		}
+
+		alpha.call();
+
+	} else if (selectedValue === "Connectivity") {
+
+		function conn() {
+			d3.selectAll("li").sort( function(a, b) {
+				if (a.count > b.count) {
+					return -1;
+				} else if (a.count < b.count) {
+					return 1;
+				} else { 
+						if (a.id > b.id) {
+						return 1;
+					} else if (a.id < b.id) {
+						return -1;
+					} else { return 0; }; 
+				}
+			});
+		}
+
+		conn.call();
+
+	}
+} // onChange callback
+
+// 	switch (selectedValue) {
+
+// 		case "Alphabetically":
+// 			function() {
+//  				d3.selectAll("li").sort( function(a, b) {
+//  					if (a.id > b.id) {
+//  						return 1;
+//  					} else if (a.id < b.id) {
+//  						return -1;
+//  					} else { return 0; }
+//  				});
+//  			};
+// 			break;
+
+// 		case "Connectivity":
+// 			function() {
+// 	 				d3.selectAll("li").sort( function(a, b) {
+// 	 					if (a.count > b.count) {
+// 	 						return -1;
+// 	 					} else if (a.count < b.count) {
+// 	 						return 1;
+// 	 					} else { 
+// 	 							if (a.id > b.id) {
+// 		 						return 1;
+// 		 					} else if (a.id < b.id) {
+// 		 						return -1;
+// 		 					} else { return 0; }; 
+//  						}
+// 	 				});
+// 	 			}
+//  			break;
+// 	}
+
+
+
+// } //onChange callback
+
 // li SECTION
 
 li
 	.on("mouseover", function(d) {
-		// console.log(d.id);
-	// 	var mouseClass = d3.select(this).attr("class");
-	// 	var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-	// 	var correspondingNode = correspondingNodeSelection.nodes()[1];
-	// correspondingNode.parentNode.appendChild(correspondingNode);
-	// if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-	// 	d3.select(correspondingNode).select(".nodeCircle")
-	// 		.style("stroke", clickHilightColor)
-	// 		.style("fill", "white");
-	// } else {
-	// 	d3.select(correspondingNode).select(".nodeCircle")
-	// 		.style("stroke", function(d) { return color(d.type) })
-	// 		.style("fill", "white");
-	// }
-	// d3.selectAll("." + mouseClass).select(".label")
-	// 		.style("display", "inline")
-	// 		.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
-	// d3.selectAll("." + mouseClass).select(".labelShadow")
-	// 		.style("display", "inline")
-	// 		.style("stroke", "white");
-	});
+		var theSelectedNode = d3.selectAll(".selectedNode");
+		var mouseClass = d3.select(this).attr("class");
+		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
+		// console.log(correspondingNode);
+	correspondingNode.parentNode.appendChild(correspondingNode);
 
+// first possibility in if statement doesn't work; fix it!
+	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+		d3.select(correspondingNode).select(".nodeCircle")
+			.style("stroke", clickHilightColor)
+			.style("fill", "white");
+			console.log(d3.select(correspondingNode).attr("class").split(" "));
+	} else {
+		d3.select(correspondingNode).select(".nodeCircle")
+			.style("stroke", function(d) { return color(d.type) })
+			.style("fill", "white");
+			// console.log("Two")
+	}
+	d3.selectAll("." + mouseClass).select(".label")
+			.style("display", "inline")
+			.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
+	d3.selectAll("." + mouseClass).select(".labelShadow")
+			.style("display", "inline")
+			.style("stroke", "white");
+	})
 
-
-// 	.on("mouseleave", function () {
-// 		var mouseClass = d3.select(this).attr("class");
-// 		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-// 		var correspondingNode = correspondingNodeSelection.nodes()[1];
-// 	correspondingNode.parentNode.appendChild(correspondingNode);
+	.on("mouseleave", function () {
+		var mouseClass = d3.select(this).attr("class");
+		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
+	correspondingNode.parentNode.appendChild(correspondingNode);
 	
-// 	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-// 		d3.select(correspondingNode).select(".nodeCircle")
-// 			.style("stroke", clickHilightColor)
-// 			.style("fill", function(d) { return color(d.type) })
-// 	} else {
-// 		d3.select(correspondingNode).select(".nodeCircle")
-// 			.style("fill", function(d) { return color(d.type) })
-// 			.style("stroke", "white");
-// 	}
-// 	d3.selectAll("." + mouseClass).select(".label")
-// 			.style("display", "none")
-// 			.style("text-shadow", "none");
-// 	d3.selectAll("." + mouseClass).select(".labelShadow")
-// 			.style("display", "none")
-// 			.style("stroke", "white");
-// 	})
+// first possibility in if statement doesn't work; fix it!
+	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+		d3.select(correspondingNode).select(".nodeCircle")
+			.style("stroke", clickHilightColor)
+			.style("fill", function(d) { return color(d.type) })
+			// console.log("one")
+	} else {
+		d3.select(correspondingNode).select(".nodeCircle")
+			.style("fill", function(d) { return color(d.type) })
+			.style("stroke", "white");
+	}
+	d3.selectAll("." + mouseClass).select(".label")
+			.style("display", "none")
+			.style("text-shadow", "none");
+	d3.selectAll("." + mouseClass).select(".labelShadow")
+			.style("display", "none")
+			.style("stroke", "white");
+			// console.log("two")
+	})
 
-// 	.on("click", function(d) {
-// 		// variables for use in if statements below
-// 		var clickClass = d3.select(this).attr("class");
-// 		var correspondingNodeSelection = d3.selectAll("." + clickClass);
-// 		var correspondingNode = correspondingNodeSelection.nodes()[1];
-// 		// clear any "onClick" styles for nodes
-// 		d3.selectAll(".nodes").classed("selectedNode", false)
-// 			.select(".nodeCircle")
-// 			.style("stroke", "white")
-// 			.style("fill-opacity", .15);
-// 		// clear any "onClick" styles for links
-// 		d3.selectAll(".lines")
-// 			.style("stroke", "grey")
-// 			.style("stroke-opacity", .15);
-// 		var isNeighbour = links.reduce(function (neighbours, link) {
-// 			if (link.target.id === d.id) {
-// 				neighbours.push(link.source.id);
-// 			} else if (link.source.id === d.id) {
-// 				neighbours.push(link.target.id);
-// 			} return neighbours;
-// 		}, [d.id]);
+	.on("click", function(d) {
+		// variables for use in if statements below
+		var clickClass = d3.select(this).attr("class");
+		var correspondingNodeSelection = d3.selectAll("." + clickClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
+		// clear any "onClick" styles for nodes
+		d3.selectAll(".nodes").classed("selectedNode", false)
+			.select(".nodeCircle")
+			.style("stroke", "white")
+			.style("fill-opacity", .15);
+		// clear any "onClick" styles for links
+		d3.selectAll(".lines")
+			.style("stroke", "grey")
+			.style("stroke-opacity", .15);
+		var isNeighbour = links.reduce(function (neighbours, link) {
+			if (link.target === d.id) {
+				neighbours.push(link.source);
+			} else if (link.source === d.id) {
+				neighbours.push(link.target);
+			} return neighbours;
+		}, [d.id]);
 
-// 		d3.selectAll(".nodes")
-// 			.classed("neighbouringNodeCircles", function(e) {
-// 				if (isNeighbour.includes(e.id)) {
-// 					return true;
-// 				}
-// 			});
-// 		d3.select(correspondingNode).classed("selectedNode", true)
-// 			.select(".nodeCircle")
-// 			.style("stroke", clickHilightColor);
-// 		d3.selectAll(".neighbouringNodeCircles")
-// 			.select(".nodeCircle")
-// 			.style("fill-opacity", 1);
-// 		d3.selectAll(".lines")
-// 			.classed("neighbouringLines", function(e) {
-// 				if (e.source.id === d.id) {
-// 					return true;
-// 				} else if (e.target.id === d.id) {
-// 					return true;
-// 				};
-// 			});
-// 			d3.selectAll(".neighbouringLines")
-// 			.style("stroke-opacity", 1);
-// 	}); // on click callback
+		d3.selectAll(".nodes")
+			.classed("neighbouringNodeCircles", function(e) {
+				if (isNeighbour.includes(e.id)) {
+					return true;
+				}
+			});
+		d3.select(correspondingNode).classed("selectedNode", true)
+			.select(".nodeCircle")
+			.style("stroke", clickHilightColor);
+		d3.selectAll(".neighbouringNodeCircles")
+			.select(".nodeCircle")
+			.style("fill-opacity", 1);
+		d3.selectAll(".lines")
+			.classed("neighbouringLines", function(e) {
+				if (e.source === d.id) {
+					return true;
+				} else if (e.target === d.id) {
+					return true;
+				};
+			});
+			d3.selectAll(".neighbouringLines")
+			.style("stroke-opacity", 1);
+	}); // on click callback
 
 // CIRCLECATCHER SECTION
 circleCatcher
@@ -258,7 +346,7 @@ circleCatcher
 					var slugTarget = "T" + slug(d.target);
 
 					var reference = d.reference;
-					console.log("reference: ", reference);
+					// console.log("reference: ", reference);
 
 					var selCon = d3.select(".selectConnect");
 					selCon.classed(slugSource, true);

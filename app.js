@@ -105,7 +105,11 @@ app.get('/test', function (req, res) {
 });
 
 app.get('/trumpworld-generated', function (req, res) {
-  	res.render('trumpworld-generated');
+    res.render('trumpworld-generated');
+});
+
+app.get('/trumpworld1', function (req, res) {
+  	res.render('trumpworld1');
 });
 
 //heroku assigns app port randomly. DONT WORRY ABOUT IT

@@ -11,7 +11,13 @@ var htmlStub = '<html><head> \
 	<h1>Trump World</h1> \
 	<div id="dataviz-container"></div> \
 	<div class=d1> \
-		<div class =d2> \
+		<div class=d2> \
+			<div id=selectorDiv> \
+				<select id=listSelect> \
+				  <option value="Connectivity">Connectivity</option> \
+		  		<option value="Alphabetically">Alphabetically</option> \
+				</select> \
+			</div> \
 			<div id=listDiv></div> \
 		</div> \
 	</div> \
@@ -133,6 +139,9 @@ jsdom.env({
 	  // 	// If time: try writing a function to filter/map/set for each unique entry in either Entity A or Entity B columns 
 	  // 	entityTypeList.forEach(function(mungeType) {})
 
+	  	// trumpworld = trumpworld
+	  	// 	.filter( function(d) { return d["Entity A"] !== "DAEWOO AMERICA DEVELOPMENT (NEW YORK) CORP" });
+
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
 	  		.map(function(d) { return d["Entity A"]});
@@ -230,10 +239,30 @@ jsdom.env({
 				};
 			});
 
+
 			// add count value to nodes
 			nodes.forEach(function(d) {
 				d.count = connectionCountList[d.id];
 			});
+
+			///
+
+			// var linksDupeList = {};
+
+			// links.forEach(function(d) {
+			// 	var sourceTargConcat = d.source.concat(d.target);
+			// 	if (!linksDupeList[sourceTargConcat]) {
+			// 		linksDupeList[sourceTargConcat] = 0
+			// 	} else {
+			// 		linksDupeList[sourceTargConcat] = 1
+			// 	}
+			// });
+
+			// console.log(linksDupeList);
+
+			// console.log(Object.keys(linksDupeList));
+
+			///
 
 			// // NODES REFERENCE
 			// allEntitiesSet.forEach(function(orgs) {
