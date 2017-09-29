@@ -12,27 +12,24 @@ var htmlStub = '<html><head> \
 	<div id="dataviz-container"></div> \
 	<div class=d1> \
 		<div class=d2> \
-			<div id=selectorDiv> \
-				<select id=listSelect> \
-				  <option value="Connectivity">Connectivity</option> \
-		  		<option value="Alphabetically">Alphabetically</option> \
-				</select> \
-			</div> \
 			<div id=listDiv></div> \
 		</div> \
 	</div> \
 	</body> \
 	<script src="trumpworld-interaction.js" charset="utf-8"></script> \
 	</html>'
+	
+			// <div id=selectorDiv> \
+			// 	<select id=listSelect> \
+			// 	  <option value="Connectivity">Connectivity</option> \
+		 //  		<option value="Alphabetically">Alphabetically</option> \
+			// 	</select> \
+			// </div> \
 
-
-// here we combine our htmlStub with D3
 jsdom.env({
 	features : { QuerySelector : true }
 	, html : htmlStub
 	, done : function(errors, window) {
-	// this callback function pre-renders the dataviz inside the html document, then export result into a static html file
-		// var el = window.document.querySelector('#dataviz-container');
  
 	  var body = window.document.querySelector('body')
 		  , listDiv = window.document.querySelector('#listDiv')
@@ -43,10 +40,6 @@ jsdom.env({
 		var margin = {top: 0, right: 0, bottom: 0, left: 0},
 			width = window.innerWidth - margin.left - margin.right,
 			height = window.innerHeight - margin.top - margin.bottom;
-
-		// var margin = {top: 0, right: 0, bottom: 0, left: 0},
-		// 	width = 900 - margin.left - margin.right,
-		// 	height = 900 - margin.top - margin.bottom;
 
 	  var voronoi = d3.voronoi()
 	    .x(function(d) { return d.x; })
@@ -78,12 +71,6 @@ jsdom.env({
 	 					.style("stroke-opacity", 1);
 				};
 			});
-
-		// var divExperiment = d3.select("body").attr("id", "divExperiment").append("div");
-		// console.log(divExperiment);
-
-// delete this once solved
-			// console.log(svg["_groups"]);
 
 		var gContainer = svg.append("g")
 			.attr("id", "gContainer")
@@ -179,14 +166,6 @@ jsdom.env({
 	  	// var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
 	  	// console.log("nodeCount: " + nodeCount);
 
-	  	// // NODES REFERENCE - uncomment to troubleshoot nodes disappearing
-	  	// var entityAs = trumpworld.map(function(d) { return d["Entity A"]; });
-	  	// var entityBs = trumpworld.map(function(d) { return d["Entity B"]; });
-	  	// var allEntities = entityAs.concat(entityBs);
-	  	// var allEntitiesSet = d3.set(allEntities).values();
-	  	// console.log("allEntitiesSet length: " + allEntitiesSet.length);
-	  	// console.log("allEntitiesSet: " + allEntitiesSet);
-
 			var nodes = [],
 					links = [],
 					listItems = [];
@@ -238,7 +217,6 @@ jsdom.env({
 					connectionCountList[d.target] += 1
 				};
 			});
-
 
 			// add count value to nodes
 			nodes.forEach(function(d) {
@@ -738,11 +716,11 @@ jsdom.env({
 
 		setTimeout(function() {
 			// Save result to an html file
-			fs.writeFile('../views/trumpworld-generated.html', window.document.documentElement.innerHTML, function(err) {
+			fs.writeFile('../views/trumpworld.html', window.document.documentElement.innerHTML, function(err) {
 				if(err) {
 					console.log('error saving document', err)
 				} else {
-					console.log('trumpworld-generated.html was saved!')
+					console.log('trumpworld.html was saved!')
 				}
 			})
 		}, 1000);

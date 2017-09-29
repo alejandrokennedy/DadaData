@@ -119,52 +119,58 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 svg.call(zoomEvent);
 zoomEvent.scaleTo(svg, .185);
 
-// selection sort logic
-var listSelector = d3.select("#listSelect")
-	.on("change", onChange);
 
-function onChange() {
-	var selectedValue = listSelector.property("value");
-	console.log(selectedValue);
 
-	if (selectedValue === "Alphabetically") {
 
-		function alpha() {
-			d3.selectAll("li").sort( function(a, b) {
-				console.log("A: ", a.id);
-				console.log("B: ", b.id);
-				if (a.id > b.id) {
-					return 1;
-				} else if (a.id < b.id) {
-					return -1;
-				} else { return 0; }
-			});
-		}
+// // selection sort logic
+// var listSelector = d3.select("#listSelect")
+// 	.on("change", onChange);
 
-		alpha.call();
+// function onChange() {
+// 	var selectedValue = listSelector.property("value");
+// 	console.log(selectedValue);
 
-	} else if (selectedValue === "Connectivity") {
+// 	if (selectedValue === "Alphabetically") {
 
-		function conn() {
-			d3.selectAll("li").sort( function(a, b) {
-				if (a.count > b.count) {
-					return -1;
-				} else if (a.count < b.count) {
-					return 1;
-				} else { 
-						if (a.id > b.id) {
-						return 1;
-					} else if (a.id < b.id) {
-						return -1;
-					} else { return 0; }; 
-				}
-			});
-		}
+// 		function alpha() {
+// 			d3.selectAll("li").sort( function(a, b) {
+// 				console.log("A: ", a.id);
+// 				console.log("B: ", b.id);
+// 				if (a.id > b.id) {
+// 					return 1;
+// 				} else if (a.id < b.id) {
+// 					return -1;
+// 				} else { return 0; }
+// 			});
+// 		}
 
-		conn.call();
+// 		alpha.call();
 
-	}
-} // onChange callback
+// 	} else if (selectedValue === "Connectivity") {
+
+// 		function conn() {
+// 			d3.selectAll("li").sort( function(a, b) {
+// 				if (a.count > b.count) {
+// 					return -1;
+// 				} else if (a.count < b.count) {
+// 					return 1;
+// 				} else { 
+// 						if (a.id > b.id) {
+// 						return 1;
+// 					} else if (a.id < b.id) {
+// 						return -1;
+// 					} else { return 0; }; 
+// 				}
+// 			});
+// 		}
+
+// 		conn.call();
+
+// 	}
+// } // onChange callback
+
+
+
 
 // 	switch (selectedValue) {
 
