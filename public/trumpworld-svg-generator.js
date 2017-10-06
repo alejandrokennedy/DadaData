@@ -12,6 +12,13 @@ var htmlStub = '<html><head> \
 	<div id="dataviz-container"></div> \
 	<div class=d1> \
 		<div class=d2> \
+			<div id=selectorDiv> \
+				<p id=selectText>Sort </p> \
+				<select id=listSelect> \
+				  <option value="By Connectivity">By Connectivity</option> \
+		  		<option value="Alphabetically">Alphabetically</option> \
+				</select> \
+			</div> \
 			<div id=listDiv></div> \
 		</div> \
 	</div> \
@@ -19,12 +26,6 @@ var htmlStub = '<html><head> \
 	<script src="trumpworld-interaction.js" charset="utf-8"></script> \
 	</html>'
 	
-			// <div id=selectorDiv> \
-			// 	<select id=listSelect> \
-			// 	  <option value="Connectivity">Connectivity</option> \
-		 //  		<option value="Alphabetically">Alphabetically</option> \
-			// 	</select> \
-			// </div> \
 
 jsdom.env({
 	features : { QuerySelector : true }
@@ -201,6 +202,35 @@ jsdom.env({
 				})
 			});
 
+			var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
+			var isDuplicate = valueArr.some(function(item, idx) {
+				return valueArr.indexOf(item) != idx
+			});
+			console.log("pre filter: ", isDuplicate, " : ", links.length);
+
+			function dedupe(arr) {
+				var hashTable = {}
+
+				return arr.filter(function(el) {
+					var sourceTargConcat = slug(el.source).concat(slug(el.target));
+					var key = JSON.stringify(sourceTargConcat);
+					// console.log(el);
+					var match = Boolean(hashTable[key]);
+
+					return (match ? false : hashTable[key] = true);
+				});
+			}
+
+			links = dedupe(links);
+
+			var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
+			var isDuplicate = valueArr.some(function(item, idx) {
+				return valueArr.indexOf(item) != idx
+			});
+			console.log("post filter: ", isDuplicate, " : ", links.length);
+
+			// console.log(links);
+
 			var connectionCountList = {};
 
 			// get nodes' connection count
@@ -228,12 +258,12 @@ jsdom.env({
 			// var linksDupeList = {};
 
 			// links.forEach(function(d) {
-			// 	var sourceTargConcat = d.source.concat(d.target);
+			// 	var sourceTargConcat = slug(d.source).concat(slug(d.target));
 			// 	if (!linksDupeList[sourceTargConcat]) {
 			// 		linksDupeList[sourceTargConcat] = 0
 			// 	} else {
-			// 		linksDupeList[sourceTargConcat] = 1
-			// 	}
+			// 		linksDupeList[sourceTargConcat] += 1
+			// 	};
 			// });
 
 			// console.log(linksDupeList);
@@ -353,13 +383,13 @@ jsdom.env({
 	 			.selectAll("li")
 	 			.data(nodes)
 	 			.enter().append("li")
-	 			.sort( function(a, b) {
-	 					if (a.count > b.count) {
-	 						return -1;
-	 					} else if (a.count < b.count) {
-	 						return 1;
-	 					} else { return 0; }
-	 				})
+	 			// .sort( function(a, b) {
+	 			// 		if (a.count > b.count) {
+	 			// 			return -1;
+	 			// 		} else if (a.count < b.count) {
+	 			// 			return 1;
+	 			// 		} else { return 0; }
+	 			// 	})
 	 			.attr("class", function(d) { return "T" + slug(d.id) })
 	 			.attr("id", function(d) { return "T" + slug(d.id) })
 	 			.html(function(d) { return d.id } )
@@ -672,11 +702,11 @@ jsdom.env({
 	 					.style("stroke-opacity", 1);
 	 			}); // on click callback
 
-			d3.timeout(function() {
-			  loading.remove();
-			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-			    simulation.tick();
-			  }
+			// d3.timeout(function() {
+			  // loading.remove();
+			  // for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+			  //   simulation.tick();
+			  // }
 
 			  clipPath
 	        .data(voronoi.polygons(graph.nodes))
@@ -709,7 +739,7 @@ jsdom.env({
 				labelShadow
 	        .attr("x", function(d) { return d.x + 11; })
 	        .attr("y", function(d) { return d.y; });
-			});
+			// });
 		}; // ready function callback
 
 	/////////////////

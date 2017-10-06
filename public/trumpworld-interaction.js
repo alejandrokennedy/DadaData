@@ -1,7 +1,9 @@
 // TODO
 // Conditional data binding of nodes (works now but is it a fluke?)
 // Fix styling for selectConnect and hoveredNode when invoked by corresponding li element
-// 
+// Remove double Daewoo
+
+
 
 // get size of sidebar
 var sidebarSize = d3.select(".d1").style("width");
@@ -93,8 +95,8 @@ lines.data(trumpJSON.links);
 
 // li re-bind
 var li = d3.selectAll("li");
-// .data(data, function(d) { return d ? d.name : this.id; })
-li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
+li.data(trumpJSON.nodes);
+// li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
 
 // zoom function
 var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
@@ -119,98 +121,76 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 svg.call(zoomEvent);
 zoomEvent.scaleTo(svg, .185);
 
+// sort data on launch
+function conn() {
+	d3.selectAll("li").sort( function(a, b) {
+		if (a.count > b.count) {
+			return -1;
+		} else if (a.count < b.count) {
+			return 1;
+		} else { 
+				if (a.id > b.id) {
+				return 1;
+			} else if (a.id < b.id) {
+				return -1;
+			} else { return 0; }; 
+		}
+	});
+}
+
+conn.call();
+
+// selection sort logic
+var listSelector = d3.select("#listSelect")
+	.on("change", onChange);
+
+function onChange() {
+	var selectedValue = listSelector.property("value");
+
+	if (selectedValue === "Alphabetically") {
+
+		function alpha() {
+			d3.selectAll("li").sort( function(a, b) {
+				if (a.id > b.id) {
+					return 1;
+				} else if (a.id < b.id) {
+					return -1;
+				} else { return 0; }
+			});
+		}
+
+		alpha.call();
+
+	} else if (selectedValue === "By Connectivity") {
+
+		function conn() {
+			d3.selectAll("li").sort( function(a, b) {
+				if (a.count > b.count) {
+					return -1;
+				} else if (a.count < b.count) {
+					return 1;
+				} else { 
+						if (a.id > b.id) {
+						return 1;
+					} else if (a.id < b.id) {
+						return -1;
+					} else { return 0; }; 
+				}
+			});
+		}
+
+		conn.call();
 
 
-
-// // selection sort logic
-// var listSelector = d3.select("#listSelect")
-// 	.on("change", onChange);
-
-// function onChange() {
-// 	var selectedValue = listSelector.property("value");
-// 	console.log(selectedValue);
-
-// 	if (selectedValue === "Alphabetically") {
-
-// 		function alpha() {
-// 			d3.selectAll("li").sort( function(a, b) {
-// 				console.log("A: ", a.id);
-// 				console.log("B: ", b.id);
-// 				if (a.id > b.id) {
-// 					return 1;
-// 				} else if (a.id < b.id) {
-// 					return -1;
-// 				} else { return 0; }
-// 			});
-// 		}
-
-// 		alpha.call();
-
-// 	} else if (selectedValue === "Connectivity") {
-
-// 		function conn() {
-// 			d3.selectAll("li").sort( function(a, b) {
-// 				if (a.count > b.count) {
-// 					return -1;
-// 				} else if (a.count < b.count) {
-// 					return 1;
-// 				} else { 
-// 						if (a.id > b.id) {
-// 						return 1;
-// 					} else if (a.id < b.id) {
-// 						return -1;
-// 					} else { return 0; }; 
-// 				}
-// 			});
-// 		}
-
-// 		conn.call();
-
-// 	}
-// } // onChange callback
+			d3.timeout(function() {
+			  loading.remove();
+			  }, 1000);
 
 
-
-
-// 	switch (selectedValue) {
-
-// 		case "Alphabetically":
-// 			function() {
-//  				d3.selectAll("li").sort( function(a, b) {
-//  					if (a.id > b.id) {
-//  						return 1;
-//  					} else if (a.id < b.id) {
-//  						return -1;
-//  					} else { return 0; }
-//  				});
-//  			};
-// 			break;
-
-// 		case "Connectivity":
-// 			function() {
-// 	 				d3.selectAll("li").sort( function(a, b) {
-// 	 					if (a.count > b.count) {
-// 	 						return -1;
-// 	 					} else if (a.count < b.count) {
-// 	 						return 1;
-// 	 					} else { 
-// 	 							if (a.id > b.id) {
-// 		 						return 1;
-// 		 					} else if (a.id < b.id) {
-// 		 						return -1;
-// 		 					} else { return 0; }; 
-//  						}
-// 	 				});
-// 	 			}
-//  			break;
-// 	}
-
-
-
-// } //onChange callback
+	}
+} // onChange callback
 
 // li SECTION
-
 li
 	.on("mouseover", function(d) {
 		var theSelectedNode = d3.selectAll(".selectedNode");

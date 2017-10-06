@@ -28,7 +28,7 @@
 		box-sizing: border-box;
 		position: absolute;
 		top:0;
-		background-color: #e5e5e5;
+		background-color: #f7f7f7;
 	}
 
 	.d2 {
@@ -85,4 +85,13 @@
 	  fill: none;
 	  /*fill-opacity: 0;*/
 	  pointer-events: all;
+	}
+
+	#selectText {
+		display: inline;
+	}
+
+	#selectorDiv {
+		margin-left: 22;
+		margin-top: 15;
 	}
