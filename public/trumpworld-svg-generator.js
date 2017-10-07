@@ -9,8 +9,10 @@ var htmlStub = '<html><head> \
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
 	<body> \
 	\
-		<div id="loader-wrapper"> \
-			<div id="loader>"></div> \
+		<div id="loader-wrapper" class="loadClass"> \
+			<div id="loader" class="loadClass"></div> \
+			<div id="loaderBefore" class="loadClass"></div> \
+			<div id="loaderAfter" class="loadClass"></div> \
 		</div> \
 	\
 	<h1>Trump World</h1> \
@@ -18,7 +20,7 @@ var htmlStub = '<html><head> \
 	<div class=d1> \
 		<div class=d2> \
 			<div id=selectorDiv> \
-				<p id=selectText>Sort : </p> \
+				<p id=selectText>Sort: </p> \
 				<select id=listSelect> \
 				  <option value="by Connectivity">by Connectivity</option> \
 		  		<option value="Alphabetically">Alphabetically</option> \
@@ -207,34 +209,36 @@ jsdom.env({
 				})
 			});
 
-			var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
-			var isDuplicate = valueArr.some(function(item, idx) {
-				return valueArr.indexOf(item) != idx
-			});
-			console.log("pre filter: ", isDuplicate, " : ", links.length);
 
-			function dedupe(arr) {
-				var hashTable = {}
 
-				return arr.filter(function(el) {
-					var sourceTargConcat = slug(el.source).concat(slug(el.target));
-					var key = JSON.stringify(sourceTargConcat);
-					// console.log(el);
-					var match = Boolean(hashTable[key]);
+			// var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
+			// var isDuplicate = valueArr.some(function(item, idx) {
+			// 	return valueArr.indexOf(item) != idx
+			// });
+			// console.log("pre filter: ", isDuplicate, " : ", links.length);
 
-					return (match ? false : hashTable[key] = true);
-				});
-			}
+			// function dedupe(arr) {
+			// 	var hashTable = {}
 
-			links = dedupe(links);
+			// 	return arr.filter(function(el) {
+			// 		var sourceTargConcat = slug(el.source).concat(slug(el.target));
+			// 		var key = JSON.stringify(sourceTargConcat);
+			// 		// console.log(el);
+			// 		var match = Boolean(hashTable[key]);
 
-			var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
-			var isDuplicate = valueArr.some(function(item, idx) {
-				return valueArr.indexOf(item) != idx
-			});
-			console.log("post filter: ", isDuplicate, " : ", links.length);
+			// 		return (match ? false : hashTable[key] = true);
+			// 	});
+			// }
 
-			// console.log(links);
+			// links = dedupe(links);
+
+			// var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
+			// var isDuplicate = valueArr.some(function(item, idx) {
+			// 	return valueArr.indexOf(item) != idx
+			// });
+			// console.log("post filter: ", isDuplicate, " : ", links.length);
+
+
 
 			var connectionCountList = {};
 

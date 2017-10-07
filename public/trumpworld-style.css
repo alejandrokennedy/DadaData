@@ -3,6 +3,7 @@
 		margin-left: 20px;
 		position: absolute;
 		text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
+		z-index: 2000;
 	}
 
 	body {
@@ -103,5 +104,85 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		/*z-index: 1000;*/
+		z-index: 1000;
+		background-color: #f7f7f7;
 	}
+
+		@-webkit-keyframes spin {
+		    0%   {
+		        -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		        -ms-transform: rotate(0deg);  /* IE 9 */
+		        transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+		    }
+		    100% {
+		        -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		        -ms-transform: rotate(360deg);  /* IE 9 */
+		        transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+		    }
+		}
+		@keyframes spin {
+		    0%   {
+		        -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		        -ms-transform: rotate(0deg);  /* IE 9 */
+		        transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+		    }
+		    100% {
+		        -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		        -ms-transform: rotate(360deg);  /* IE 9 */
+		        transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+		    }
+		}
+
+		#loader {
+			display: block;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 150px;
+			height: 150px;
+			margin: -75px 0 0 -75px;
+
+			border: 3px solid transparent;
+			border-top-color: rgb(31, 119, 180);
+			border-radius: 50%;
+			z-index: 1500;
+
+			-webkit-animation: spin 2s linear infinite;
+			animation: spin 2s linear infinite;
+		}
+
+		/*#loader:before {*/
+		#loaderBefore {
+			display: block;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 140px;
+			height: 140px;
+			margin: -70px 0 0 -70px;
+
+			border: 3px solid transparent;
+			border-top-color: rgb(255, 127, 14);
+			border-radius: 50%;
+
+			-webkit-animation: spin 1.5s linear infinite;
+			animation: spin 1.5s linear infinite;
+		}
+
+		/*#loader:after {*/
+		#loaderAfter {
+			display: block;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 130px;
+			height: 130px;
+			margin: -65px 0 0 -65px;
+
+			border: 3px solid transparent;
+			border-top-color: rgb(44, 160, 44);
+			border-radius: 50%;
+
+			-webkit-animation: spin 1s linear infinite;
+			animation: spin 1s linear infinite;
+		}

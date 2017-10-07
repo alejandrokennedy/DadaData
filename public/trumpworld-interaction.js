@@ -140,6 +140,36 @@ function conn() {
 
 conn.call();
 
+var transitionDuration = 1000
+
+var loadWrapper = d3.select("#loader-wrapper")
+.transition()
+.duration(transitionDuration)
+.ease(d3.easeQuadOut)
+.style("background-color", "transparent");
+
+var loader = d3.select("#loader")
+.attr("class", "loadClass")
+.transition()
+.duration(10000)
+.ease(d3.easeQuadOut)
+.style("border-color", "transparent");
+
+var loader = d3.select("#loaderBefore")
+.transition()
+.duration(10000)
+.ease(d3.easeQuadOut)
+.style("border-color", "transparent");
+
+var loader = d3.select("#loaderAfter")
+.transition()
+.duration(10000)
+.ease(d3.easeQuadOut)
+.style("border-color", "transparent");
+
+
+loadWrapper.remove();
+
 // selection sort logic
 var listSelector = d3.select("#listSelect")
 	.on("change", onChange);
