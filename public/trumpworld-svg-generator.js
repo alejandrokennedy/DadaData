@@ -8,14 +8,19 @@ var htmlStub = '<html><head> \
 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script> \
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
 	<body> \
+	\
+		<div id="loader-wrapper"> \
+			<div id="loader>"></div> \
+		</div> \
+	\
 	<h1>Trump World</h1> \
 	<div id="dataviz-container"></div> \
 	<div class=d1> \
 		<div class=d2> \
 			<div id=selectorDiv> \
-				<p id=selectText>Sort </p> \
+				<p id=selectText>Sort : </p> \
 				<select id=listSelect> \
-				  <option value="By Connectivity">By Connectivity</option> \
+				  <option value="by Connectivity">by Connectivity</option> \
 		  		<option value="Alphabetically">Alphabetically</option> \
 				</select> \
 			</div> \
@@ -702,11 +707,11 @@ jsdom.env({
 	 					.style("stroke-opacity", 1);
 	 			}); // on click callback
 
-			// d3.timeout(function() {
-			  // loading.remove();
-			  // for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-			  //   simulation.tick();
-			  // }
+			d3.timeout(function() {
+			  loading.remove();
+			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+			    simulation.tick();
+			  }
 
 			  clipPath
 	        .data(voronoi.polygons(graph.nodes))
@@ -739,7 +744,7 @@ jsdom.env({
 				labelShadow
 	        .attr("x", function(d) { return d.x + 11; })
 	        .attr("y", function(d) { return d.y; });
-			// });
+			});
 		}; // ready function callback
 
 	/////////////////

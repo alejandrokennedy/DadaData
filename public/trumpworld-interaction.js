@@ -161,7 +161,7 @@ function onChange() {
 
 		alpha.call();
 
-	} else if (selectedValue === "By Connectivity") {
+	} else if (selectedValue === "by Connectivity") {
 
 		function conn() {
 			d3.selectAll("li").sort( function(a, b) {
@@ -180,12 +180,6 @@ function onChange() {
 		}
 
 		conn.call();
-
-
-			d3.timeout(function() {
-			  loading.remove();
-			  }, 1000);
-
 
 	}
 } // onChange callback
