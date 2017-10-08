@@ -82,7 +82,7 @@ h3 > a {
   /*border: 2px solid orange;*/
   color: white;
   text-decoration: none;
-  transition: all ease-in-out .1s;
+  transition: all ease-in-out .07s;
   text-shadow: #333 0 0 15px, #333 0 0 10px, #333 0 0 4px;
 }
   /*text-shadow: #bcf3ff 0 0 10px;*/
