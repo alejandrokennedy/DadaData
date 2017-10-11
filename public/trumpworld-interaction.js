@@ -2,6 +2,7 @@
 // Conditional data binding of nodes (works now but is it a fluke?)
 // Fix styling for selectConnect and hoveredNode when invoked by corresponding li element
 // Remove double Daewoo
+// Fix Ajit Pai select connect hover text no-show
 
 
 
@@ -20,6 +21,9 @@ function resizeSVG() {
 	.attr("height", height);
 }
 resizeSVG.call();
+
+// resize selectorDiv
+d3.selectAll("#selectorDiv").style("width", sidebarSize);
 
 // queue up the data
 d3.queue()
@@ -63,6 +67,9 @@ var svg = d3.select("svg")
 		 				d3.selectAll(".lines")
 		 					.style("stroke", "grey")
 		 					.style("stroke-opacity", 1);
+		 				// clear any "onClick styles for LIs"
+		 				d3.selectAll("li")
+		 					.style("opacity", 1);
 					};
 				});
 
@@ -291,6 +298,9 @@ li
 				neighbours.push(link.target);
 			} return neighbours;
 		}, [d.id]);
+		// clear any "onClick" styles for LIs
+		d3.selectAll("li").classed("neighbouringNodeLIs", false)
+			.style("opacity", .25);
 
 		d3.selectAll(".nodes")
 			.classed("neighbouringNodeCircles", function(e) {
@@ -314,6 +324,19 @@ li
 			});
 			d3.selectAll(".neighbouringLines")
 			.style("stroke-opacity", 1);
+
+		// style neighbouring LIs on click
+		d3.selectAll("li")
+			.classed("neighbouringNodeLIs", function(e) {
+				if (isNeighbour.includes(e.id)) {
+					return true;
+				}
+			});
+			console.log(d3.selectAll(".neighbouringNodeLIs").nodes())
+		d3.selectAll(".neighbouringNodeLIs")
+			.style("opacity", 1);
+
+
 	}); // on click callback
 
 // CIRCLECATCHER SECTION

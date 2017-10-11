@@ -38,7 +38,12 @@
 		overflow:auto;
 	}
 
+	#listDiv {
+		/*padding-top: 30px;*/
+	}
+
 	ul {
+		margin-top: 55px;
 		padding-left: 12px;
 	}
 
@@ -89,13 +94,16 @@
 	}
 
 	#selectText {
-		display: inline;
+		display: inline-block;
 	}
 
 	#selectorDiv {
-		margin-left: 22;
-		margin-top: 15;
-		/*z-index: 900;*/
+		padding-top: 10px;
+		padding-bottom: 10px;
+		padding-left: 20px;
+		position: fixed;
+		background-color: #f7f7f7;
+		z-index: 900;
 	}
 
 	#loader-wrapper {
