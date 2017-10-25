@@ -2,6 +2,7 @@
 // Conditional data binding of nodes (works now but is it a fluke?)
 // Fix styling for selectConnect and hoveredNode when invoked by corresponding li element
 // Remove double Daewoo
+// Fix Ajit Pai select connect hover text no-show
 
 
 
@@ -50,21 +51,6 @@ function slug (id) {
 					 .replace(/\//g,"")
 				 	 .replace(/ /g,"");
 };
-
-var svg = d3.select("svg")
-	.on("click", function(){
-					if (d3.event.target === this) {
-						// clear any "onClick" styles for nodes
-		 				d3.selectAll(".nodes").classed("selectedNode", false)
-		 					.select(".nodeCircle")
-		 					.style("stroke", "white")
-		 					.style("fill-opacity", 1);
-		 				// clear any "onClick" styles for links
-		 				d3.selectAll(".lines")
-		 					.style("stroke", "grey")
-		 					.style("stroke-opacity", 1);
-					};
-				});
 
 var gContainer = d3.select("#gContainer");
 var clickHilightColor = "rgb(52, 255, 38)";
@@ -117,9 +103,6 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
     labelShadow.style("stroke-width", labelStroke);
 }); // zoom function callback
 
-// call zoom
-svg.call(zoomEvent);
-zoomEvent.scaleTo(svg, .185);
 
 // sort data on launch
 function conn() {
@@ -137,6 +120,45 @@ function conn() {
 		}
 	});
 }
+
+// alpha sort
+function alpha() {
+	d3.selectAll("li").sort( function(a, b) {
+		if (a.id > b.id) {
+			return 1;
+		} else if (a.id < b.id) {
+			return -1;
+		} else { return 0; }
+	});
+}
+
+var svg = d3.select("svg")
+	.on("click", function(){
+					if (d3.event.target === this) {
+						// clear any "onClick" styles for nodes
+		 				d3.selectAll(".nodes").classed("selectedNode", false)
+		 					.select(".nodeCircle")
+		 					.style("stroke", "white")
+		 					.style("fill-opacity", 1);
+		 				// clear any "onClick" styles for links
+		 				d3.selectAll(".lines")
+		 					.style("stroke", "grey")
+		 					.style("stroke-opacity", 1);
+		 				// clear any "onClick" styles for LIs
+		 				d3.selectAll("li")
+		 					.style("opacity", 1);
+		 				// clear any "onClick" styles for LIs
+		 				if (d3.select("#listSelect").node().value == "by Connectivity") {
+		 					conn.call();
+		 				} else {
+		 					alpha.call()
+		 				}
+					};
+				});
+
+// call zoom
+svg.call(zoomEvent);
+zoomEvent.scaleTo(svg, .185);
 
 conn.call();
 
@@ -179,16 +201,6 @@ function onChange() {
 
 	if (selectedValue === "Alphabetically") {
 
-		function alpha() {
-			d3.selectAll("li").sort( function(a, b) {
-				if (a.id > b.id) {
-					return 1;
-				} else if (a.id < b.id) {
-					return -1;
-				} else { return 0; }
-			});
-		}
-
 		alpha.call();
 
 	} else if (selectedValue === "by Connectivity") {
@@ -218,7 +230,9 @@ function onChange() {
 li
 	.on("mouseover", function(d) {
 		var theSelectedNode = d3.selectAll(".selectedNode");
-		var mouseClass = d3.select(this).attr("class");
+		console.log(theSelectedNode.node());
+		// why is TBUSYBOYSINVESTMENTSLLC not producing "theSelectedNode"?
+		var mouseClass = d3.select(this).attr("class").split(" ")[0];
 		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
 		// console.log(correspondingNode);
@@ -229,7 +243,6 @@ li
 		d3.select(correspondingNode).select(".nodeCircle")
 			.style("stroke", clickHilightColor)
 			.style("fill", "white");
-			console.log(d3.select(correspondingNode).attr("class").split(" "));
 	} else {
 		d3.select(correspondingNode).select(".nodeCircle")
 			.style("stroke", function(d) { return color(d.type) })
@@ -245,7 +258,7 @@ li
 	})
 
 	.on("mouseleave", function () {
-		var mouseClass = d3.select(this).attr("class");
+		var mouseClass = d3.select(this).attr("class").split(" ")[0];
 		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
 	correspondingNode.parentNode.appendChild(correspondingNode);
@@ -273,6 +286,7 @@ li
 	.on("click", function(d) {
 		// variables for use in if statements below
 		var clickClass = d3.select(this).attr("class");
+		console.log(clickClass);
 		var correspondingNodeSelection = d3.selectAll("." + clickClass);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
 		// clear any "onClick" styles for nodes
@@ -284,26 +298,16 @@ li
 		d3.selectAll(".lines")
 			.style("stroke", "grey")
 			.style("stroke-opacity", .15);
-		var isNeighbour = links.reduce(function (neighbours, link) {
-			if (link.target === d.id) {
-				neighbours.push(link.source);
-			} else if (link.source === d.id) {
-				neighbours.push(link.target);
-			} return neighbours;
-		}, [d.id]);
 
-		d3.selectAll(".nodes")
-			.classed("neighbouringNodeCircles", function(e) {
-				if (isNeighbour.includes(e.id)) {
-					return true;
-				}
-			});
-		d3.select(correspondingNode).classed("selectedNode", true)
+		// clear any "onClick" styles for LIs
+		d3.selectAll("li").classed("neighbouringNodeLIs", false)
+			.style("opacity", .25);
+
+		d3.select(correspondingNode)
+			.classed("selectedNode", true)
 			.select(".nodeCircle")
 			.style("stroke", clickHilightColor);
-		d3.selectAll(".neighbouringNodeCircles")
-			.select(".nodeCircle")
-			.style("fill-opacity", 1);
+
 		d3.selectAll(".lines")
 			.classed("neighbouringLines", function(e) {
 				if (e.source === d.id) {
@@ -312,8 +316,80 @@ li
 					return true;
 				};
 			});
+
 			d3.selectAll(".neighbouringLines")
 			.style("stroke-opacity", 1);
+
+
+		// Create array of links connecting to immediate neighbours
+		var isNeighbour = links.reduce(function (neighbours, link) {
+			if (link.target === d.id) {
+				neighbours.push(link.source);
+			} else if (link.source === d.id) {
+				neighbours.push(link.target);
+			} return neighbours;
+		}, [d.id]);
+
+
+		// // attempt to create object directly
+		// var neighbours = {};
+
+		// var isNeighbourObject = links.reduce(function (neighbours, link) {
+		// 	if (link.target === d.id) {
+		// 		neighbours[d.id] = d.id;
+		// 	} else if (link.source === d.id) {
+		// 		neighbours[d.id] = d.id;
+		// 	} return neighbours;
+		// }, [d.id]);
+
+		// console.log(isNeighbourObject);
+
+
+		// turn isNeighbour array into an object
+		var isNeighbourObj = {}
+		isNeighbour.forEach(function(el) {
+			isNeighbourObj[el] = el;
+		})
+
+		d3.selectAll(".nodes")
+			.classed("neighbouringNodeCircles", function(e) {
+				if (isNeighbour.includes(e.id)) {
+					return true;
+				}
+			});
+
+		d3.selectAll(".neighbouringNodeCircles")
+			.select(".nodeCircle")
+			.style("fill-opacity", 1);
+
+		// style neighbouring LIs on click
+		d3.selectAll("li")
+			.classed("neighbouringNodeLIs", function(e) {
+				if (isNeighbour.includes(e.id)) {
+					return true;
+				}
+			});
+		d3.selectAll(".neighbouringNodeLIs")
+			.style("opacity", 1);
+
+//		console.log(isNeighbour);
+//		consider using an object version of isNeighbour instead of looping over array for li sort below
+		// sort LIs: neighbours on top
+		d3.selectAll("li").sort( function(a, b) {
+			// console.log(a);
+
+				// if (isNeighbour.includes(a.id)) {
+
+				if (isNeighbourObj[a.id]) {
+					// console.log(isNeighbourObj[a]);
+				// if (a === isNeighbourObj[a]) {
+
+					return -1;
+				} else {
+					return 1;
+				}
+		});
+
 	}); // on click callback
 
 // CIRCLECATCHER SECTION
@@ -494,8 +570,47 @@ circleCatcher
 				};
 			});
 
-			d3.selectAll(".neighbouringLines")
-			.style("stroke-opacity", 1);
+		d3.selectAll(".neighbouringLines")
+		.style("stroke-opacity", 1);
+
+		// clear any "onClick" styles for LIs
+		d3.selectAll("li").classed("neighbouringNodeLIs", false)
+			.style("opacity", .25);
+
+		// sort LIs
+		var isNeighbourObj = {}
+
+		isNeighbour.forEach(function(el) {
+			isNeighbourObj[el] = el;
+		})
+
+				d3.selectAll("li")
+			.classed("neighbouringNodeLIs", function(e) {
+				if (isNeighbour.includes(e.id)) {
+					return true;
+				}
+			});
+		d3.selectAll(".neighbouringNodeLIs")
+			.style("opacity", 1);
+
+//		console.log(isNeighbour);
+//		consider using an object version of isNeighbour instead of looping over array for li sort below
+		// sort LIs: neighbours on top
+		d3.selectAll("li").sort( function(a, b) {
+			// console.log(a);
+
+				// if (isNeighbour.includes(a.id)) {
+
+				if (isNeighbourObj[a.id]) {
+					// console.log(isNeighbourObj[a]);
+				// if (a === isNeighbourObj[a]) {
+
+					return -1;
+				} else {
+					return 1;
+				}
+		});
+
 	}); // on click callback
 
 
