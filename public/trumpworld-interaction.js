@@ -230,8 +230,6 @@ function onChange() {
 li
 	.on("mouseover", function(d) {
 		var theSelectedNode = d3.selectAll(".selectedNode");
-		console.log(theSelectedNode.node());
-		// why is TBUSYBOYSINVESTMENTSLLC not producing "theSelectedNode"?
 		var mouseClass = d3.select(this).attr("class").split(" ")[0];
 		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
@@ -286,7 +284,6 @@ li
 	.on("click", function(d) {
 		// variables for use in if statements below
 		var clickClass = d3.select(this).attr("class");
-		console.log(clickClass);
 		var correspondingNodeSelection = d3.selectAll("." + clickClass);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
 		// clear any "onClick" styles for nodes
