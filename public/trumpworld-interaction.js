@@ -5,6 +5,8 @@
 // Fix Ajit Pai select connect hover text no-show
 
 
+// ^(?!\/\/)([^\/\n]*)console.log
+
 
 // get size of sidebar
 var sidebarSize = d3.select(".d1").style("width");
@@ -147,6 +149,23 @@ var svg = d3.select("svg")
 		 				// clear any "onClick" styles for LIs
 		 				d3.selectAll("li")
 		 					.style("opacity", 1);
+
+	 					// scroll to top of LI div
+	 					// do this only if a node is selected
+
+	 					// d3.select(".d2").style("color", "red");
+
+	 					// var d2Select = document.getElementById("listDiv");
+	 					var d2Select = document.getElementsByClassName("d2");
+
+	 					function styleThis() {
+	 					var scrollTopPlease = d2Select.style.color = "red";
+	 					}
+	 					styleThis.call;
+	 					// var scrollTopPlease = d2Select.innerHTML;
+	 					console.log(d2Select);
+	 					// console.log(scrollTopPlease);
+
 		 				// clear any "onClick" styles for LIs
 		 				if (d3.select("#listSelect").node().value == "by Connectivity") {
 		 					conn.call();
@@ -226,66 +245,186 @@ function onChange() {
 	}
 } // onChange callback
 
-// li SECTION
+
+
+////////// GLOBAL VARIABLES //////////
+
+var isNeighbourObj = {};
+var selectedNodeSlugID;
+var selectedNodeID;
+var linkSource;
+var linkTarget;
+var hoveredEntityID;
+
+
+
+////////// GENERIC ON("MOUSEOVER") FUNCTIONS //////////
+
+function genericMouseOverStuffGoesHereForNow () {
+
+	// if an entity is selected, do the following
+	if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
+
+		// assign selectedNodeSlugID and selectedNodeID to existing global variables
+		selectedNodeSlugID = d3.selectAll(".selectedNode").attr("class").split(" ")[1];
+		selectedNodeID = d3.selectAll(".selectedNode").data()[0].id;
+
+		// attribute selectConnect class to lines bridging selected and hovered nodes
+		d3.selectAll(".neighbouringLines")
+			.classed("selectConnect", function(d) {
+				linkSource = "T" + slug(d.source)
+				linkTarget = "T" + slug(d.target)
+				if (selectedNodeSlugID === linkSource && hoveredEntityID === linkTarget) {
+					return true;
+				} else if (selectedNodeSlugID === linkTarget && hoveredEntityID === linkSource) {
+					return true;
+				}	 						
+		});
+
+	} // if statement callback
+
+} // genericMouseOverStuffGoesHereForNow callback
+
+
+////////// GENERIC ON("CLICK") FUNCTIONS //////////
+
+// Style and lower (sort) LIs that represent neighbouring node
+function styleAndLowerConnectedLIs (isNeighbourObj) {
+
+	// clear any "onClick" styles for LIs
+	d3.selectAll("li").classed("neighbouringNodeLIs", false)
+		.style("opacity", .25);
+
+	// class neighbouring LIs on click
+	d3.selectAll("li")
+		.classed("neighbouringNodeLIs", function(e) {
+			// if (isNeighbour.includes(e.id)) {
+			if (isNeighbourObj[e.id]) {
+				return true;
+			}
+		});
+	// style neighbouring LIs on click
+	d3.selectAll(".neighbouringNodeLIs")
+		.style("opacity", 1)
+		.lower();
+} // styleAndLowerConnectedLIs callback
+
+
+
+////////// LI SECTION //////////
+
 li
 	.on("mouseover", function(d) {
-		var theSelectedNode = d3.selectAll(".selectedNode");
-		var mouseClass = d3.select(this).attr("class").split(" ")[0];
-		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-		var correspondingNode = correspondingNodeSelection.nodes()[0];
-		// console.log(correspondingNode);
-	correspondingNode.parentNode.appendChild(correspondingNode);
 
-// first possibility in if statement doesn't work; fix it!
-	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-		d3.select(correspondingNode).select(".nodeCircle")
-			.style("stroke", clickHilightColor)
-			.style("fill", "white");
-	} else {
-		d3.select(correspondingNode).select(".nodeCircle")
-			.style("stroke", function(d) { return color(d.type) })
-			.style("fill", "white");
-			// console.log("Two")
-	}
-	d3.selectAll("." + mouseClass).select(".label")
-			.style("display", "inline")
-			.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
-	d3.selectAll("." + mouseClass).select(".labelShadow")
-			.style("display", "inline")
-			.style("stroke", "white");
-	})
+		hoveredEntityID = d3.select(this).attr("class").split(" ")[0];
+
+		var theSelectedNode = d3.selectAll(".selectedNode");
+		var correspondingNodeSelection = d3.selectAll("." + hoveredEntityID);
+		var nodeNumIWant = correspondingNodeSelection.nodes().length - 2;
+		var correspondingNode = correspondingNodeSelection.nodes()[nodeNumIWant];
+
+
+		genericMouseOverStuffGoesHereForNow();
+
+		// console.log("   ==========   ")
+		// console.log(theSelectedNode);
+		// console.log(correspondingNodeSelection);
+		// console.log(nodeNumIWant);
+		// console.log(correspondingNode);
+		// console.log("   ----------   ")
+
+
+		// var selectedNodeLog = d3.selectAll(".selectedNode");
+		// console.log(selectedNodeLog.nodes());
+		// console.log(selectedNodeLog.data()[0].id);
+
+
+		correspondingNode.parentNode.appendChild(correspondingNode);
+
+		if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+
+			d3.select(correspondingNode).select(".nodeCircle")
+					.style("stroke", clickHilightColor)
+					// .style("fill", function(d) { return color(d.type) });
+			d3.select(correspondingNode).select(".label")
+				.text(function(d) { return d.id } );
+			d3.select(correspondingNode).select(".labelShadow")
+				.text(function(d) { return d.id } );
+
+
+			///
+
+
+			// // conditionally style hovered nodes and add connection text
+			// if (d3.select(this.parentNode).attr("class").split(" ").includes("selectedNode")) {
+			// 	d3.select(this.parentNode).select(".nodeCircle")
+			// 		.style("stroke", clickHilightColor)
+			// 		.style("fill", function(d) { return color(d.type) });
+			// 	d3.select(this.parentNode).select(".label")
+			// 		.text(function(d) { return d.id } );
+			// 	d3.select(this.parentNode).select(".labelShadow")
+			// 		.text(function(d) { return d.id } );
+			// } else if (d3.select(".selectConnect")["_groups"][0][0] === null) {
+			// 	d3.select(this.parentNode).select(".nodeCircle")
+			// 		.style("stroke", function(d) { return color(d.type) })
+			// 		.style("fill", "white");
+			// 	d3.select(this.parentNode).select(".label")
+			// 		.text(function(d) { return d.id } );
+			// 	d3.select(this.parentNode).select(".labelShadow")
+			// 		.text(function(d) { return d.id } );
+			// } else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredEntityID)) {
+			// 	d3.select(this.parentNode).select(".nodeCircle")
+			// 		.style("stroke", clickHilightColor)
+			// 		.style("fill", function(d) { return color(d.type) });
+
+
+			///
+
+		} else if (d3.select(".selectConnect")["_groups"][0][0] === null) {
+			// console.log(true);
+			d3.select(correspondingNode).select(".nodeCircle")
+				.style("stroke", function(d) { return color(d.type) })
+				.style("fill", "white");
+		} 
+		else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredEntityID)) {
+		d3.selectAll("." + hoveredEntityID).select(".label")
+				.style("display", "inline")
+				.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
+		d3.selectAll("." + hoveredEntityID).select(".labelShadow")
+				.style("display", "inline")
+				.style("stroke", "white");
+		}
+	}) // LI on mouseover callback
 
 	.on("mouseleave", function () {
-		var mouseClass = d3.select(this).attr("class").split(" ")[0];
-		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+		hoveredEntityID = d3.select(this).attr("class").split(" ")[0];
+		var correspondingNodeSelection = d3.selectAll("." + hoveredEntityID);
 		var correspondingNode = correspondingNodeSelection.nodes()[0];
-	correspondingNode.parentNode.appendChild(correspondingNode);
-	
-// first possibility in if statement doesn't work; fix it!
-	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-		d3.select(correspondingNode).select(".nodeCircle")
-			.style("stroke", clickHilightColor)
-			.style("fill", function(d) { return color(d.type) })
-			// console.log("one")
-	} else {
-		d3.select(correspondingNode).select(".nodeCircle")
-			.style("fill", function(d) { return color(d.type) })
-			.style("stroke", "white");
-	}
-	d3.selectAll("." + mouseClass).select(".label")
-			.style("display", "none")
-			.style("text-shadow", "none");
-	d3.selectAll("." + mouseClass).select(".labelShadow")
-			.style("display", "none")
-			.style("stroke", "white");
-			// console.log("two")
+		correspondingNode.parentNode.appendChild(correspondingNode);
+
+	// first possibility in if statement doesn't work; fix it!
+		if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+			d3.select(correspondingNode).select(".nodeCircle")
+				.style("stroke", clickHilightColor)
+				.style("fill", function(d) { return color(d.type) })
+				// console.log("one")
+		} else {
+			d3.select(correspondingNode).select(".nodeCircle")
+				.style("fill", function(d) { return color(d.type) })
+				.style("stroke", "white");
+		}
+		d3.selectAll("." + hoveredEntityID).select(".label")
+				.style("display", "none")
+				.style("text-shadow", "none");
+		d3.selectAll("." + hoveredEntityID).select(".labelShadow")
+				.style("display", "none")
+				.style("stroke", "white");
+				// console.log("two")
 	})
 
+
+	// LI onClick
 	.on("click", function(d) {
-		// variables for use in if statements below
-		var clickClass = d3.select(this).attr("class");
-		var correspondingNodeSelection = d3.selectAll("." + clickClass);
-		var correspondingNode = correspondingNodeSelection.nodes()[0];
 		// clear any "onClick" styles for nodes
 		d3.selectAll(".nodes").classed("selectedNode", false)
 			.select(".nodeCircle")
@@ -296,15 +435,24 @@ li
 			.style("stroke", "grey")
 			.style("stroke-opacity", .15);
 
-		// clear any "onClick" styles for LIs
-		d3.selectAll("li").classed("neighbouringNodeLIs", false)
-			.style("opacity", .25);
+		// variables for use in if statements
+		var clickClass = d3.select(this).attr("class");
+		var correspondingNodeSelection = d3.selectAll("." + clickClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
 
+		// console.log("click class: ", clickClass)
+		// console.log("correspondingNodeSelection: ", correspondingNodeSelection)
+		// console.log("correspondingNode: ", correspondingNode);
+
+		// class and style selected node
 		d3.select(correspondingNode)
 			.classed("selectedNode", true)
 			.select(".nodeCircle")
 			.style("stroke", clickHilightColor);
 
+			// console.log(correspondingNode);
+
+		// class neighbouring lines
 		d3.selectAll(".lines")
 			.classed("neighbouringLines", function(e) {
 				if (e.source === d.id) {
@@ -314,7 +462,8 @@ li
 				};
 			});
 
-			d3.selectAll(".neighbouringLines")
+		// style neighbouring lines
+		d3.selectAll(".neighbouringLines")
 			.style("stroke-opacity", 1);
 
 
@@ -343,77 +492,92 @@ li
 
 
 		// turn isNeighbour array into an object
-		var isNeighbourObj = {}
+		// console.log("first: ", isNeighbourObj)
+		isNeighbourObj = {};
 		isNeighbour.forEach(function(el) {
 			isNeighbourObj[el] = el;
-		})
-
-		d3.selectAll(".nodes")
-			.classed("neighbouringNodeCircles", function(e) {
-				if (isNeighbour.includes(e.id)) {
-					return true;
-				}
-			});
-
-		d3.selectAll(".neighbouringNodeCircles")
-			.select(".nodeCircle")
-			.style("fill-opacity", 1);
-
-		// style neighbouring LIs on click
-		d3.selectAll("li")
-			.classed("neighbouringNodeLIs", function(e) {
-				if (isNeighbour.includes(e.id)) {
-					return true;
-				}
-			});
-		d3.selectAll(".neighbouringNodeLIs")
-			.style("opacity", 1);
-
-//		console.log(isNeighbour);
-//		consider using an object version of isNeighbour instead of looping over array for li sort below
-		// sort LIs: neighbours on top
-		d3.selectAll("li").sort( function(a, b) {
-			// console.log(a);
-
-				// if (isNeighbour.includes(a.id)) {
-
-				if (isNeighbourObj[a.id]) {
-					// console.log(isNeighbourObj[a]);
-				// if (a === isNeighbourObj[a]) {
-
-					return -1;
-				} else {
-					return 1;
-				}
 		});
+		// console.log("second: ", isNeighbourObj)
+
+		// call function to class, style, and lower LIs representing connected nodes
+		styleAndLowerConnectedLIs(isNeighbourObj);
+
+		// // class neighbouring nodes
+		// d3.selectAll(".nodes")
+		// 	.classed("neighbouringNodeCircles", function(e) {
+		// 		if (isNeighbour.includes(e.id)) {
+		// 			return true;
+		// 		}
+		// 	});
+		// // style neighbouring nodes
+		// d3.selectAll(".neighbouringNodeCircles")
+		// 	.select(".nodeCircle")
+		// 	.style("fill-opacity", 1);
+
+
+
+
+
+		// // class and style neighbouring LIs on click
+		// d3.selectAll("li")
+		// 	.classed("neighbouringNodeLIs", function(e) {
+		// 		if (isNeighbour.includes(e.id)) {
+		// 			return true;
+		// 		}
+		// 	});
+		// d3.selectAll(".neighbouringNodeLIs")
+		// 	.style("opacity", 1);
+
+		// // sort LIs: neighbours on top
+		// d3.selectAll("li").sort( function(a, b) {
+		// 		if (isNeighbourObj[a.id]) {
+		// 			return -1;
+		// 		} else {
+		// 			return 1;
+		// 		}
+		// });
+
+
+
+
 
 	}); // on click callback
 
-// CIRCLECATCHER SECTION
+
+
+////////// CIRCLECATCHER SECTION //////////
+
 circleCatcher
 	.on("mouseover", function (d) {
-		var hoveredNode = d;
-		var hoveredNodeID = "T" + slug(hoveredNode.id);
 
-		// declare selectedNodeSlugID
-		if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
-			var selectedNodeSlugID = d3.selectAll(".selectedNode").attr("class").split(" ")[1];
-			var selectedNodeID = d3.selectAll(".selectedNode").data()[0].id;
-		}
+		hoveredEntityID = "T" + slug(d.id);
 
-		// add selectConnect class to links connecting hovered node with slected node
-		if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
-			d3.selectAll(".neighbouringLines")
-				.classed("selectConnect", function(d) {
-					var linkSource = "T" + slug(d.source)
-					var linkTarget = "T" + slug(d.target)
-					if (selectedNodeSlugID === linkSource && hoveredNodeID === linkTarget) {
-						return true;
-					} else if (selectedNodeSlugID === linkTarget && hoveredNodeID === linkSource) {
-						return true;
-					}	 						
-			});
-		}
+		
+		genericMouseOverStuffGoesHereForNow();
+
+
+
+		// // declare selectedNodeSlugID
+		// if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
+		// 	var selectedNodeSlugID = d3.selectAll(".selectedNode").attr("class").split(" ")[1];
+		// 	var selectedNodeID = d3.selectAll(".selectedNode").data()[0].id;
+		// }
+
+
+
+		// // add selectConnect class to links connecting hovered node with slected node
+		// if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
+		// 	d3.selectAll(".neighbouringLines")
+		// 		.classed("selectConnect", function(d) {
+		// 			var linkSource = "T" + slug(d.source)
+		// 			var linkTarget = "T" + slug(d.target)
+		// 			if (selectedNodeSlugID === linkSource && hoveredEntityID === linkTarget) {
+		// 				return true;
+		// 			} else if (selectedNodeSlugID === linkTarget && hoveredEntityID === linkSource) {
+		// 				return true;
+		// 			}	 						
+		// 	});
+		// }
 
 		// declare entityConnection
 		if (d3.select(".selectConnect")["_groups"][0][0] !== null) {
@@ -431,6 +595,7 @@ circleCatcher
 					var reference = d.reference;
 					// console.log("reference: ", reference);
 
+// IS THIS ADDING UNECESSARY CLASSES TO LINES (screwing up other things)?
 					var selCon = d3.select(".selectConnect");
 					selCon.classed(slugSource, true);
 					selCon.classed(slugTarget, true);
@@ -462,7 +627,7 @@ circleCatcher
 				.text(function(d) { return d.id } );
 			d3.select(this.parentNode).select(".labelShadow")
 				.text(function(d) { return d.id } );
-		} else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredNodeID)) {
+		} else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredEntityID)) {
 			d3.select(this.parentNode).select(".nodeCircle")
 				.style("stroke", clickHilightColor)
 				.style("fill", function(d) { return color(d.type) });
@@ -522,6 +687,7 @@ circleCatcher
 		}
 	})
 
+	// Circlecatcher onClick
 	.on("click", function(d) {
 		// clear any "onClick" styles for nodes
 		d3.selectAll(".nodes").classed("selectedNode", false)
@@ -533,6 +699,7 @@ circleCatcher
 			.style("stroke", "grey")
 			.style("stroke-opacity", .15);
 
+		// Create array of links connecting to immediate neighbours
 		var isNeighbour = links.reduce(function (neighbours, link) {
 			if (link.target === d.id) {
 				neighbours.push(link.source);
@@ -541,6 +708,7 @@ circleCatcher
 			} return neighbours;
 		}, [d.id])
 
+		// class neighbouring nodes
 		d3.selectAll(".nodes")
 			.classed("neighbouringNodeCircles", function(e) {
 				if (isNeighbour.includes(e.id)) { 
@@ -548,16 +716,19 @@ circleCatcher
 				}
 			});
 
+		// class and style selected node
 		d3.select(this.parentNode)
 			.classed("selectedNode", true)
 			.select(".nodeCircle")
 			.style("stroke", clickHilightColor)
 			.style("fill", function(d) { return color(d.type) });
 
+		// style neighbouring nodes
 		d3.selectAll(".neighbouringNodeCircles")
 			.select(".nodeCircle")
 			.style("fill-opacity", 1);
 
+		// class neighbouring lines
 		d3.selectAll(".lines")
 			.classed("neighbouringLines", function(e) {
 				if (e.source === d.id) {
@@ -567,48 +738,34 @@ circleCatcher
 				};
 			});
 
+		// style neighbouring lines
 		d3.selectAll(".neighbouringLines")
 		.style("stroke-opacity", 1);
 
-		// clear any "onClick" styles for LIs
-		d3.selectAll("li").classed("neighbouringNodeLIs", false)
-			.style("opacity", .25);
-
-		// sort LIs
-		var isNeighbourObj = {}
-
+		// turn isNeighbour array into an object
+		isNeighbourObj = {}
 		isNeighbour.forEach(function(el) {
 			isNeighbourObj[el] = el;
-		})
-
-				d3.selectAll("li")
-			.classed("neighbouringNodeLIs", function(e) {
-				if (isNeighbour.includes(e.id)) {
-					return true;
-				}
-			});
-		d3.selectAll(".neighbouringNodeLIs")
-			.style("opacity", 1);
-
-//		console.log(isNeighbour);
-//		consider using an object version of isNeighbour instead of looping over array for li sort below
-		// sort LIs: neighbours on top
-		d3.selectAll("li").sort( function(a, b) {
-			// console.log(a);
-
-				// if (isNeighbour.includes(a.id)) {
-
-				if (isNeighbourObj[a.id]) {
-					// console.log(isNeighbourObj[a]);
-				// if (a === isNeighbourObj[a]) {
-
-					return -1;
-				} else {
-					return 1;
-				}
 		});
 
+		// call function to class, style, and lower LIs representing connected nodes
+		styleAndLowerConnectedLIs(isNeighbourObj);
+
+		// // sort LIs: neighbours on top
+		// d3.selectAll("li").sort( function(a, b) {
+		// 		if (!isNeighbourObj[a.id] && !isNeighbourObj[b.id]) {
+		// 			return 0;
+		// 		} else if (isNeighbourObj[a.id] && !isNeighbourObj[b.id]) {
+		// 			return -1;
+		// 		} else if (isNeighbourObj[a.id] && isNeighbourObj[b.id]) {
+		// 			return 0;
+		// 		} else {
+		// 			return 1;
+		// 		}
+		// });
+
 	}); // on click callback
+
 
 
 // // Verify that these two blocks are actually needed
@@ -620,4 +777,4 @@ circleCatcher
 // zoomEvent.scaleTo(svg, .185);
 // }, .002);
 
-}
+} // end of Ready function
