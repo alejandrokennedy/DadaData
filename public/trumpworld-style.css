@@ -57,6 +57,10 @@
   	list-style-type: none;
 	}
 
+	li:hover {
+		cursor: pointer;
+	}
+
 	.links {
 		stroke: grey;
 		stroke-width: 1px;
@@ -72,7 +76,7 @@
 	  display: none;
 	  font: sans-serif;
 	}
-
+/*
 	.nodes:hover text {
 	  display: inline;
 	}
@@ -88,7 +92,7 @@
 		text-shadow: #ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px;
 	  /*stroke-width: 20;*/
 	}
-
+*/
 	.clip-path-circle {
 		/*stroke: crimson;*/
 	  fill: none;
@@ -101,7 +105,8 @@
 	}
 
 	#selectorDiv {
-		width: 260px;
+		width: 264px;
+		/*border: 1px solid black;*/
 		padding-top: 10px;
 		padding-bottom: 10px;
 		padding-left: 20px;
