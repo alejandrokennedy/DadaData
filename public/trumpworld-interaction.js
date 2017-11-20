@@ -144,7 +144,9 @@ function alpha() {
 
 function clearStylesForClick() {
 	// clear any "onClick" styles for nodes
-	d3.selectAll(".nodes").classed("selectedNode", false)
+	d3.selectAll(".nodes")
+		.classed("selectedNode", false)
+		.classed("neighbouringNodeCircles", false)
 		.select(".nodeCircle")
 		.style("stroke", "white")
 		.style("fill-opacity", .15);
@@ -162,7 +164,9 @@ var svg = d3.select("svg")
 	.on("click", function(){
 		if (d3.event.target === this) {
 			// clear any "onClick" styles for nodes
-			d3.selectAll(".nodes").classed("selectedNode", false)
+			d3.selectAll(".nodes")
+				.classed("selectedNode", false)
+				.classed("neighbouringNodeCircles", false)
 				.select(".nodeCircle")
 				.style("stroke", "white")
 				.style("fill-opacity", 1);
@@ -564,14 +568,6 @@ li
 		var nodeNumIWant = hoveredEntityNodeClass.nodes().length - 2;
 		var correspondingNode = hoveredEntityNodeClass.nodes()[nodeNumIWant];
 		hoveredEntityNode = hoveredEntityNodeClass.nodes()[nodeNumIWant];
-
-		// console.log("   ==========   ")
-		// console.log(hoveredEntityNodeClass.nodes());
-		// console.log(nodeNumIWant);
-
-		// console.log(correspondingNode);
-		// console.log(hoveredEntityNode);
-		// console.log("   ----------   ")
 
 		onMouseoverFunction(d);
 
