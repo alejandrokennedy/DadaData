@@ -278,6 +278,7 @@ function onChange() {
 	}
 } // onChange callback
 
+<<<<<<< HEAD
 
 
 ////////// GLOBAL VARIABLES //////////
@@ -375,6 +376,23 @@ function onMouseoverFunction (d) {
 	// conditionally style hovered nodes and add connection text
 	if (d3.select(hoveredEntityNode).attr("class").split(" ").includes("selectedNode")) {
 		d3.select(hoveredEntityNode).select(".nodeCircle")
+=======
+// li SECTION
+li
+	.on("mouseover", function(d) {
+		var theSelectedNode = d3.selectAll(".selectedNode");
+		console.log(theSelectedNode.node());
+		// why is TBUSYBOYSINVESTMENTSLLC not producing "theSelectedNode"?
+		var mouseClass = d3.select(this).attr("class").split(" ")[0];
+		var correspondingNodeSelection = d3.selectAll("." + mouseClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
+		// console.log(correspondingNode);
+	correspondingNode.parentNode.appendChild(correspondingNode);
+
+// first possibility in if statement doesn't work; fix it!
+	if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
+		d3.select(correspondingNode).select(".nodeCircle")
+>>>>>>> parent of 822ace4... Removed console logs
 			.style("stroke", clickHilightColor)
 			.style("fill", function(d) { return color(d.type) });
 		d3.select(hoveredEntityNode).select(".label")
@@ -426,7 +444,6 @@ function onMouseoverFunction (d) {
 			.text(function(d) { return entityConnection; } );
 		}
 
-
 } // onMouseoverFunction callback
 
 
@@ -443,12 +460,27 @@ function onMouseleaveFunction () {
 		d3.select(hoveredEntityNode).select(".labelShadow")
 			.style("display", "none")
 			.style("stroke", "white");
+<<<<<<< HEAD
 		if (d3.select(hoveredEntityNode).attr("class").split(" ").includes("selectedNode")) {
 				d3.select(hoveredEntityNode).select(".nodeCircle")
 				.style("stroke", "clickHilightColor")
 				.style("fill", function(d) { return color(d.type) });
 		} else {
 			d3.select(hoveredEntityNode).select(".nodeCircle")
+=======
+			// console.log("two")
+	})
+
+	.on("click", function(d) {
+		// variables for use in if statements below
+		var clickClass = d3.select(this).attr("class");
+		console.log(clickClass);
+		var correspondingNodeSelection = d3.selectAll("." + clickClass);
+		var correspondingNode = correspondingNodeSelection.nodes()[0];
+		// clear any "onClick" styles for nodes
+		d3.selectAll(".nodes").classed("selectedNode", false)
+			.select(".nodeCircle")
+>>>>>>> parent of 822ace4... Removed console logs
 			.style("stroke", "white")
 			.style("fill", function(d) { return color(d.type) });
 		}
