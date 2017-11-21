@@ -401,29 +401,29 @@ function onMouseoverFunction (d) {
 		// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
 		// }
 
-			var getLabel = d3.select(hoveredEntityNode).select(".label");
-			var getLabelShadow = d3.select(hoveredEntityNode).select(".labelShadow");
-			
-			getLabel.text(function(d) { return d.id; } )
-				.append("tspan")
-				.attr("dy", "1.5em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
-				.style("fill", "#585858")
-				.text(function(d) { return "connection with " + selectedNodeID + ":" } )
-				.append("tspan")
-				.attr("dy", "1.25em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
-				.text(function(d) { return entityConnection; } );
+		var getLabel = d3.select(hoveredEntityNode).select(".label");
+		var getLabelShadow = d3.select(hoveredEntityNode).select(".labelShadow");
+		
+		getLabel.text(function(d) { return d.id; } )
+			.append("tspan")
+			.attr("dy", "1.5em")
+			.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+			.style("fill", "#585858")
+			.text(function(d) { return "connection with " + selectedNodeID + ":" } )
+			.append("tspan")
+			.attr("dy", "1.25em")
+			.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+			.text(function(d) { return entityConnection; } );
 
-			getLabelShadow.text(function(d) { return d.id; } )
-				.append("tspan")
-				.attr("dy", "1.5em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
-				.text(function(d) { return "connection with " + selectedNodeID + ":" } )
-				.append("tspan")
-				.attr("dy", "1.25em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
-				.text(function(d) { return entityConnection; } );
+		getLabelShadow.text(function(d) { return d.id; } )
+			.append("tspan")
+			.attr("dy", "1.5em")
+			.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+			.text(function(d) { return "connection with " + selectedNodeID + ":" } )
+			.append("tspan")
+			.attr("dy", "1.25em")
+			.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+			.text(function(d) { return entityConnection; } );
 		}
 
 
