@@ -5,6 +5,7 @@
 // Fix Ajit Pai select connect hover text no-show
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
+// Fix: LIs disappearing from under the mouse in Firefox and Safari (and node label staying)
 
 // REFACTOR CHECKLIST
 // function to clear styles?
@@ -113,7 +114,6 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
     labelShadow.style("stroke-width", labelStroke);
 }); // zoom function callback
 
-
 // sort data on launch
 function conn() {
 	d3.selectAll("li").sort( function(a, b) {
@@ -180,6 +180,19 @@ var svg = d3.select("svg")
 				.style("border", "none")
 				.style("background-color", "#f7f7f7")
 				.classed("selectedLi", false);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			// scroll to top of LI div
 			// do this only if a node is selected
@@ -553,6 +566,24 @@ function styleAndLowerConnectedLIs (isNeighbourObj) {
 		.style("border-color", clickHilightColor)
 		.style("background-color", "white")
 		.lower();
+
+
+
+
+	function scrollTopTween(scrollTop) {
+	  return function() {
+	    var i = d3.interpolateNumber(this.scrollTop, scrollTop);
+	    var scrollElement = this;
+	    return function(t) {
+	    	scrollElement.scrollTop = i(t); };
+	 };
+	}
+
+	d3.select(".d2")
+		.transition().duration(800).ease(d3.easeCubicOut)
+		.tween("tweenName", scrollTopTween(0));
+
+	onMouseleaveFunction();
 
 } // styleAndLowerConnectedLIs callback
 
