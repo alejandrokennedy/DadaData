@@ -84,15 +84,6 @@ jsdom.env({
 			.attr("id", "gContainer")
 			.attr("transform", "translate(" + 300 + "," + margin.top + ")");
 
- 		var loading = svg.append("text")
- 			.attr("class", "loading")
-	    .attr("dy", "0.35em")
-	    .attr("text-anchor", "middle")
-	    .attr("transform", "translate(" + 1/2 * width + "," + 1/2 * height + ")")
-	    .attr("font-family", "sans-serif")
-	    .attr("font-size", 20)
-	    .text("Loading. One moment, please…");
-
 		var simulation = d3.forceSimulation()
 			.force("charge", d3.forceManyBody().strength(-200))
 			// .force("link", d3.forceLink(links).distance(20).strength(1).iterations(10))
@@ -101,7 +92,6 @@ jsdom.env({
 			.force("y", d3.forceY(height / 2));
 
 		var color = d3.scaleOrdinal(d3.schemeCategory10).domain(["organization", "person", "federal agency"]);
-	  // console.log(d3.schemeCategory10);
 
 	  d3.queue()
 	  	.defer(d3.csv, "https://raw.githubusercontent.com/BuzzFeedNews/trumpworld/master/data/trumpworld.csv")
@@ -117,25 +107,21 @@ jsdom.env({
 							 .replace(/\(/g,"")
 							 .replace(/\)/g,"")
 							 .replace(/\//g,"")
-						 	 .replace(/ /g,"");
+						 	 .replace(/ /g,"")
+						 	 .replace(/#/g,"")
+						 	 .replace(/—/g,"");
 	  };
 
 	  function ready (error, trumpworld) {
 	  	if (error) throw error;
-	  	// console.log("Entity Count: " + trumpworld.length);
+		// console.log("Entity Count: " + trumpworld.length);
 
-			// // if additional categories of entity are added, uncomment the code below and see what they are
+		// // if additional categories of entity are added, uncomment the code below and see what they are
 	  // 	var entityTypeList = d3.set(
 	  // 		trumpworld.map(function(d) {return d["Entity A Type"] })
 	  // 		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })))
 	  // 		.values();
 	  // 	console.log("entityTypeList: " + entityTypeList)
-
-	  // 	// If time: try writing a function to filter/map/set for each unique entry in either Entity A or Entity B columns 
-	  // 	entityTypeList.forEach(function(mungeType) {})
-
-	  	// trumpworld = trumpworld
-	  	// 	.filter( function(d) { return d["Entity A"] !== "DAEWOO AMERICA DEVELOPMENT (NEW YORK) CORP" });
 
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
@@ -168,9 +154,10 @@ jsdom.env({
 	  	var allOrgs = d3.set(orgs).values();
 	  	var allPeeps = d3.set(peeps).values();
 	  	var allFeds = d3.set(feds).values();
-	  	var entitiesList = allOrgs.concat(allPeeps).concat(allFeds).sort();
-	  	// console.log(entitiesList);
 
+	  	// // some console logs for reference
+	  	// var entitiesList = allOrgs.concat(allPeeps).concat(allFeds).sort();
+	  	// console.log(entitiesList);
 	  	// var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
 	  	// console.log("nodeCount: " + nodeCount);
 
@@ -187,9 +174,8 @@ jsdom.env({
 					"reference" : d["Source(s)"]
 				})
 			});
-			// console.log("linkCount: " + links.length)
 
-			// NODES (NEW)
+			// NODES
 			allOrgs.forEach(function(orgs) {
 				nodes.push({
 					"id" : orgs,
@@ -209,36 +195,7 @@ jsdom.env({
 				})
 			});
 
-
-
-			// var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
-			// var isDuplicate = valueArr.some(function(item, idx) {
-			// 	return valueArr.indexOf(item) != idx
-			// });
-			// console.log("pre filter: ", isDuplicate, " : ", links.length);
-
-			// function dedupe(arr) {
-			// 	var hashTable = {}
-
-			// 	return arr.filter(function(el) {
-			// 		var sourceTargConcat = slug(el.source).concat(slug(el.target));
-			// 		var key = JSON.stringify(sourceTargConcat);
-			// 		// console.log(el);
-			// 		var match = Boolean(hashTable[key]);
-
-			// 		return (match ? false : hashTable[key] = true);
-			// 	});
-			// }
-
-			// links = dedupe(links);
-
-			// var valueArr = links.map(function(d) { return slug(d.source).concat(slug(d.target))});
-			// var isDuplicate = valueArr.some(function(item, idx) {
-			// 	return valueArr.indexOf(item) != idx
-			// });
-			// console.log("post filter: ", isDuplicate, " : ", links.length);
-
-
+			/////
 
 			var connectionCountList = {};
 
@@ -262,33 +219,7 @@ jsdom.env({
 				d.count = connectionCountList[d.id];
 			});
 
-			///
-
-			// var linksDupeList = {};
-
-			// links.forEach(function(d) {
-			// 	var sourceTargConcat = slug(d.source).concat(slug(d.target));
-			// 	if (!linksDupeList[sourceTargConcat]) {
-			// 		linksDupeList[sourceTargConcat] = 0
-			// 	} else {
-			// 		linksDupeList[sourceTargConcat] += 1
-			// 	};
-			// });
-
-			// console.log(linksDupeList);
-
-			// console.log(Object.keys(linksDupeList));
-
-			///
-
-			// // NODES REFERENCE
-			// allEntitiesSet.forEach(function(orgs) {
-			// 	nodes.push({
-			// 		"id" : orgs,
-			// 		"type" : "organization"
-			// 	})
-			// });
-
+			/////
 
 			// GRAPH
 			var graph = {
@@ -296,6 +227,7 @@ jsdom.env({
 				"links": links
 			}
 
+			// create json for use in trumpworld-interaction.js
 			fs.writeFile('../public/trumpworld-graph.json', JSON.stringify(graph), function(err) {
 				if(err) {
 					console.log('error saving document', err)
@@ -362,15 +294,11 @@ jsdom.env({
 
 			svg.call(zoomEvent);
 
-			// console.log("This should log svg['_groups']: ", svg["_groups"]);
-
 // UNCOMMENT to troubleshoot
 	 		// zoomEvent.scaleTo(svg, .185);
 
 		 	simulation
 		 		.nodes(graph.nodes);
-		 		// do I need the following '"tick", ticked' for the visualization to run?
-		 		// .on("tick", ticked);
 
 	 		simulation.force("link")
 	 			.links(graph.links);
@@ -383,144 +311,14 @@ jsdom.env({
 
 	 		var clickHilightColor = "rgb(52, 255, 38)";
 
-// UNCOMMENT to troubleshoot
-	 		var buttonDiv = d3.select(listDiv).append("div").attr("class", "buttonDiv");
-	 		// var buttonAlpha = d3.select(".buttonDiv").append("button").text("Sort Alphabetically");
-	 		// var buttonCount = d3.select(".buttonDiv").append("button").text("Sort by Connectivity");
-
 	 		var ul = d3.select(listDiv).append("ul")
 	 			.selectAll("li")
 	 			.data(nodes)
 	 			.enter().append("li")
-	 			// .sort( function(a, b) {
-	 			// 		if (a.count > b.count) {
-	 			// 			return -1;
-	 			// 		} else if (a.count < b.count) {
-	 			// 			return 1;
-	 			// 		} else { return 0; }
-	 			// 	})
 	 			.attr("class", function(d) { return "T" + slug(d.id) })
 	 			.attr("id", function(d) { return "T" + slug(d.id) })
 	 			.html(function(d) { return d.id } )
 	 			.style("color", function(d) { return color(d.type) })
-
-	 			.on("mouseover", function() {
-	 				var mouseClass = d3.select(this).attr("class");
-	 				var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
-					correspondingNode.parentNode.appendChild(correspondingNode);
-					if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-						d3.select(correspondingNode).select(".nodeCircle")
-							.style("stroke", clickHilightColor)
-							.style("fill", "white");
-					} else {
-						d3.select(correspondingNode).select(".nodeCircle")
-							.style("stroke", function(d) { return color(d.type) })
-							.style("fill", "white");
-					}
-					d3.selectAll("." + mouseClass).select(".label")
- 						.style("display", "inline")
- 						.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
-					d3.selectAll("." + mouseClass).select(".labelShadow")
- 						.style("display", "inline")
- 						.style("stroke", "white");
-	 			})
-
-	 			.on("mouseleave", function () {
-	 				var mouseClass = d3.select(this).attr("class");
-	 				var correspondingNodeSelection = d3.selectAll("." + mouseClass);
-	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
-					correspondingNode.parentNode.appendChild(correspondingNode);
-					
-					if (d3.select(correspondingNode).attr("class").split(" ").includes("selectedNode")) {
-						d3.select(correspondingNode).select(".nodeCircle")
-							.style("stroke", clickHilightColor)
-							.style("fill", function(d) { return color(d.type) })
-					} else {
-						d3.select(correspondingNode).select(".nodeCircle")
-							.style("fill", function(d) { return color(d.type) })
-							.style("stroke", "white");
-					}
-					d3.selectAll("." + mouseClass).select(".label")
- 						.style("display", "none")
- 						.style("text-shadow", "none");
-					d3.selectAll("." + mouseClass).select(".labelShadow")
- 						.style("display", "none")
- 						.style("stroke", "white");
-	 			})
-
-	 			.on("click", function(d) {
- 					// variables for use in if statements below
-	 				var clickClass = d3.select(this).attr("class");
-	 				var correspondingNodeSelection = d3.selectAll("." + clickClass);
-	 				var correspondingNode = correspondingNodeSelection.nodes()[1];
-	 				// clear any "onClick" styles for nodes
-	 				d3.selectAll(".nodes").classed("selectedNode", false)
-	 					.select(".nodeCircle")
-	 					.style("stroke", "white")
-	 					.style("fill-opacity", .15);
-	 				// clear any "onClick" styles for links
-	 				d3.selectAll(".lines")
-	 					.style("stroke", "grey")
-	 					.style("stroke-opacity", .15);
-	 				var isNeighbour = links.reduce(function (neighbours, link) {
-	 					if (link.target.id === d.id) {
-	 						neighbours.push(link.source.id);
-	 					} else if (link.source.id === d.id) {
-	 						neighbours.push(link.target.id);
-	 					} return neighbours;
-	 				}, [d.id]);
-
-	 				d3.selectAll(".nodes")
-	 					.classed("neighbouringNodeCircles", function(e) {
-	 						if (isNeighbour.includes(e.id)) {
-	 							return true;
-	 						}
-	 					});
-	 				d3.select(correspondingNode).classed("selectedNode", true)
-	 					.select(".nodeCircle")
-	 					.style("stroke", clickHilightColor);
- 					d3.selectAll(".neighbouringNodeCircles")
- 						.select(".nodeCircle")
- 						.style("fill-opacity", 1);
-	 				d3.selectAll(".lines")
-	 					.classed("neighbouringLines", function(e) {
-	 						if (e.source.id === d.id) {
-	 							return true;
-	 						} else if (e.target.id === d.id) {
-	 							return true;
-	 						};
-	 					});
-	 					d3.selectAll(".neighbouringLines")
-	 					.style("stroke-opacity", 1);
-	 			}); // on click callback
-
-	 			// // sort button 1
-	 			// buttonAlpha.on("click", function() {
-	 			// 	d3.selectAll("li").sort( function(a, b) {
-	 			// 		if (a.id > b.id) {
-	 			// 			return 1;
-	 			// 		} else if (a.id < b.id) {
-	 			// 			return -1;
-	 			// 		} else { return 0; }
-	 			// 	});
-	 			// })
-
-	 	// 		buttonCount.on("click", function() {
-	 	// 			d3.selectAll("li").sort( function(a, b) {
-	 	// 				if (a.count > b.count) {
-	 	// 					return -1;
-	 	// 				} else if (a.count < b.count) {
-	 	// 					return 1;
-	 	// 				} else { 
-	 	// 						if (a.id > b.id) {
-		 // 						return 1;
-		 // 					} else if (a.id < b.id) {
-		 // 						return -1;
-		 // 					} else { return 0; }; 
- 		// 				}
-	 	// 			});
-	 	// 		})
 
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
@@ -531,188 +329,9 @@ jsdom.env({
 	 			.style("stroke", "none")
 	 			.attr("clip-path", function(d) { return "url(#clip-" + slug(d.id) + ")"; })
 
-	 			.on("mouseover", function (d) {
-	 				var hoveredNode = d
-	 				var hoveredNodeID = "T" + slug(hoveredNode.id)
-
-	 				// declare selectedNodeSlugID
-	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
-		 				var selectedNodeSlugID = d3.selectAll(".selectedNode").attr("class").split(" ")[1];
-		 				var selectedNodeID = d3.selectAll(".selectedNode").data()[0].id;
-		 			}
-
-	 				// add selectConnect class to links connecting hovered node with slected node
-	 				if (d3.select(".selectedNode")["_groups"][0][0] !== null) {
-		 				d3.selectAll(".neighbouringLines")
-		 					.classed("selectConnect", function(d) {
-		 						var linkSource = "T" + slug(d.source.id)
-		 						var linkTarget = "T" + slug(d.target.id)
-			 					if (selectedNodeSlugID === linkSource && hoveredNodeID === linkTarget) {
-			 						return true;
-			 					} else if (selectedNodeSlugID === linkTarget && hoveredNodeID === linkSource) {
-			 						return true;
-			 					}	 						
-		 				});
-	 				}
-
-	 				// declare entityConnection
-	 				if (d3.select(".selectConnect")["_groups"][0][0] !== null) {
-		 				var entityConnection = d3.select(".selectConnect").data()[0].connection;
-		 			}
-
-	 				// style selectConnect link
-	 				d3.select(".selectConnect")
-	 					.style("stroke", clickHilightColor)
-	 					.each(
-	 						function(d) {
-	 							var slugSource = "T" + slug(d.source.id);
-	 							var slugTarget = "T" + slug(d.target.id);
-
-	 							var reference = d.reference;
-	 							console.log("reference: ", reference);
-
-	 							var selCon = d3.select(".selectConnect");
-	 							selCon.classed(slugSource, true);
-	 							selCon.classed(slugTarget, true);
-	 						}
- 						);
-
-	 				// style labels on hover
-	 				d3.select(this.parentNode).select(".label")
-	 					.style("display", "inline")
- 						.style("text-shadow", "#ffffff 0 0 6px, #ffffff 0 0 4px, #ffffff 0 0 2px");
-	 				d3.select(this.parentNode).select(".labelShadow")
-	 					.style("display", "inline")
- 						.style("stroke", "white");
-
- 					// conditionally style hovered nodes and add connection text
- 					if (d3.select(this.parentNode).attr("class").split(" ").includes("selectedNode")) {
- 						d3.select(this.parentNode).select(".nodeCircle")
-	 						.style("stroke", clickHilightColor)
-	 						.style("fill", function(d) { return color(d.type) });
-	 					d3.select(this.parentNode).select(".label")
-	 						.text(function(d) { return d.id } );
-	 					d3.select(this.parentNode).select(".labelShadow")
-	 						.text(function(d) { return d.id } );
-	 				} else if (d3.select(".selectConnect")["_groups"][0][0] === null) {
-	 					d3.select(this.parentNode).select(".nodeCircle")
-	 						.style("stroke", function(d) { return color(d.type) })
-	 						.style("fill", "white");
-	 					d3.select(this.parentNode).select(".label")
-	 						.text(function(d) { return d.id } );
-	 					d3.select(this.parentNode).select(".labelShadow")
-	 						.text(function(d) { return d.id } );
-	 				} else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredNodeID)) {
-	 					d3.select(this.parentNode).select(".nodeCircle")
-	 						.style("stroke", clickHilightColor)
-	 						.style("fill", function(d) { return color(d.type) });
-
- 						// update connection info label on click
-	 				// 	d3.select(this.parentNode).select(".label")
-	 				// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
-	 				// 	d3.select(this.parentNode).select(".labelShadow")
-	 				// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + entityConnection; } );
-	 				// }
-
-		 				var getLabel = d3.select(this.parentNode).select(".label");
-		 				var getLabelShadow = d3.select(this.parentNode).select(".labelShadow");
-		 				
-		 				getLabel.text(function(d) { return d.id; } )
-	 						.append("tspan")
-	 						.attr("dy", "1.5em")
-	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
-	 						.style("fill", "#585858")
-	 						.text(function(d) { return "connection with " + selectedNodeID + ":" } )
- 							.append("tspan")
-	 						.attr("dy", "1.25em")
-	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
-	 						.text(function(d) { return entityConnection; } );
-
-	 					getLabelShadow.text(function(d) { return d.id; } )
-	 						.append("tspan")
-	 						.attr("dy", "1.5em")
-	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
-	 						.text(function(d) { return "connection with " + selectedNodeID + ":" } )
- 							.append("tspan")
-	 						.attr("dy", "1.25em")
-	 						.attr("x", parseFloat(d3.select(this.parentNode).select(".label").attr("x")) + 40)
-	 						.text(function(d) { return entityConnection; } );
-	 				}
-
-	 			}) // on mouseover callback
-
-	 			.on("mouseleave", function () {
-	 				d3.selectAll(".neighbouringLines")
-	 					.classed("selectConnect", false)
-	 					.style("stroke", "grey");
-	 				d3.select(this.parentNode).select(".label")
-	 					.style("display", "none")
- 						.style("text-shadow", "none");
-	 				d3.select(this.parentNode).select(".labelShadow")
-	 					.style("display", "none")
- 						.style("stroke", "white");
-	 				if (d3.select(this.parentNode).attr("class").split(" ").includes("selectedNode")) {
-	 						d3.select(this.parentNode).select(".nodeCircle")
-	 						.style("stroke", "clickHilightColor")
-	 						.style("fill", function(d) { return color(d.type) });
-	 				} else {
-	 					d3.select(this.parentNode).select(".nodeCircle")
-	 					.style("stroke", "white")
-	 					.style("fill", function(d) { return color(d.type) });
-	 				}
-	 			})
-
-	 			.on("click", function(d) {
-	 				// clear any "onClick" styles for nodes
-	 				d3.selectAll(".nodes").classed("selectedNode", false)
-	 					.select(".nodeCircle")
-	 					.style("stroke", "white")
-	 					.style("fill-opacity", .15);
-	 				// clear any "onClick" styles for links
-	 				d3.selectAll(".lines")
-	 					.style("stroke", "grey")
-	 					.style("stroke-opacity", .15);
-
-	 				var isNeighbour = links.reduce(function (neighbours, link) {
-	 					if (link.target.id === d.id) {
-	 						neighbours.push(link.source.id);
-	 					} else if (link.source.id === d.id) {
-	 						neighbours.push(link.target.id)
-	 					} return neighbours;
-	 				}, [d.id])
-
-	 				d3.selectAll(".nodes")
-	 					.classed("neighbouringNodeCircles", function(e) {
-	 						if (isNeighbour.includes(e.id)) { 
-	 							return true;
-	 						}
-	 					});
-
-	 				d3.select(this.parentNode)
-	 					.classed("selectedNode", true)
-	 					.select(".nodeCircle")
-	 					.style("stroke", clickHilightColor)
-	 					.style("fill", function(d) { return color(d.type) });
-
- 					d3.selectAll(".neighbouringNodeCircles")
- 						.select(".nodeCircle")
- 						.style("fill-opacity", 1);
-
-	 				d3.selectAll(".lines")
-	 					.classed("neighbouringLines", function(e) {
-	 						if (e.source.id === d.id) {
-	 							return true;
-	 						} else if (e.target.id === d.id) {
-	 							return true;
-	 						};
-	 					});
-
-	 					d3.selectAll(".neighbouringLines")
-	 					.style("stroke-opacity", 1);
-	 			}); // on click callback
-
+	 		// generate static simulation
 			d3.timeout(function() {
-			  loading.remove();
+
 			  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
 			    simulation.tick();
 			  }
@@ -753,8 +372,8 @@ jsdom.env({
 
 	/////////////////
 
+		// Save result to an html file
 		setTimeout(function() {
-			// Save result to an html file
 			fs.writeFile('../views/trumpworld.html', window.document.documentElement.innerHTML, function(err) {
 				if(err) {
 					console.log('error saving document', err)
@@ -764,4 +383,4 @@ jsdom.env({
 			})
 		}, 1000);
 	} // end jsDom done callback
-})
+}) // end jsdom.env callback

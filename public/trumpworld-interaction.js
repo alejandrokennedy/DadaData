@@ -6,6 +6,7 @@
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
 // Fix: LIs disappearing from under the mouse in Firefox and Safari (and node label staying)
+// Fix stacktrace error (logs in stacktrace-error.js)
 
 // REFACTOR CHECKLIST
 // function to clear styles?
@@ -51,16 +52,16 @@ var max_labelStroke = 20
 
 function slug (id) {
 	return id.replace(/,/g,"")
-	 .replace(/\./g,"")
-	 .replace(/'/g,"")
-	 .replace(/"/g,"")
-	 .replace(/&/g,"")
-	 .replace(/\(/g,"")
-	 .replace(/\)/g,"")
-	 .replace(/\//g,"")
- 	 .replace(/ /g,"")
- 	 .replace(/#/g,"")
- 	 .replace(/—/g,"");
+					 .replace(/\./g,"")
+					 .replace(/'/g,"")
+					 .replace(/"/g,"")
+					 .replace(/&/g,"")
+					 .replace(/\(/g,"")
+					 .replace(/\)/g,"")
+					 .replace(/\//g,"")
+				 	 .replace(/ /g,"")
+				 	 .replace(/#/g,"")
+				 	 .replace(/—/g,"");
 };
 
 var gContainer = d3.select("#gContainer");
@@ -291,8 +292,6 @@ function onChange() {
 	}
 } // onChange callback
 
-
-
 ////////// GLOBAL VARIABLES //////////
 
 var isNeighbour;
@@ -471,7 +470,7 @@ function onMouseleaveFunction () {
 
 ////////// GENERIC ON("CLICK") FUNCTIONS //////////
 
-function onClickFunction (d) {
+function onClickFunction (d, isNeighbourObj) {
 
 	clickedEntityMultiElementSelection = d3.selectAll("." + clickedEntitySlugID);
 
@@ -537,11 +536,8 @@ function onClickFunction (d) {
 	d3.select(clickedEntityLi)
 		.classed("selectedLi", true);
 
-} // onClickFunction callback
 
-// does this need to be its own function?
 // Style and lower (sort) LIs that represent neighbouring node
-function styleAndLowerConnectedLIs (isNeighbourObj) {
 
 	// clear any "onClick" styles for LIs
 	d3.selectAll("li").classed("neighbouringNodeLIs", false)
@@ -642,10 +638,7 @@ li
 		clickedEntitySlugID = d3.select(this).attr("class").split(" ")[0];
 
 		// call function to class, style, and lower LIs representing connected nodes
-		onClickFunction(d);
-
-		// call function to class, style, and lower LIs representing connected nodes
-		styleAndLowerConnectedLIs(isNeighbourObj);
+		onClickFunction(d, isNeighbourObj);
 
 	}); // on click callback
 
@@ -669,41 +662,14 @@ circleCatcher
 
 	})
 
-	// Circlecatcher onClick
 	.on("click", function(d) {
 
 		// update global variable
 		clickedEntitySlugID = d3.select(this.parentNode).attr("class").split(" ")[1];
 		
 		// pass onClickFunction the data from clicked node
-		onClickFunction(d);
-
-		// call function to class, style, and lower LIs representing connected nodes
-		// does this function need to be separate? Pros? Cons?
-		styleAndLowerConnectedLIs(isNeighbourObj);
-
-		// // sort LIs: neighbours on top
-		// d3.selectAll("li").sort( function(a, b) {
-		// 		if (!isNeighbourObj[a.id] && !isNeighbourObj[b.id]) {
-		// 			return 0;
-		// 		} else if (isNeighbourObj[a.id] && !isNeighbourObj[b.id]) {
-		// 			return -1;
-		// 		} else if (isNeighbourObj[a.id] && isNeighbourObj[b.id]) {
-		// 			return 0;
-		// 		} else {
-		// 			return 1;
-		// 		}
-		// });
+		onClickFunction(d, isNeighbourObj);
 
 	}); // on click callback
-
-// // Verify that these two blocks are actually needed
-// setTimeout(function() {
-// svg.call(zoomEvent);
-// }, .001);
-
-// setTimeout(function() {
-// zoomEvent.scaleTo(svg, .185);
-// }, .002);
 
 } // end of Ready function
