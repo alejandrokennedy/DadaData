@@ -16,7 +16,9 @@ var htmlStub = '<html><head> \
 		</div> \
 	\
 	<h1>Trump World</h1> \
-	<div id="dataviz-container"></div> \
+	<div id="dataviz-container"> \
+		<div id="legend"></div> \
+	</div> \
 	<div class=d1> \
 		<div class=d2> \
 			<div id=selectorDiv> \
@@ -116,12 +118,12 @@ jsdom.env({
 	  	if (error) throw error;
 		// console.log("Entity Count: " + trumpworld.length);
 
-		// // if additional categories of entity are added, uncomment the code below and see what they are
-	  // 	var entityTypeList = d3.set(
-	  // 		trumpworld.map(function(d) {return d["Entity A Type"] })
-	  // 		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })))
-	  // 		.values();
-	  // 	console.log("entityTypeList: " + entityTypeList)
+		// list of entity types for use in legend
+	  	var entityTypeList = d3.set(
+	  		trumpworld.map(function(d) {return d["Entity A Type"] })
+	  		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })));
+	  		// .values();
+	  	console.log("entityTypeList: " + entityTypeList)
 
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
@@ -381,6 +383,6 @@ jsdom.env({
 					console.log('trumpworld.html was saved!')
 				}
 			})
-		}, 1000);
+		}, 2000);
 	} // end jsDom done callback
 }) // end jsdom.env callback

@@ -1,15 +1,16 @@
 // TODO
-// Remove double Daewoo
-// Fix .TTHEREEDSCORDISH2016CHILDRENSTRUST#2
-// Fix .TTHEREEDSCORDISH2016CHILDRENSTRUST#1
-// Fix Ajit Pai select connect hover text no-show
+// create entityTypeList-like variable in interaction file so as to be able to console log legend
+// why are the circles in github desktop not small anymore?
+
+/////////
+
+// Fix stacktrace error (logs in stacktrace-error.js)
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
-// Fix: LIs disappearing from under the mouse in Firefox and Safari (and node label staying)
-// Fix stacktrace error (logs in stacktrace-error.js)
+
+// Remove double Daewoo?
 
 // REFACTOR CHECKLIST
-// function to clear styles?
 // How to select from an array based on values (so as to not need [0]th, or length - 2)?
 // what code is duplicated between this and SVG-generator? The slug??? Be sure to remove duplification.
 // categorize global variables
@@ -181,38 +182,6 @@ var svg = d3.select("svg")
 				.style("border", "none")
 				.style("background-color", "#f7f7f7")
 				.classed("selectedLi", false);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			// scroll to top of LI div
-			// do this only if a node is selected
-
-			// d3.select(".d2").style("color", "red");
-
-			// var d2Select = document.getElementById("listDiv");
-			var d2Select = document.getElementsByClassName("d2");
-
-			function styleThis() {
-			var scrollTopPlease = d2Select.style.color = "red";
-			}
-			styleThis.call;
-			// var scrollTopPlease = d2Select.innerHTML;
-
-			// console.log(d2Select);
-			
-			// console.log(scrollTopPlease);
-
 			// clear any "onClick" styles for LIs
 			if (d3.select("#listSelect").node().value == "by Connectivity") {
 				conn.call();
