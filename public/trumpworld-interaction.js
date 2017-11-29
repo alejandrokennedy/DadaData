@@ -42,6 +42,10 @@ d3.queue()
 function ready (error, trumpJSON) {
 	if (error) throw error;
 
+console.log(trumpJSON);
+
+// var entityTypeList = 
+
 var nominal_text_size = 60;
 var max_text_size = 14;
 

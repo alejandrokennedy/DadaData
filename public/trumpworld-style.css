@@ -46,7 +46,7 @@
 	}
 
 	#legend {
-		border: 2px solid;
+		/*border: 2px solid;*/
 		position:fixed;
 		bottom: 0;
 		width: 180px;
