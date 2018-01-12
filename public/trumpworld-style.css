@@ -48,8 +48,9 @@
 	#legend {
 		position:fixed;
 		bottom: 0;
-		width: 180px;
+		width: 140px;
 		height: 120px;
+		background-color: rgba(247, 247, 247, 0.85);
 	}
 
 	.legendText {

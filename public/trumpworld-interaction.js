@@ -5,6 +5,7 @@
 // Create "About" overlay
 // Zoom to selection
 // Disambiguate selectConnect phrasing
+// Add search
 
 // TODO
 
@@ -623,15 +624,20 @@ var legendCircleGs = d3.select("#legendG")
  .data(entityTypeList).enter()
  	.append("g")
  	.attr("class", function(d) { return "legend " + d})
- 	.attr("transform", function(d) { return "translate(" + 20 + "," + legendYScale(d) + ")" });
+ 	.attr("transform", function(d) { return "translate(" + 15 + "," + legendYScale(d) + ")" });
 
 legendCircleGs.append("circle")
 	.attr("r", 8)
 	.style("stroke", "none")
 	.style("fill", function(d) { return color(d) });
 
+function upCaseFirst(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 legendCircleGs.append("text")
-	.text(function(d) { return d})
-	.attr("class", "legendText");
+	.text(function(d) { return upCaseFirst(d) })
+	.attr("class", "legendText")
+	.attr("transform", "translate(" + 12 + "," + 4 + ")" );
 
 } // end of Ready function
