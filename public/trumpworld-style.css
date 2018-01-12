@@ -46,11 +46,14 @@
 	}
 
 	#legend {
-		/*border: 2px solid;*/
 		position:fixed;
 		bottom: 0;
 		width: 180px;
 		height: 120px;
+	}
+
+	.legendText {
+		font-color: black;
 	}
 
 	ul {

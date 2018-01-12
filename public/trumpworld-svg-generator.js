@@ -119,11 +119,11 @@ jsdom.env({
 		// console.log("Entity Count: " + trumpworld.length);
 
 		// list of entity types for use in legend
-	  	var entityTypeList = d3.set(
-	  		trumpworld.map(function(d) {return d["Entity A Type"] })
-	  		.concat(trumpworld.map(function(d) {return d["Entity B Type"] })));
+	  	// var entityTypeList = d3.set(
+	  	// 	trumpworld.map(function(d) {return d["Entity A Type"] })
+	  	// 	.concat(trumpworld.map(function(d) {return d["Entity B Type"] })));
 	  		// .values();
-	  	console.log("entityTypeList: " + entityTypeList)
+	  	// console.log("entityTypeList: " + entityTypeList)
 
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})

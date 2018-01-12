@@ -1,0 +1,1260 @@
+Last login: Mon Nov 20 19:50:07 on ttys000
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
+nothing to commit, working tree clean
+pcp170016pcs:DadaData Alex$ git reset HEAD^5
+fatal: ambiguous argument 'HEAD^5': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+pcp170016pcs:DadaData Alex$ git reset HEAD
+pcp170016pcs:DadaData Alex$ git reset HEAD^1
+Unstaged changes after reset:
+M	public/trumpworld-interaction.js
+pcp170016pcs:DadaData Alex$ git reset HEAD
+Unstaged changes after reset:
+M	public/trumpworld-interaction.js
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git pull
+Updating 0a0e6ab..1ff0b33
+error: Your local changes to the following files would be overwritten by merge:
+	public/trumpworld-interaction.js
+Please commit your changes or stash them before you merge.
+Aborting
+pcp170016pcs:DadaData Alex$ git pull
+Updating 0a0e6ab..1ff0b33
+error: Your local changes to the following files would be overwritten by merge:
+	public/trumpworld-interaction.js
+Please commit your changes or stash them before you merge.
+Aborting
+pcp170016pcs:DadaData Alex$ git pull
+Merge made by the 'recursive' strategy.
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/master' by 2 commits.
+  (use "git push" to publish your local commits)
+nothing to commit, working tree clean
+pcp170016pcs:DadaData Alex$ git reset --hard 0a0e6ab
+HEAD is now at 0a0e6ab Just a test
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+nothing to commit, working tree clean
+pcp170016pcs:DadaData Alex$ git reset --hard 0a0e6ab
+HEAD is now at 0a0e6ab Just a test
+pcp170016pcs:DadaData Alex$ git reset --hard 0a0e6ab
+HEAD is now at 0a0e6ab Just a test
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Already on 'testBranch1'
+Your branch is up-to-date with 'origin/testBranch1'.
+pcp170016pcs:DadaData Alex$ git merge -s ours master
+Already up-to-date.
+pcp170016pcs:DadaData Alex$ git checkout master
+Switched to branch 'master'
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+pcp170016pcs:DadaData Alex$ git checkout master
+Already on 'master'
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+pcp170016pcs:DadaData Alex$ git pull
+Updating 0a0e6ab..6c0daec
+Fast-forward
+ public/trumpworld-interaction.js | 36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
+pcp170016pcs:DadaData Alex$ git checkout master
+Already on 'master'
+Your branch is up-to-date with 'origin/master'.
+pcp170016pcs:DadaData Alex$ git merge testBranch1
+Already up-to-date.
+pcp170016pcs:DadaData Alex$ git status
+On branch testBranch1
+Your branch is up-to-date with 'origin/testBranch1'.
+nothing to commit, working tree clean
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Already on 'testBranch1'
+Your branch is up-to-date with 'origin/testBranch1'.
+pcp170016pcs:DadaData Alex$ git merge -s ours master
+Merge made by the 'ours' strategy.
+pcp170016pcs:DadaData Alex$ git merge testBranch1
+Already up-to-date.
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Already on 'testBranch1'
+Your branch is ahead of 'origin/testBranch1' by 3 commits.
+  (use "git push" to publish your local commits)
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Switched to branch 'testBranch1'
+Your branch is up-to-date with 'origin/testBranch1'.
+pcp170016pcs:DadaData Alex$ git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Switched to branch 'testBranch1'
+Your branch is up-to-date with 'origin/testBranch1'.
+pcp170016pcs:DadaData Alex$ git merge -s ours master
+Already up-to-date.
+pcp170016pcs:DadaData Alex$ git checkout testBranch1
+Already on 'testBranch1'
+Your branch is up-to-date with 'origin/testBranch1'.
+pcp170016pcs:DadaData Alex$ git branch -m master old-master
+pcp170016pcs:DadaData Alex$ git branch -m testBranch1 master
+pcp170016pcs:DadaData Alex$ git push -f origin master
+Total 0 (delta 0), reused 0 (delta 0)
+To https://github.com/alejandrokennedy/DadaData.git
+   6c0daec..397e87a  master -> master
+pcp170016pcs:DadaData Alex$ git push -f origin master
+Everything up-to-date
+pcp170016pcs:DadaData Alex$ git push -f origin master
+Everything up-to-date
+pcp170016pcs:DadaData Alex$ git log
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+
+    added style clearing for neighbouringNodeCircles
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+
+    added style clearing for neighbouringNodeCircles
+
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+
+    added style clearing for neighbouringNodeCircles
+
+commit 6ad97781fe2f80d6797d7584f8fa6557b21721b0
+:...skipping...
+commit a2f055608703a72ac0efb4a73bca1ed9890486a8 (HEAD -> master, origin/master)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 14:07:41 2017 -0500
+
+    Test 3
+
+commit 397e87a18eca48abffee943b8f8f2fb72047b64b (origin/testBranch1)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:52:03 2017 -0500
+
+    testing
+
+commit d306719c4e896ab2974a4cace1840cbe59caf380
+Merge: 0a0e6ab 6c0daec
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:47:20 2017 -0500
+
+    Merge branch 'master' into testBranch1
+    
+    attempting to overwrite master with older version
+
+commit 6c0daecfc8b8eb96e937181203ddcc1ca5265637
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 22 13:35:04 2017 -0500
+
+    Adding a commit to overwrite currently pushed version
+
+commit 1ff0b33538254a479f292a00f6ca247d3077f9e3
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:29:09 2017 -0500
+
+    Test 2
+
+commit 0a0e6ab10ef30d55ef78ef72eda58f922f23977b
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:24:09 2017 -0500
+
+    Just a test
+
+commit 87649c701be70820c83e59b23f6431650bec4cb9
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 19:06:46 2017 -0500
+
+    de-indented getLabel section
+
+commit 77fcae073a3843b4d8841da4499191a302e0599e
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:36:49 2017 -0500
+
+    added style clearing for neighbouringNodeCircles
+
+commit 6ad97781fe2f80d6797d7584f8fa6557b21721b0
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 20 15:07:43 2017 -0500
+
+    Refactored interactivity code into functions, added visible selection to Lis
+
+commit 3711ff7332af0a07ca32d7ddc5b097632456b1ae
+Merge: c6a532b a6cc3f6
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Tue Nov 7 17:58:41 2017 -0500
+
+    Merge branch 'testBranch0'
+
+commit a6cc3f629688c47bb5b9d2717888994c50029c19
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Tue Nov 7 17:58:05 2017 -0500
+
+    Refactored all mouseover/mouseout/click code. All interaction now works flawlessly
+
+commit 002d0ec0a6e537245f67967c742ee6265b1513be (origin/testBranch0)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 6 10:47:59 2017 -0500
+
+    Refactored onClick into one function, ran trumpworld-svg-generator, found and commented on some bugs
+
+commit e87eaa953ac6a25707b6c916acd1f8995d9812d6
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 1 19:52:04 2017 -0400
+
+    Switched from sort to .lower(), Began refactoring process, adjusted selectorDiv width
+
+commit c6a532b13fe7d3e8eca2fe2b57bdbb2eacc66471
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:22:11 2017 -0400
+
+    Ran svg generator
+
+commit 822ace48683f9430b8a3d9c4356cd11477209468
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:20:22 2017 -0400
+
+    Removed console logs
+
+commit 14327afab4fab422eda2f16fa9c023aba14850c7
+Merge: 70109e9 7198994
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:11:07 2017 -0400
+
+    Merge branch 'test-branch'
+
+commit 71989948c1cdb81753c361397e2874fec72c0b1b (origin/test-branch)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:09:52 2017 -0400
+
+commit 3711ff7332af0a07ca32d7ddc5b097632456b1ae
+Merge: c6a532b a6cc3f6
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Tue Nov 7 17:58:41 2017 -0500
+
+    Merge branch 'testBranch0'
+
+commit a6cc3f629688c47bb5b9d2717888994c50029c19
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Tue Nov 7 17:58:05 2017 -0500
+
+    Refactored all mouseover/mouseout/click code. All interaction now works flawlessly
+
+commit 002d0ec0a6e537245f67967c742ee6265b1513be (origin/testBranch0)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Mon Nov 6 10:47:59 2017 -0500
+
+    Refactored onClick into one function, ran trumpworld-svg-generator, found and commented on some bugs
+
+commit e87eaa953ac6a25707b6c916acd1f8995d9812d6
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Nov 1 19:52:04 2017 -0400
+
+    Switched from sort to .lower(), Began refactoring process, adjusted selectorDiv width
+
+commit c6a532b13fe7d3e8eca2fe2b57bdbb2eacc66471
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:22:11 2017 -0400
+
+    Ran svg generator
+
+commit 822ace48683f9430b8a3d9c4356cd11477209468
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:20:22 2017 -0400
+
+    Removed console logs
+
+commit 14327afab4fab422eda2f16fa9c023aba14850c7
+Merge: 70109e9 7198994
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:11:07 2017 -0400
+
+    Merge branch 'test-branch'
+
+commit 71989948c1cdb81753c361397e2874fec72c0b1b (origin/test-branch)
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 25 14:09:52 2017 -0400
+
+    Improved sort speed, fixed node styles when selecting by LI, adjusted—rendered fixed—sidebar width
+
+commit 1587a5f1ee749332353ba39e7abdc459f2f81bde
+Author: alejandrokennedy <alejandrokennedy@gmail.com>
+Date:   Wed Oct 11 11:41:40 2017 -0400
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 2 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git ignore
+git: 'ignore' is not a git command. See 'git --help'.
+pcp170016pcs:DadaData Alex$ ls
+README.md	app.js		node_modules	package.json	public		views
+pcp170016pcs:DadaData Alex$ ls -a
+.		.DS_Store	.gitignore	app.js		package.json	views
+..		.git		README.md	node_modules	public
+pcp170016pcs:DadaData Alex$ cd git
+-bash: cd: git: No such file or directory
+pcp170016pcs:DadaData Alex$ cd .git
+pcp170016pcs:.git Alex$ ls
+COMMIT_EDITMSG	ORIG_HEAD	description	info		objects
+FETCH_HEAD	branches	hooks		lfs		refs
+HEAD		config		index		logs
+pcp170016pcs:.git Alex$ ls -m
+COMMIT_EDITMSG, FETCH_HEAD, HEAD, ORIG_HEAD, branches, config, description, hooks, index, info, lfs, 
+logs, objects, refs
+pcp170016pcs:.git Alex$ ls -a
+.		FETCH_HEAD	branches	hooks		lfs		refs
+..		HEAD		config		index		logs
+COMMIT_EDITMSG	ORIG_HEAD	description	info		objects
+pcp170016pcs:.git Alex$ touch .gitignore
+pcp170016pcs:.git Alex$ cd ..
+pcp170016pcs:DadaData Alex$ touch .gitignore
+pcp170016pcs:DadaData Alex$ ls
+README.md	app.js		node_modules	package.json	public		views
+pcp170016pcs:DadaData Alex$ ls -a
+.		.DS_Store	.gitignore	app.js		package.json	views
+..		.git		README.md	node_modules	public
+pcp170016pcs:DadaData Alex$ cd .git
+pcp170016pcs:.git Alex$ ls
+COMMIT_EDITMSG	ORIG_HEAD	description	info		objects
+FETCH_HEAD	branches	hooks		lfs		refs
+HEAD		config		index		logs
+pcp170016pcs:.git Alex$ git status
+fatal: This operation must be run in a work tree
+pcp170016pcs:.git Alex$ cd ..
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 2 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git add public/trumpworld-interaction.js public/trumpworld-svg-generator.js views/trumpworld.html
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 2 commits.
+  (use "git push" to publish your local commits)
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+pcp170016pcs:DadaData Alex$ git commit
+[master 5a91a92] removed unnecessary code/commented code from svg generator, updated SLUG in svg generator
+ 3 files changed, 31 insertions(+), 446 deletions(-)
+pcp170016pcs:DadaData Alex$ git push
+fatal: The upstream branch of your current branch does not match
+the name of your current branch.  To push to the upstream branch
+on the remote, use
+
+    git push origin HEAD:testBranch1
+
+To push to the branch of the same name on the remote, use
+
+    git push origin master
+
+To choose either option permanently, see push.default in 'git help config'.
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 3 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-style.css
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git push origin master
+Everything up-to-date
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 3 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-style.css
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git push origin master
+Everything up-to-date
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 3 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   public/trumpworld-interaction.js
+	modified:   public/trumpworld-style.css
+	modified:   public/trumpworld-svg-generator.js
+	modified:   views/trumpworld.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pcp170016pcs:DadaData Alex$ git status
+On branch master
+Your branch is ahead of 'origin/testBranch1' by 4 commits.
+  (use "git push" to publish your local commits)
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	public/stacktrace-error.js
+
+nothing added to commit but untracked files present (use "git add" to track)
+pcp170016pcs:DadaData Alex$ 
