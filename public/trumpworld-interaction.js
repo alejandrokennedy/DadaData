@@ -1,29 +1,34 @@
-// FINAL TOUCHES
+// MANDATORY FINAL TOUCHES
 
-// Legend
+// Zoom to selection
 // Make hilighting more prominent
 // Create "About" overlay
-// Zoom to selection
 // Disambiguate selectConnect phrasing
-// Add search
+// Add search to sidebar list
 
-// TODO
 
-// why are the circles in github desktop not small anymore?
-// change color of government Agencies
+// EXTRA EMBELlISHMENTS
+
+// Change color of government Agencies
+// Move legend to sidebar
 // Legend hover?
 // Node circle size based on:
 	// number of connections
 	// net worth / annual revenue
-/////////
 
+
+// BUGS TO GET RID OF
+
+// Sort differently while a node is selected: sorts as though no selection has been made
+// why are the circles in github desktop not small anymore?
 // Fix stacktrace error (logs in stacktrace-error.js)
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
-
 // Remove double Daewoo?
 
+
 // REFACTOR CHECKLIST
+
 // How to select from an array based on values (so as to not need [0]th, or length - 2)?
 // what code is duplicated between this and SVG-generator? The slug??? Be sure to remove duplification.
 // categorize global variables
@@ -486,6 +491,40 @@ function onClickFunction (d, isNeighbourObj) {
 			}
 		});
 
+
+///////////////////////////////////
+
+
+
+	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
+	var cxArray = []
+	var cyArray = []
+
+	currentlySelectedNodes.each(function(d, i) {
+		cxArray.push(parseFloat(d3.select(this).attr("cx")));
+		cyArray.push(parseFloat(d3.select(this).attr("cy")));
+	})
+
+	var xExtent = d3.extent(cxArray);
+	var yExtent = d3.extent(cyArray);
+
+	var xCenter = (xExtent[1] + xExtent[0]) / 2;
+	var yCenter = (yExtent[1] + yExtent[0]) / 2;
+
+	console.log("xExtent: ", xExtent);
+	console.log("yExtent: ", yExtent);
+	console.log("xCenter: ", xCenter);
+	console.log("yCenter: ", yCenter);
+	console.log("-------------------")
+
+	zoomEvent.translateTo(svg, xCenter, yCenter);
+
+
+
+
+
+	/////////////////////////////////////
+
 	// style neighbouring nodes
 	d3.selectAll(".neighbouringNodeCircles")
 		.select(".nodeCircle")
@@ -605,8 +644,6 @@ var legendDiv = d3.select("#legend").node();
 var legendMargin = {top: 30, right: 15, bottom: 0, left: 15},
 	legendWidth = legendDiv.clientWidth - legendMargin.left - legendMargin.right,
 	legendHeight = legendDiv.clientHeight - legendMargin.top - legendMargin.bottom;
-
-console.log(legendHeight);
 
 var legendSVG = d3.select("#legend").append("svg")
 	.attr("width", legendWidth + legendMargin.left + legendMargin.right)
