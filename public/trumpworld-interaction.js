@@ -279,6 +279,18 @@ function onChange() {
 	}
 } // onChange callback
 
+// calculate gContainer dimensions (for use with zoom-to-selection functionality)
+var allNodesCxArray = []
+var allNodesCyArray = []
+
+nodes.each(function(d, i) {
+		allNodesCxArray.push(parseFloat(d3.select(this).attr("cx")));
+		allNodesCyArray.push(parseFloat(d3.select(this).attr("cy")));
+	})
+
+var allNodesXExtent = d3.extent(allNodesCxArray);
+var allNodesYExtent = d3.extent(allNodesCyArray);
+
 ////////// GLOBAL VARIABLES //////////
 
 var isNeighbour;
@@ -494,7 +506,7 @@ function onClickFunction (d, isNeighbourObj) {
 
 ///////////////////////////////////
 
-
+	var thisDurationVariable = 1500
 
 	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
 	var cxArray = []
@@ -511,13 +523,47 @@ function onClickFunction (d, isNeighbourObj) {
 	var xCenter = (xExtent[1] + xExtent[0]) / 2;
 	var yCenter = (yExtent[1] + yExtent[0]) / 2;
 
-	console.log("xExtent: ", xExtent);
-	console.log("yExtent: ", yExtent);
-	console.log("xCenter: ", xCenter);
-	console.log("yCenter: ", yCenter);
-	console.log("-------------------")
+	zoomEvent
+	// .transition()
+	// .duration(thisDurationVariable)
+	.translateTo(svg, xCenter, yCenter);
 
-	zoomEvent.translateTo(svg, xCenter, yCenter);
+	var selectionXWidth = xExtent[1] - xExtent[0];
+	var selectionYWidth = yExtent[1] - yExtent[0];
+
+	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
+	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
+
+	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
+	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
+
+	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
+		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
+			return selectionToVisWidthRatio;
+		} else {
+			return selectionToVisHeightRatio;
+		}
+	}
+
+	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
+
+	var zoomToSelectionScale = d3.scaleLinear()
+		.domain([1200, 1])
+		.range([40, 0.25])
+
+	zoomEvent
+	// .transition()
+	// .duration(thisDurationVariable)
+	.scaleTo(svg, zoomToSelectionScale(selectionToVisRatio));
+
+
+
+
+
+
+
+
+
 
 
 
