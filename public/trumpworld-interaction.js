@@ -115,9 +115,14 @@ var li = d3.selectAll("li");
 li.data(trumpJSON.nodes);
 // li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
 
-// zoom function
-var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
+var zoomEvent = d3.zoom()
+    .scaleExtent([0.1, 9])
+    .on("zoom", zoomed);
+
+function zoomed() {
 	gContainer.attr("transform", d3.event.transform);
+
+	// console.log(d3.event.transform.k)
 
 	var stroke = nominal_stroke;
     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
@@ -132,7 +137,7 @@ var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
 	var labelStroke = text_size / 7.5;
     if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
     labelShadow.style("stroke-width", labelStroke);
-}); // zoom function callback
+}
 
 // sort data on launch
 function conn() {
@@ -503,74 +508,6 @@ function onClickFunction (d, isNeighbourObj) {
 			}
 		});
 
-
-///////////////////////////////////
-
-	var thisDurationVariable = 1500
-
-	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
-	var cxArray = []
-	var cyArray = []
-
-	currentlySelectedNodes.each(function(d, i) {
-		cxArray.push(parseFloat(d3.select(this).attr("cx")));
-		cyArray.push(parseFloat(d3.select(this).attr("cy")));
-	})
-
-	var xExtent = d3.extent(cxArray);
-	var yExtent = d3.extent(cyArray);
-
-	var xCenter = (xExtent[1] + xExtent[0]) / 2;
-	var yCenter = (yExtent[1] + yExtent[0]) / 2;
-
-	zoomEvent
-	// .transition()
-	// .duration(thisDurationVariable)
-	.translateTo(svg, xCenter, yCenter);
-
-	var selectionXWidth = xExtent[1] - xExtent[0];
-	var selectionYWidth = yExtent[1] - yExtent[0];
-
-	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
-	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
-
-	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
-	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
-
-	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
-		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
-			return selectionToVisWidthRatio;
-		} else {
-			return selectionToVisHeightRatio;
-		}
-	}
-
-	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
-
-	var zoomToSelectionScale = d3.scaleLinear()
-		.domain([1200, 1])
-		.range([40, 0.25])
-
-	zoomEvent
-	// .transition()
-	// .duration(thisDurationVariable)
-	.scaleTo(svg, zoomToSelectionScale(selectionToVisRatio));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/////////////////////////////////////
-
 	// style neighbouring nodes
 	d3.selectAll(".neighbouringNodeCircles")
 		.select(".nodeCircle")
@@ -661,6 +598,59 @@ li
 		// update global variable
 		clickedEntitySlugID = d3.select(this).attr("class").split(" ")[0];
 		onClickFunction(d, isNeighbourObj);
+
+	// zoom on selection
+	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
+	var cxArray = []
+	var cyArray = []
+
+	currentlySelectedNodes.each(function(d, i) {
+		cxArray.push(parseFloat(d3.select(this).attr("cx")));
+		cyArray.push(parseFloat(d3.select(this).attr("cy")));
+	})
+
+	var xExtent = d3.extent(cxArray);
+	var yExtent = d3.extent(cyArray);
+
+	var xCenter = (xExtent[1] + xExtent[0]) / 2;
+	var yCenter = (yExtent[1] + yExtent[0]) / 2;
+
+	var selectionXWidth = xExtent[1] - xExtent[0];
+	var selectionYWidth = yExtent[1] - yExtent[0];
+
+	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
+	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
+
+	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
+	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
+
+	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
+		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
+			return selectionToVisWidthRatio;
+		} else {
+			return selectionToVisHeightRatio;
+		}
+	}
+
+	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
+
+	var zoomToSelectionScale = d3.scaleLinear()
+		.domain([1200, 1])
+		.range([5, 0.20])
+
+	var zoomBy = zoomToSelectionScale(selectionToVisRatio)
+	console.log(zoomBy);
+
+	var translateBy = [width / 2 - zoomBy * xCenter, height / 2 - zoomBy * yCenter]
+
+	var t1 = d3.zoomIdentity
+	.translate(translateBy[0], translateBy[1])
+	.scale(zoomBy);
+
+	svg.transition()
+		.duration(transitionDuration)
+		.call(zoomEvent.transform, t1);
+
 	}); // on click callback
 
 ////////// CIRCLECATCHER SECTION //////////
