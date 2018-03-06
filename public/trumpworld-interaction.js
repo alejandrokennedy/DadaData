@@ -1,10 +1,15 @@
 // MANDATORY FINAL TOUCHES
 
 // Zoom to selection
+	// use https://davidwalsh.name/offsetheight-visibility to zoom only if elements are not visible
+	// conditional scaling (minimum, maximum, make sure vis loads at correct zoom for window size)
+
+
 // Make hilighting more prominent
 // Create "About" overlay
 // Disambiguate selectConnect phrasing
 // Add search to sidebar list
+// Put legend in sidebar
 
 
 // EXTRA EMBELlISHMENTS
@@ -25,6 +30,7 @@
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
 // Remove double Daewoo?
+// Click Donald Trump to sort, click again... sorts reverse alphabetically?
 
 
 // REFACTOR CHECKLIST
@@ -42,6 +48,9 @@ var sidebarSize = d3.select(".d1").style("width");
 var margin = {top: 0, right: parseInt(sidebarSize), bottom: 0, left: 0},
 	width = window.innerWidth - margin.left - margin.right,
 	height = window.innerHeight - margin.top - margin.bottom;
+
+	// console.log(width);
+	// console.log(height);
 
 // resize the SVG
 function resizeSVG() {
@@ -214,9 +223,24 @@ var svg = d3.select("svg")
 		};
 	});
 
+// calculate gContainer dimensions (for use with zoom-to-selection functionality)
+var allNodesCxArray = []
+var allNodesCyArray = []
+
+nodes.each(function(d, i) {
+		allNodesCxArray.push(parseFloat(d3.select(this).attr("cx")));
+		allNodesCyArray.push(parseFloat(d3.select(this).attr("cy")));
+	})
+
+var allNodesXExtent = d3.extent(allNodesCxArray);
+var allNodesYExtent = d3.extent(allNodesCyArray);
+
 // call zoom
 svg.call(zoomEvent);
-zoomEvent.scaleTo(svg, .185);
+// zoomEvent.scaleTo(svg, .185);
+
+var allNodesSelection = d3.selectAll(".nodes");
+zoomOnSelection(allNodesSelection);
 
 conn.call();
 
@@ -246,7 +270,6 @@ var loader = d3.select("#loaderAfter")
 .duration(10000)
 .ease(d3.easeQuadOut)
 .style("border-color", "transparent");
-
 
 loadWrapper.remove();
 
@@ -283,18 +306,6 @@ function onChange() {
 
 	}
 } // onChange callback
-
-// calculate gContainer dimensions (for use with zoom-to-selection functionality)
-var allNodesCxArray = []
-var allNodesCyArray = []
-
-nodes.each(function(d, i) {
-		allNodesCxArray.push(parseFloat(d3.select(this).attr("cx")));
-		allNodesCyArray.push(parseFloat(d3.select(this).attr("cy")));
-	})
-
-var allNodesXExtent = d3.extent(allNodesCxArray);
-var allNodesYExtent = d3.extent(allNodesCyArray);
 
 ////////// GLOBAL VARIABLES //////////
 
@@ -471,6 +482,71 @@ function onMouseleaveFunction () {
 
 ////////// GENERIC ON("CLICK") FUNCTIONS //////////
 
+
+function zoomOnSelection(currentlySelectedNodes) {
+	var cxArray = []
+	var cyArray = []
+
+	currentlySelectedNodes.each(function(d, i) {
+		cxArray.push(parseFloat(d3.select(this).attr("cx")));
+		cyArray.push(parseFloat(d3.select(this).attr("cy")));
+	})
+
+	var xExtent = d3.extent(cxArray);
+	var yExtent = d3.extent(cyArray);
+
+	var xCenter = (xExtent[1] + xExtent[0]) / 2;
+	var yCenter = (yExtent[1] + yExtent[0]) / 2;
+
+	var selectionXWidth = xExtent[1] - xExtent[0];
+	var selectionYWidth = yExtent[1] - yExtent[0];
+
+	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
+	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
+
+	// var visXWidth = width;
+	// var visYWidth = height;
+
+	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
+	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
+
+	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
+		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
+			return selectionToVisWidthRatio;
+		} else {
+			return selectionToVisHeightRatio;
+		}
+	}
+
+	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
+
+	// console.log("gContainer width: ", gContainer.node());
+	// console.log("gContainer width: ", gContainer.node().getBBox().width);
+
+	// console.log("selectionToVisRatio: ", selectionToVisRatio);
+
+	var zoomToSelectionScale = d3.scaleLinear()
+		.domain([1200, 1])
+		.range([5, 0.20]);
+
+		// .domain([100, 1])
+		// .range([1.2, 0.23]);
+
+	var zoomBy = zoomToSelectionScale(selectionToVisRatio)
+	// console.log("zoomBy: ", zoomBy);
+	// console.log("-------------");
+
+	var translateBy = [width / 2 - zoomBy * xCenter, height / 2 - zoomBy * yCenter]
+
+	var t1 = d3.zoomIdentity
+	.translate(translateBy[0], translateBy[1])
+	.scale(zoomBy);
+
+	svg.transition()
+		.duration(transitionDuration)
+		.call(zoomEvent.transform, t1);
+	}
+
 function onClickFunction (d, isNeighbourObj) {
 
 	clickedEntityMultiElementSelection = d3.selectAll("." + clickedEntitySlugID);
@@ -601,55 +677,9 @@ li
 
 	// zoom on selection
 	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
-	var cxArray = []
-	var cyArray = []
 
-	currentlySelectedNodes.each(function(d, i) {
-		cxArray.push(parseFloat(d3.select(this).attr("cx")));
-		cyArray.push(parseFloat(d3.select(this).attr("cy")));
-	})
+	zoomOnSelection(currentlySelectedNodes);
 
-	var xExtent = d3.extent(cxArray);
-	var yExtent = d3.extent(cyArray);
-
-	var xCenter = (xExtent[1] + xExtent[0]) / 2;
-	var yCenter = (yExtent[1] + yExtent[0]) / 2;
-
-	var selectionXWidth = xExtent[1] - xExtent[0];
-	var selectionYWidth = yExtent[1] - yExtent[0];
-
-	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
-	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
-
-	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
-	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
-
-	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
-		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
-			return selectionToVisWidthRatio;
-		} else {
-			return selectionToVisHeightRatio;
-		}
-	}
-
-	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
-
-	var zoomToSelectionScale = d3.scaleLinear()
-		.domain([1200, 1])
-		.range([5, 0.20])
-
-	var zoomBy = zoomToSelectionScale(selectionToVisRatio)
-	console.log(zoomBy);
-
-	var translateBy = [width / 2 - zoomBy * xCenter, height / 2 - zoomBy * yCenter]
-
-	var t1 = d3.zoomIdentity
-	.translate(translateBy[0], translateBy[1])
-	.scale(zoomBy);
-
-	svg.transition()
-		.duration(transitionDuration)
-		.call(zoomEvent.transform, t1);
 
 	}); // on click callback
 
