@@ -10,6 +10,7 @@
 // Disambiguate selectConnect phrasing
 // Add search to sidebar list
 // Put legend in sidebar
+// have hover-over text float over sidebar
 
 
 // EXTRA EMBELlISHMENTS
@@ -31,6 +32,7 @@
 // Word wrap connection (test - select: Rex Tillerson, hover: Igor Sechin)
 // Remove double Daewoo?
 // Click Donald Trump to sort, click again... sorts reverse alphabetically?
+// Capitalize "a" in "Federal agency" in legend
 
 
 // REFACTOR CHECKLIST
@@ -48,9 +50,6 @@ var sidebarSize = d3.select(".d1").style("width");
 var margin = {top: 0, right: parseInt(sidebarSize), bottom: 0, left: 0},
 	width = window.innerWidth - margin.left - margin.right,
 	height = window.innerHeight - margin.top - margin.bottom;
-
-	// console.log(width);
-	// console.log(height);
 
 // resize the SVG
 function resizeSVG() {
@@ -130,8 +129,6 @@ var zoomEvent = d3.zoom()
 
 function zoomed() {
 	gContainer.attr("transform", d3.event.transform);
-
-	// console.log(d3.event.transform.k)
 
 	var stroke = nominal_stroke;
     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
@@ -223,7 +220,7 @@ var svg = d3.select("svg")
 		};
 	});
 
-// calculate gContainer dimensions (for use with zoom-to-selection functionality)
+// calculate effective dimensions of viz, using node array (for use with zoom-to-selection functionality)
 var allNodesCxArray = []
 var allNodesCyArray = []
 
@@ -237,8 +234,8 @@ var allNodesYExtent = d3.extent(allNodesCyArray);
 
 // call zoom
 svg.call(zoomEvent);
-// zoomEvent.scaleTo(svg, .185);
 
+// set initial zoom level
 var allNodesSelection = d3.selectAll(".nodes");
 zoomOnSelection(allNodesSelection);
 
@@ -479,73 +476,102 @@ function onMouseleaveFunction () {
 } // onMouseleaveFunction callback
 
 
-
 ////////// GENERIC ON("CLICK") FUNCTIONS //////////
-
-
 function zoomOnSelection(currentlySelectedNodes) {
-	var cxArray = []
-	var cyArray = []
+	var cxArray = [];
+	var cyArray = [];
+	var nodeOutsideViewport = false;
 
 	currentlySelectedNodes.each(function(d, i) {
 		cxArray.push(parseFloat(d3.select(this).attr("cx")));
 		cyArray.push(parseFloat(d3.select(this).attr("cy")));
-	})
 
-	var xExtent = d3.extent(cxArray);
-	var yExtent = d3.extent(cyArray);
-
-	var xCenter = (xExtent[1] + xExtent[0]) / 2;
-	var yCenter = (yExtent[1] + yExtent[0]) / 2;
-
-	var selectionXWidth = xExtent[1] - xExtent[0];
-	var selectionYWidth = yExtent[1] - yExtent[0];
-
-	var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
-	var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
-
-	// var visXWidth = width;
-	// var visYWidth = height;
-
-	var selectionToVisWidthRatio = visXWidth / selectionXWidth;
-	var selectionToVisHeightRatio = visYWidth / selectionYWidth;
-
-	function findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio) {
-		if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
-			return selectionToVisWidthRatio;
-		} else {
-			return selectionToVisHeightRatio;
+		var isInViewport = function(el) {
+			var bounding = el.getBoundingClientRect()
+			return (
+				bounding.top >= 0 &&
+				bounding.left >= 0 &&
+				bounding.right <= width &&
+				bounding.bottom <= height
+			);
 		}
+
+		if(isInViewport(this) === false) {
+			nodeOutsideViewport = true
+		}
+	});
+
+	if (nodeOutsideViewport === true) {
+			executeZoomOnSelection();
 	}
 
-	var selectionToVisRatio = findTheBiggerDimension(selectionToVisWidthRatio, selectionToVisHeightRatio);
+	function executeZoomOnSelection() {
 
-	// console.log("gContainer width: ", gContainer.node());
-	// console.log("gContainer width: ", gContainer.node().getBBox().width);
+		var xExtent = d3.extent(cxArray);
+		var yExtent = d3.extent(cyArray);
 
-	// console.log("selectionToVisRatio: ", selectionToVisRatio);
+		var xCenter = (xExtent[1] + xExtent[0]) / 2;
+		var yCenter = (yExtent[1] + yExtent[0]) / 2;
 
-	var zoomToSelectionScale = d3.scaleLinear()
-		.domain([1200, 1])
-		.range([5, 0.20]);
+		var selectionXWidth = xExtent[1] - xExtent[0];
+		var selectionYWidth = yExtent[1] - yExtent[0];
 
-		// .domain([100, 1])
-		// .range([1.2, 0.23]);
+		var visXWidth = allNodesXExtent[1] - allNodesXExtent[0];
+		var visYWidth = allNodesYExtent[1] - allNodesYExtent[0];
 
-	var zoomBy = zoomToSelectionScale(selectionToVisRatio)
-	// console.log("zoomBy: ", zoomBy);
-	// console.log("-------------");
+		var selectionToVisWidthRatio = visXWidth / selectionXWidth;
+		var selectionToVisHeightRatio = visYWidth / selectionYWidth;
 
-	var translateBy = [width / 2 - zoomBy * xCenter, height / 2 - zoomBy * yCenter]
+		function findTheSmallerDimension(width, height) {
+			if (width < height) {
+				return width;
+			} else {
+				return height;
+			}
+		}
 
-	var t1 = d3.zoomIdentity
-	.translate(translateBy[0], translateBy[1])
-	.scale(zoomBy);
+		var meaningfulWindowSize = findTheSmallerDimension(width, height);
 
-	svg.transition()
-		.duration(transitionDuration)
-		.call(zoomEvent.transform, t1);
-	}
+		function findTheSmallerRatio(selectionToVisWidthRatio, selectionToVisHeightRatio) {
+			if (selectionToVisWidthRatio < selectionToVisHeightRatio) {
+				return selectionToVisWidthRatio;
+			} else {
+				return selectionToVisHeightRatio;
+			}
+		}
+
+		var selectionToVisRatio = findTheSmallerRatio(selectionToVisWidthRatio, selectionToVisHeightRatio);
+
+		var upperZoomOnSelectionLimitScale = d3.scaleLinear()
+			.domain([600, 1500])
+			.range([.13, 0.34]);
+
+		var upperZoomOnSelectionLimit = upperZoomOnSelectionLimitScale(meaningfulWindowSize)
+
+		var lowerZoomOnSelectionLimitScale = d3.scaleLinear()
+			.domain([600, 1500])
+			.range([.4, .8]);
+
+		var lowerZoomOnSelectionLimit = lowerZoomOnSelectionLimitScale(meaningfulWindowSize)
+
+		var zoomToSelectionScale = d3.scaleLinear()
+			.domain([4, 1])
+			.range([lowerZoomOnSelectionLimit, upperZoomOnSelectionLimit])
+			.clamp(true);
+
+		var zoomBy = zoomToSelectionScale(selectionToVisRatio)
+
+		var translateBy = [width / 2 - zoomBy * xCenter, height / 2 - zoomBy * yCenter]
+
+		var t1 = d3.zoomIdentity
+		.translate(translateBy[0], translateBy[1])
+		.scale(zoomBy);
+
+		svg.transition()
+			.duration(transitionDuration)
+			.call(zoomEvent.transform, t1);
+	} // executeZoomOnSelection callback
+} // zoomOnSelection callback
 
 function onClickFunction (d, isNeighbourObj) {
 
@@ -657,7 +683,13 @@ function onClickFunction (d, isNeighbourObj) {
 
 	onMouseleaveFunction();
 
-} // styleAndLowerConnectedLIs callback
+	// zoom on selection
+	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
+
+	zoomOnSelection(currentlySelectedNodes);
+
+} // onClickFunction callback
+
 
 ////////// LI SECTION //////////
 li
@@ -674,13 +706,6 @@ li
 		// update global variable
 		clickedEntitySlugID = d3.select(this).attr("class").split(" ")[0];
 		onClickFunction(d, isNeighbourObj);
-
-	// zoom on selection
-	var currentlySelectedNodes = d3.selectAll(".neighbouringNodeCircles");
-
-	zoomOnSelection(currentlySelectedNodes);
-
-
 	}); // on click callback
 
 ////////// CIRCLECATCHER SECTION //////////
@@ -692,7 +717,7 @@ circleCatcher
 
 	.on("mouseleave", function () {
 		onMouseleaveFunction();
-	})
+	}) // on mouseleave callback
 
 	.on("click", function(d) {
 		// update global variable
