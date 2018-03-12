@@ -782,7 +782,7 @@ var legendCircleGs = d3.select("#legendG")
 	.selectAll(".legendCircles")
  .data(entityTypeList).enter()
  	.append("g")
- 	.attr("class", function(d) { return "legend " + d})
+ 	.attr("class", function(d) { return "legend " + d })
  	.attr("transform", function(d) { return "translate(" + 15 + "," + legendYScale(d) + ")" });
 
 legendCircleGs.append("circle")
@@ -790,12 +790,8 @@ legendCircleGs.append("circle")
 	.style("stroke", "none")
 	.style("fill", function(d) { return color(d) });
 
-function upCaseFirst(string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 legendCircleGs.append("text")
-	.text(function(d) { return upCaseFirst(d) })
+	.text(function(d) { return d })
 	.attr("class", "legendText")
 	.attr("transform", "translate(" + 12 + "," + 4 + ")" );
 

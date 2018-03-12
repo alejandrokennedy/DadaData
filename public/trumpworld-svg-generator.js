@@ -17,7 +17,6 @@ var htmlStub = '<html><head> \
 	\
 	<h1>Trump World</h1> \
 	<div id="dataviz-container"> \
-		<div id="legend"></div> \
 	</div> \
 	<div class=d1> \
 		<div class=d2> \
@@ -29,6 +28,7 @@ var htmlStub = '<html><head> \
 				</select> \
 			</div> \
 			<div id=listDiv></div> \
+			<div id="legend"></div> \
 		</div> \
 	</div> \
 	</body> \
