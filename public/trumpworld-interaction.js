@@ -1,10 +1,5 @@
 // MANDATORY FINAL TOUCHES
 
-// Zoom to selection
-	// use https://davidwalsh.name/offsetheight-visibility to zoom only if elements are not visible
-	// conditional scaling (minimum, maximum, make sure vis loads at correct zoom for window size)
-
-
 // Make hilighting more prominent
 // Create "About" overlay
 // Disambiguate selectConnect phrasing
@@ -43,6 +38,31 @@
 
 // ^(?!\/\/)([^\/\n]*)console.log
 
+
+////////// OVERLAY SECTION //////////
+
+// var overlayDiv = d3.select("body").append("div")
+// 	.attr("id", "overlay");
+
+// // add "about" to legend (and put legend in sidebar) so that people know where to look for info
+// // have H1 reset the viz
+// var heading1 = d3.select("h1")
+
+// heading1.on("click", function () {
+// 	overlayDiv.style("display", "block");
+// });
+
+// overlayDiv.on("click", function() {
+// 	overlayDiv.style("display", "none");
+// })
+
+// // console.log(overlayDiv.nodes());
+
+
+
+
+////////// SETUP SECTION //////////
+
 // get size of sidebar
 var sidebarSize = d3.select(".d1").style("width");
 
@@ -74,6 +94,7 @@ var max_text_size = 14;
 var nominal_stroke = 1.25;
 var max_stroke = 3.5;
 
+// is nominal_labelStroke used anywhere? Or is this just a pointless variable?
 var nominal_labelStroke = 1
 var max_labelStroke = 20
 
@@ -192,7 +213,7 @@ function clearStylesForClick() {
 }
 
 var svg = d3.select("svg")
-	.on("click", function(){
+	.on("click", function() {
 		if (d3.event.target === this) {
 			// clear any "onClick" styles for nodes
 			d3.selectAll(".nodes")
@@ -480,12 +501,14 @@ function onMouseleaveFunction () {
 function zoomOnSelection(currentlySelectedNodes) {
 	var cxArray = [];
 	var cyArray = [];
+	// reset nodeOutsideViewport variable. If a node from the next selection is outside the viewport, it will be changed to true
 	var nodeOutsideViewport = false;
 
 	currentlySelectedNodes.each(function(d, i) {
 		cxArray.push(parseFloat(d3.select(this).attr("cx")));
 		cyArray.push(parseFloat(d3.select(this).attr("cy")));
 
+// Change this to a for loop (take out of ".each")
 		var isInViewport = function(el) {
 			var bounding = el.getBoundingClientRect()
 			return (
@@ -496,6 +519,7 @@ function zoomOnSelection(currentlySelectedNodes) {
 			);
 		}
 
+		// check whether any of the selected nodes is outside the viewport
 		if(isInViewport(this) === false) {
 			nodeOutsideViewport = true
 		}
@@ -591,6 +615,13 @@ function onClickFunction (d, isNeighbourObj) {
 		.classed("selectedNode", true)
 		.select(".nodeCircle")
 		.style("stroke", clickHilightColor)
+
+
+		///
+		// .style("paint-order", "stroke")
+		///
+
+
 		.style("fill", function(d) { return color(d.type) });
 
 	// Create array of links connecting to immediate neighbours
