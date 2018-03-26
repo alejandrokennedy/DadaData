@@ -1,17 +1,15 @@
 // MANDATORY FINAL TOUCHES
 
-// Make hilighting more prominent
 // Create "About" overlay
+// Make hilighting more prominent
 // Disambiguate selectConnect phrasing
-// Add search to sidebar list
-// Put legend in sidebar
+// Add search to sidebar list (consider https://select2.org )
 // have hover-over text float over sidebar
 
 
 // EXTRA EMBELlISHMENTS
 
 // Change color of government Agencies
-// Move legend to sidebar
 // Legend hover?
 // Node circle size based on:
 	// number of connections
@@ -21,6 +19,7 @@
 // BUGS TO GET RID OF
 
 // Sort differently while a node is selected: sorts as though no selection has been made
+// On sort change (alphabetically to connectivity or vice-versa), should list scroll to top? It currently doesn't
 // why are the circles in github desktop not small anymore?
 // Fix stacktrace error (logs in stacktrace-error.js)
 // Fix: click Betsy DeVos, hover "The Stow Company - Holland, Inc."
@@ -37,28 +36,6 @@
 // categorize global variables
 
 // ^(?!\/\/)([^\/\n]*)console.log
-
-
-////////// OVERLAY SECTION //////////
-
-// var overlayDiv = d3.select("body").append("div")
-// 	.attr("id", "overlay");
-
-// // add "about" to legend (and put legend in sidebar) so that people know where to look for info
-// // have H1 reset the viz
-// var heading1 = d3.select("h1")
-
-// heading1.on("click", function () {
-// 	overlayDiv.style("display", "block");
-// });
-
-// overlayDiv.on("click", function() {
-// 	overlayDiv.style("display", "none");
-// })
-
-// // console.log(overlayDiv.nodes());
-
-
 
 
 ////////// SETUP SECTION //////////
@@ -762,12 +739,13 @@ var entityTypeList = d3.set(
 	).values();
 
 var legendDiv = d3.select("#legend").node();
+var theLegend = d3.select("#legend").append("div").attr("class", "theLegend").node();
 
 var legendMargin = {top: 30, right: 15, bottom: 0, left: 15},
-	legendWidth = legendDiv.clientWidth - legendMargin.left - legendMargin.right,
-	legendHeight = legendDiv.clientHeight - legendMargin.top - legendMargin.bottom;
+	legendWidth = theLegend.clientWidth - legendMargin.left - legendMargin.right,
+	legendHeight = theLegend.clientHeight - legendMargin.top - legendMargin.bottom;
 
-var legendSVG = d3.select("#legend").append("svg")
+var legendSVG = d3.select(".theLegend").append("svg")
 	.attr("width", legendWidth + legendMargin.left + legendMargin.right)
 	.attr("height", legendHeight + legendMargin.top + legendMargin.bottom)
  .append("g")
@@ -794,5 +772,37 @@ legendCircleGs.append("text")
 	.text(function(d) { return d })
 	.attr("class", "legendText")
 	.attr("transform", "translate(" + 12 + "," + 4 + ")" );
+
+
+////////// OVERLAY SECTION //////////
+
+var aboutDiv = d3.select("#legend").append("div").attr("id", "aboutDiv");
+var aboutTextDiv = d3.select("#aboutDiv").append("div").attr("id", "aboutTextDiv");
+var aboutTextP = d3.select("#aboutTextDiv").append("p").attr("class", "aboutText aboutP").text("About");
+var aboutTexth3 = d3.select("#aboutTextDiv").append("h3").attr("class", "aboutText abouth3").text("Trump World");
+
+// var overlayDiv = d3.select("body").append("div").attr("id", "overlay");
+// var overlayTextDiv = d3.select("#overlay").append("div").attr("id", "overlayTextDiv");
+
+var overlayDiv = d3.select("#overlay");
+var overlayTextDiv = d3.select("#overlayTextDiv");
+
+// var overlayTextH1 = d3.select("#overlayTextDiv").append("h2").attr("class", "overlayText overlayH2").text("Trump World");
+// var overlayTextH1 = d3.select("#overlayTextDiv").append("p").attr("class", "overlayText overlayP").text("Trump World uses a dataset created by BuzzFeed and crowdsourced to the general public.");
+
+aboutTextDiv.on("click", function () {
+	overlayDiv.style("display", "block");
+});
+
+overlayDiv.on("click", function() {
+	overlayDiv.style("display", "none");
+})
+
+
+
+
+
+
+
 
 } // end of Ready function

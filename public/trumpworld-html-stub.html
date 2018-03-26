@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html> \
+	<head> \
+		<title>Trump World</title> \
+		<link rel="stylesheet" type="text/css" href="trumpworld-style.css"> \
+		<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script> \
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
+	<head/> \
+	<body> \
+		\
+		<div id="loader-wrapper" class="loadClass"> \
+			<div id="loader" class="loadClass"></div> \
+			<div id="loaderBefore" class="loadClass"></div> \
+			<div id="loaderAfter" class="loadClass"></div> \
+		</div> \
+		\
+		<h1>Trump World</h1> \
+		<div id="dataviz-container"></div> \
+		<div class=d1> \
+			<div class=d2> \
+				<div id=selectorDiv> \
+					<p id=selectText>Sort: </p> \
+					<select id=listSelect> \
+					  <option value="by Connectivity">by Connectivity</option> \
+			  		<option value="Alphabetically">Alphabetically</option> \
+					</select> \
+				</div> \
+				<div id=listDiv></div> \
+				<div id="legend"></div> \
+			</div> \
+		</div> \
+		<div id="overlay"> \
+			<div class="closeButton">&times;</div> \
+			<div id="overlayTextDiv"> \
+				<p class="overlayText overlayP">Trump World uses a dataset created by BuzzFeed and <a href="https://www.buzzfeed.com/johntemplon/help-us-map-trumpworld?utm_term=.qvG2RERqe#.ii62k3kDR" target="_blank">crowdsourced to the general public</a>. You can view and download the raw data <a href="https://github.com/BuzzFeedNews/trumpworld" target="_blank">here</a>.</p> \
+			</div> \
+		</div> \
+	</body> \
+		<script src="trumpworld-interaction.js" charset="utf-8"></script> \
+	</html>
