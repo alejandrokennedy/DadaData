@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var port = process.env.PORT || 5000
 var d3 = require('d3');
+// var decompress = require('decompress');
 
 // IS AN SVG VARIABLE ACTUALLY REQUIRED? I DON'T BELIEVE SO.
 // var svg = require('./public/svg-generator');

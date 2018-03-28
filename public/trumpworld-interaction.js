@@ -1,6 +1,5 @@
 // MANDATORY FINAL TOUCHES
 
-// Create "About" overlay
 // Make hilighting more prominent
 // Disambiguate selectConnect phrasing
 // Add search to sidebar list (consider https://select2.org )
@@ -9,6 +8,7 @@
 
 // EXTRA EMBELlISHMENTS
 
+// Tweak overlay
 // Change color of government Agencies
 // Legend hover?
 // Node circle size based on:
@@ -143,33 +143,125 @@ function zoomed() {
     labelShadow.style("stroke-width", labelStroke);
 }
 
-// sort data on launch
-function conn() {
-	d3.selectAll("li").sort( function(a, b) {
-		if (a.count > b.count) {
-			return -1;
-		} else if (a.count < b.count) {
-			return 1;
-		} else { 
-				if (a.id > b.id) {
+////////// SORT SECTION //////////
+
+// var listSelector = d3.select("#listSelect")
+// 	.on("change", onChange);
+
+// function onChange() {
+// 	var selectedValue = listSelector.property("value");
+
+// 	if (selectedValue === "Alphabetically") {
+
+// 		alpha.call();
+
+// 	} else if (selectedValue === "by Connectivity") {
+
+// 		function conn() {
+// 			d3.selectAll("li").sort( function(a, b) {
+// 				if (a.count > b.count) {
+// 					return -1;
+// 				} else if (a.count < b.count) {
+// 					return 1;
+// 				} else { 
+// 						if (a.id > b.id) {
+// 						return 1;
+// 					} else if (a.id < b.id) {
+// 						return -1;
+// 					} else { return 0; }; 
+// 				}
+// 			});
+// 		}
+
+// 		conn.call();
+
+// 	}
+// } // onChange callback
+
+
+
+
+
+
+
+
+
+
+// selection sort logic
+var listSelector = d3.select("#listSelect");
+
+listSelector
+	.on("change", 
+		console.log(listSelector)
+		// listSort(li)
+		);
+
+
+var goGoListSelector = d3.select("#listSelect")
+	.on("change", console.log("change, dammit!"));
+
+
+function listSort(liSelection) {
+	var listSelectorValue = listSelector.property("value");
+	console.log(listSelectorValue);
+	if (listSelectorValue === "Alphabetically") {
+
+		liSelection.sort( function(a, b) {
+			if (a.id > b.id) {
 				return 1;
 			} else if (a.id < b.id) {
 				return -1;
-			} else { return 0; }; 
-		}
-	});
-}
+			} else { return 0; }
+		});
 
-// alpha sort
-function alpha() {
-	d3.selectAll("li").sort( function(a, b) {
-		if (a.id > b.id) {
-			return 1;
-		} else if (a.id < b.id) {
-			return -1;
-		} else { return 0; }
-	});
-}
+	} else if (listSelectorValue === "by Connectivity") {
+
+		liSelection.sort( function(a, b) {
+			if (a.count > b.count) {
+				return -1;
+			} else if (a.count < b.count) {
+				return 1;
+			} else { 
+					if (a.id > b.id) {
+					return 1;
+				} else if (a.id < b.id) {
+					return -1;
+				} else { return 0; }; 
+			}
+		});
+
+	}
+} // listSort callback
+
+// on load, sort by connection
+listSort(li);
+
+// function conn() {
+// 	li.sort( function(a, b) {
+// 		if (a.count > b.count) {
+// 			return -1;
+// 		} else if (a.count < b.count) {
+// 			return 1;
+// 		} else { 
+// 				if (a.id > b.id) {
+// 				return 1;
+// 			} else if (a.id < b.id) {
+// 				return -1;
+// 			} else { return 0; }; 
+// 		}
+// 	});
+// }
+
+// // alpha sort
+// function alpha() {
+// 	li.sort( function(a, b) {
+// 		if (a.id > b.id) {
+// 			return 1;
+// 		} else if (a.id < b.id) {
+// 			return -1;
+// 		} else { return 0; }
+// 	});
+// }
 
 function clearStylesForClick() {
 	// clear any "onClick" styles for nodes
@@ -184,7 +276,7 @@ function clearStylesForClick() {
 		.style("stroke", "grey")
 		.style("stroke-opacity", .15);
 	// clear any "onClick" styles for LIs
-	d3.selectAll("li").classed("selectedLi", false)
+	li.classed("selectedLi", false)
 		.style("border", "none")
 		.style("background-color", "#f7f7f7");
 }
@@ -204,17 +296,13 @@ var svg = d3.select("svg")
 				.style("stroke", "grey")
 				.style("stroke-opacity", 1);
 			// clear any "onClick" styles for LIs
-			d3.selectAll("li")
+			li
 				.style("opacity", 1)
 				.style("border", "none")
 				.style("background-color", "#f7f7f7")
 				.classed("selectedLi", false);
-			// clear any "onClick" styles for LIs
-			if (d3.select("#listSelect").node().value == "by Connectivity") {
-				conn.call();
-			} else {
-				alpha.call()
-			}
+			// sort LIs
+			listSort(li);
 		};
 	});
 
@@ -236,8 +324,6 @@ svg.call(zoomEvent);
 // set initial zoom level
 var allNodesSelection = d3.selectAll(".nodes");
 zoomOnSelection(allNodesSelection);
-
-conn.call();
 
 var transitionDuration = 1000
 
@@ -267,40 +353,6 @@ var loader = d3.select("#loaderAfter")
 .style("border-color", "transparent");
 
 loadWrapper.remove();
-
-// selection sort logic
-var listSelector = d3.select("#listSelect")
-	.on("change", onChange);
-
-function onChange() {
-	var selectedValue = listSelector.property("value");
-
-	if (selectedValue === "Alphabetically") {
-
-		alpha.call();
-
-	} else if (selectedValue === "by Connectivity") {
-
-		function conn() {
-			d3.selectAll("li").sort( function(a, b) {
-				if (a.count > b.count) {
-					return -1;
-				} else if (a.count < b.count) {
-					return 1;
-				} else { 
-						if (a.id > b.id) {
-						return 1;
-					} else if (a.id < b.id) {
-						return -1;
-					} else { return 0; }; 
-				}
-			});
-		}
-
-		conn.call();
-
-	}
-} // onChange callback
 
 ////////// GLOBAL VARIABLES //////////
 
@@ -485,7 +537,7 @@ function zoomOnSelection(currentlySelectedNodes) {
 		cxArray.push(parseFloat(d3.select(this).attr("cx")));
 		cyArray.push(parseFloat(d3.select(this).attr("cy")));
 
-// Change this to a for loop (take out of ".each")
+		// Change this to a for loop (take out of ".each")
 		var isInViewport = function(el) {
 			var bounding = el.getBoundingClientRect()
 			return (
@@ -651,21 +703,25 @@ function onClickFunction (d, isNeighbourObj) {
 // Style and lower (sort) LIs that represent neighbouring node
 
 	// clear any "onClick" styles for LIs
-	d3.selectAll("li").classed("neighbouringNodeLIs", false)
+	li.classed("neighbouringNodeLIs", false)
 		.style("opacity", .25);
 
 	// class neighbouring LIs on click
-	d3.selectAll("li")
+	li
 		.classed("neighbouringNodeLIs", function(e) {
 			// if (isNeighbour.includes(e.id)) {
 			if (isNeighbourObj[e.id]) {
 				return true;
 			}
 		});
+
 	// style neighbouring Lis on click
-	d3.selectAll(".neighbouringNodeLIs")
-		.style("opacity", 1)
-		.lower();
+	var neighbouringNodeLIsSelection = d3.selectAll(".neighbouringNodeLIs");
+	
+	neighbouringNodeLIsSelection.style("opacity", 1).lower();
+
+// uncomment once listSort has been amended
+	listSort(neighbouringNodeLIsSelection);
 
 	// style selected Li on click
 	d3.selectAll(".selectedLi")
