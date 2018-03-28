@@ -1,5 +1,6 @@
 // MANDATORY FINAL TOUCHES
 
+// .lower selected LI on change sort
 // Make hilighting more prominent
 // Disambiguate selectConnect phrasing
 // Add search to sidebar list (consider https://select2.org )
@@ -145,65 +146,21 @@ function zoomed() {
 
 ////////// SORT SECTION //////////
 
-// var listSelector = d3.select("#listSelect")
-// 	.on("change", onChange);
-
-// function onChange() {
-// 	var selectedValue = listSelector.property("value");
-
-// 	if (selectedValue === "Alphabetically") {
-
-// 		alpha.call();
-
-// 	} else if (selectedValue === "by Connectivity") {
-
-// 		function conn() {
-// 			d3.selectAll("li").sort( function(a, b) {
-// 				if (a.count > b.count) {
-// 					return -1;
-// 				} else if (a.count < b.count) {
-// 					return 1;
-// 				} else { 
-// 						if (a.id > b.id) {
-// 						return 1;
-// 					} else if (a.id < b.id) {
-// 						return -1;
-// 					} else { return 0; }; 
-// 				}
-// 			});
-// 		}
-
-// 		conn.call();
-
-// 	}
-// } // onChange callback
-
-
-
-
-
-
-
-
-
-
-// selection sort logic
 var listSelector = d3.select("#listSelect");
 
-listSelector
-	.on("change", 
-		console.log(listSelector)
-		// listSort(li)
-		);
+listSelector.on("change", listSortOnChange);
 
-
-var goGoListSelector = d3.select("#listSelect")
-	.on("change", console.log("change, dammit!"));
-
+function listSortOnChange() {
+	if (d3.select(".selectedNode").node() !== null) {
+		listSort(neighbouringNodeLIsSelection);
+		selectedLi.lower();
+	} else {
+		listSort(li);
+	}
+}
 
 function listSort(liSelection) {
 	var listSelectorValue = listSelector.property("value");
-	console.log(listSelectorValue);
 	if (listSelectorValue === "Alphabetically") {
 
 		liSelection.sort( function(a, b) {
@@ -236,32 +193,7 @@ function listSort(liSelection) {
 // on load, sort by connection
 listSort(li);
 
-// function conn() {
-// 	li.sort( function(a, b) {
-// 		if (a.count > b.count) {
-// 			return -1;
-// 		} else if (a.count < b.count) {
-// 			return 1;
-// 		} else { 
-// 				if (a.id > b.id) {
-// 				return 1;
-// 			} else if (a.id < b.id) {
-// 				return -1;
-// 			} else { return 0; }; 
-// 		}
-// 	});
-// }
-
-// // alpha sort
-// function alpha() {
-// 	li.sort( function(a, b) {
-// 		if (a.id > b.id) {
-// 			return 1;
-// 		} else if (a.id < b.id) {
-// 			return -1;
-// 		} else { return 0; }
-// 	});
-// }
+////////// CLEAR STYLES SECTION //////////
 
 function clearStylesForClick() {
 	// clear any "onClick" styles for nodes
@@ -381,6 +313,8 @@ var getNode;
 var getLi;
 var clickedEntityNode;
 var clickedEntityLi;
+var neighbouringNodeLIsSelection;
+var selectedLi;
 
 ////////// GENERIC ON("MOUSEOVER") FUNCTIONS //////////
 
@@ -716,7 +650,7 @@ function onClickFunction (d, isNeighbourObj) {
 		});
 
 	// style neighbouring Lis on click
-	var neighbouringNodeLIsSelection = d3.selectAll(".neighbouringNodeLIs");
+	neighbouringNodeLIsSelection = d3.selectAll(".neighbouringNodeLIs");
 	
 	neighbouringNodeLIsSelection.style("opacity", 1).lower();
 
@@ -724,7 +658,9 @@ function onClickFunction (d, isNeighbourObj) {
 	listSort(neighbouringNodeLIsSelection);
 
 	// style selected Li on click
-	d3.selectAll(".selectedLi")
+	selectedLi = d3.selectAll(".selectedLi")
+
+	selectedLi
 		.style("border", "2px solid")
 		.style("border-color", clickHilightColor)
 		.style("background-color", "white")
