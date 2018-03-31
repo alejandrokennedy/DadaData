@@ -9,6 +9,7 @@
 
 // EXTRA EMBELlISHMENTS
 
+// Pin selected li to top of list
 // Tweak overlay
 // Change color of government Agencies
 // Legend hover?
@@ -151,6 +152,7 @@ var listSelector = d3.select("#listSelect");
 listSelector.on("change", listSortOnChange);
 
 function listSortOnChange() {
+	scrollToTopOfSidebar();
 	if (d3.select(".selectedNode").node() !== null) {
 		listSort(neighbouringNodeLIsSelection);
 		selectedLi.lower();
@@ -158,6 +160,24 @@ function listSortOnChange() {
 		listSort(li);
 	}
 }
+
+function scrollToTopOfSidebar() {
+
+	d3.select(".d2")
+		.transition().duration(800).ease(d3.easeCubicOut)
+		.tween("tweenName", scrollTopTween(0));
+
+	function scrollTopTween(scrollTop) {
+
+	  return function() {
+	    var i = d3.interpolateNumber(this.scrollTop, scrollTop);
+	    var scrollElement = this;
+	    return function(t) {
+	    	scrollElement.scrollTop = i(t); };
+	 };
+
+	} // scrollTopTween callback
+} // scrollToTopOfSidebar callback
 
 function listSort(liSelection) {
 	var listSelectorValue = listSelector.property("value");
@@ -668,18 +688,7 @@ function onClickFunction (d, isNeighbourObj) {
 
 
 // Scroll to top of D2 (entity list)
-	function scrollTopTween(scrollTop) {
-	  return function() {
-	    var i = d3.interpolateNumber(this.scrollTop, scrollTop);
-	    var scrollElement = this;
-	    return function(t) {
-	    	scrollElement.scrollTop = i(t); };
-	 };
-	}
-
-	d3.select(".d2")
-		.transition().duration(800).ease(d3.easeCubicOut)
-		.tween("tweenName", scrollTopTween(0));
+	scrollToTopOfSidebar();
 
 	onMouseleaveFunction();
 

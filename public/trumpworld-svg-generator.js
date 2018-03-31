@@ -2,14 +2,18 @@ var d3 = require('d3');
 var jsdom = require('jsdom');
 var fs = require('fs');
 
-// var htmlStubFile = `./trumpworldStub.html`
+var htmlStubFile = 'trumpworld-html-stub.html'
 
 // console.log(htmlStubFile);
 
-// var htmlStub = fs.readFile(htmlStubFile, function (err, data) {
-// 	if (err) throw err;
-// 	console.log(data);
-// });
+// asynchronous javascript
+
+fs.readFileSync(htmlStubFile, function (err, data) {
+	if (err) throw err;
+
+
+	console.log(data);
+});
 
 var htmlStub = '<html> \
 	<head> \
