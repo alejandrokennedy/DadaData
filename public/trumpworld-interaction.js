@@ -1,6 +1,5 @@
 // MANDATORY FINAL TOUCHES
 
-// .lower selected LI on change sort
 // Make hilighting more prominent
 // Disambiguate selectConnect phrasing
 // Add search to sidebar list (consider https://select2.org )
@@ -39,6 +38,40 @@
 
 // ^(?!\/\/)([^\/\n]*)console.log
 
+////////// GLOBAL VARIABLES //////////
+
+var isNeighbour;
+var isNeighbourObj;
+
+var selectedNodeID;
+var selectedNodeSlugID;
+
+var linkSource;
+var linkTarget;
+
+// var selectedStroke = 
+
+
+/// --- /// Move variables below this line when categorizing them
+
+// onMousoverFunction global variables
+var hoveredEntityID;
+var hoveredEntityMultiElementSelection;
+var hoveredEntityNode;
+var getNodeOnHover;
+var ConnectionDescriptionText;
+
+// onClick global variables
+var clickedEntitySlugID;
+var clickedEntityMultiElementSelection
+var getNode;
+var getLi;
+var clickedEntityNode;
+var clickedEntityLi;
+// does selectedCircleD3Selection make sense as a global variable?
+var selectedCircleD3Selection;
+var neighbouringNodeLIsSelection;
+var selectedLi;
 
 ////////// SETUP SECTION //////////
 
@@ -66,16 +99,6 @@ d3.queue()
 // load data
 function ready (error, trumpJSON) {
 	if (error) throw error;
-
-var nominal_text_size = 60;
-var max_text_size = 14;
-
-var nominal_stroke = 1.25;
-var max_stroke = 3.5;
-
-// is nominal_labelStroke used anywhere? Or is this just a pointless variable?
-var nominal_labelStroke = 1
-var max_labelStroke = 20
 
 function slug (id) {
 	return id.replace(/,/g,"")
@@ -123,25 +146,77 @@ var li = d3.selectAll("li");
 li.data(trumpJSON.nodes);
 // li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
 
+////////// ZOOM SECTION //////////
+
+var nominal_text_size = 60;
+var max_text_size = 14;
+
+var nominal_stroke = 1.25;
+var max_stroke = 3.5;
+
+// is nominal_labelStroke used anywhere? Or is this just a pointless variable?
+var nominal_labelStroke = 1
+var max_labelStroke = 20
+
+function styleSelectedNodeCircle(selectedCircle) {
+	selectedCircle
+	.style("fill", function(d) { return color(d.type) })
+	.style("stroke", clickHilightColor)
+	.transition()
+	.duration(200)
+	.ease(d3.easeQuadOut)
+	.style("stroke-width", selectedCircleStroke)
+	.style("paint-order", "stroke")
+	;
+	// in css change styles for .nodes.selectedNode circle
+}
+
 var zoomEvent = d3.zoom()
     .scaleExtent([0.1, 9])
     .on("zoom", zoomed);
 
+var selectedCircleStroke = nominal_stroke * 8;
+
 function zoomed() {
 	gContainer.attr("transform", d3.event.transform);
 
+	// console.log(clickedEntityNode);
+
 	var stroke = nominal_stroke;
     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
-    lines.style("stroke-width",stroke);
-    circle.style("stroke-width",stroke * 1.5);
+    // if (nominal_stroke * d3.event.transform.k > max_stroke) console.log(nominal_stroke);
+    lines.style("stroke-width", stroke);
+    circle.style("stroke-width", stroke * 1.5);
+    // for when a circle becomes selected
+    selectedCircleStroke = stroke * 8;
+
+    ///
+
+    if (d3.select(".selectedNode").node() !== null) {
+    	// var selectedNodeCircleD3Selection = d3.select(".selectedNode").select(".nodeCircle");
+    	selectedCircleD3Selection.style("stroke-width", selectedCircleStroke)
+
+    	// fix transition on zoom (should be immediately responsive)
+    	// styleSelectedNodeCircle(selectedCircleD3Selection);
+
+    	// if ()
+    	// selectedNodeCircleD3Selection.style("stroke-width", stroke * 8);
+    	// console.log(selectedNodeCircleD3Selection);
+    }
+
+
+    ///
 
 	var text_size = nominal_text_size ;
 		if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
+		// if (nominal_text_size * d3.event.transform.k > max_text_size) console.log(nominal_text_size);
 		label.style("font-size",text_size + "px");
 		labelShadow.style("font-size",text_size + "px");
 
+// this doesn't seem to actually work (get activated)
 	var labelStroke = text_size / 7.5;
-    if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+    // if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+    if (text_size / 7.5 > max_labelStroke) console.log(text_size);
     labelShadow.style("stroke-width", labelStroke);
 }
 
@@ -215,14 +290,17 @@ listSort(li);
 
 ////////// CLEAR STYLES SECTION //////////
 
-function clearStylesForClick() {
+function clearStylesForClick(selectedCircle) {
 	// clear any "onClick" styles for nodes
+	// d3.selectAll(".nodes").selectAll("*:not(.selectedNode)")
 	d3.selectAll(".nodes")
 		.classed("selectedNode", false)
 		.classed("neighbouringNodeCircles", false)
 		.select(".nodeCircle")
 		.style("stroke", "white")
-		.style("fill-opacity", .15);
+		.style("fill-opacity", .15)
+		.style("stroke-width", nominal_stroke)
+		.style("paint-order", "fill");
 	// clear any "onClick" styles for links
 	d3.selectAll(".lines")
 		.style("stroke", "grey")
@@ -242,7 +320,9 @@ var svg = d3.select("svg")
 				.classed("neighbouringNodeCircles", false)
 				.select(".nodeCircle")
 				.style("stroke", "white")
-				.style("fill-opacity", 1);
+				.style("stroke-width", nominal_stroke)
+				.style("fill-opacity", 1)
+				.style("paint-order", "fill");
 			// clear any "onClick" styles for links
 			d3.selectAll(".lines")
 				.style("stroke", "grey")
@@ -305,36 +385,6 @@ var loader = d3.select("#loaderAfter")
 .style("border-color", "transparent");
 
 loadWrapper.remove();
-
-////////// GLOBAL VARIABLES //////////
-
-var isNeighbour;
-var isNeighbourObj;
-
-var selectedNodeSlugID;
-var selectedNodeID;
-
-var linkSource;
-var linkTarget;
-
-/// --- /// Move variables below this line when categorizing them
-
-// onMousoverFunction global variables
-var hoveredEntityID;
-var hoveredEntityMultiElementSelection;
-var hoveredEntityNode;
-var getNodeOnHover;
-var ConnectionDescriptionText;
-
-// onClick global variables
-var clickedEntitySlugID;
-var clickedEntityMultiElementSelection
-var getNode;
-var getLi;
-var clickedEntityNode;
-var clickedEntityLi;
-var neighbouringNodeLIsSelection;
-var selectedLi;
 
 ////////// GENERIC ON("MOUSEOVER") FUNCTIONS //////////
 
@@ -401,9 +451,9 @@ function onMouseoverFunction (d) {
 
 	// conditionally style hovered nodes and add connection text
 	if (d3.select(hoveredEntityNode).attr("class").split(" ").includes("selectedNode")) {
-		d3.select(hoveredEntityNode).select(".nodeCircle")
-			.style("stroke", clickHilightColor)
-			.style("fill", function(d) { return color(d.type) });
+		// pretty sure I don't need to alter the selected node
+		// d3.select(hoveredEntityNode).select(".nodeCircle")
+
 		d3.select(hoveredEntityNode).select(".label")
 			.text(function(d) { return d.id } );
 		d3.select(hoveredEntityNode).select(".labelShadow")
@@ -475,6 +525,8 @@ function onMouseleaveFunction () {
 		} else {
 			d3.select(hoveredEntityNode).select(".nodeCircle")
 			.style("stroke", "white")
+			//change nominal stroke to computed one (make zoom function "stroke" a global variable?)
+			.style("stroke-width", nominal_stroke)
 			.style("fill", function(d) { return color(d.type) });
 		}
 } // onMouseleaveFunction callback
@@ -593,19 +645,27 @@ function onClickFunction (d, isNeighbourObj) {
 	// clear styles
 	clearStylesForClick.call();
 
+	///
+
+	selectedCircleD3Selection = d3.select(clickedEntityNode).select(".nodeCircle");
+	console.log(selectedCircleD3Selection);
+
+	styleSelectedNodeCircle(selectedCircleD3Selection);
+
+	///
+
 	// class and style selected node
 	d3.select(clickedEntityNode)
 		.classed("selectedNode", true)
-		.select(".nodeCircle")
-		.style("stroke", clickHilightColor)
-
 
 		///
 		// .style("paint-order", "stroke")
+		// .style("stroke-width", selectedCircleStroke)
+		// .style("stroke-width", "30px")
 		///
 
-
-		.style("fill", function(d) { return color(d.type) });
+		
+		;
 
 	// Create array of links connecting to immediate neighbours
 	isNeighbour = links.reduce(function (neighbours, link) {

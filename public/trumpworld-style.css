@@ -202,14 +202,14 @@ li:hover {
 }
 
 .nodes circle {
-  fill: #ccc;
-  /*paint-order: stroke;*/
+  /*fill: #ccc;*/
   stroke: white;
 }
 
+/*
 .nodes.selectedNode circle {
   paint-order: stroke;
-}
+}*/
 
 .nodes text {
   display: none;

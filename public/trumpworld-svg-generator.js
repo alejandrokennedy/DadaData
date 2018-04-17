@@ -2,58 +2,10 @@ var d3 = require('d3');
 var jsdom = require('jsdom');
 var fs = require('fs');
 
-var htmlStubFile = 'trumpworld-html-stub.html'
+///////////////////////////
 
-// console.log(htmlStubFile);
-
-// asynchronous javascript
-
-fs.readFileSync(htmlStubFile, function (err, data) {
-	if (err) throw err;
-
-
-	console.log(data);
-});
-
-var htmlStub = '<html> \
-	<head> \
-		<title>Trump World</title> \
-		<link rel="stylesheet" type="text/css" href="trumpworld-style.css"> \
-		<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script> \
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script> \
-	<head/> \
-	<body> \
-		\
-		<div id="loader-wrapper" class="loadClass"> \
-			<div id="loader" class="loadClass"></div> \
-			<div id="loaderBefore" class="loadClass"></div> \
-			<div id="loaderAfter" class="loadClass"></div> \
-		</div> \
-		\
-		<h1>Trump World</h1> \
-		<div id="dataviz-container"></div> \
-		<div class=d1> \
-			<div class=d2> \
-				<div id=selectorDiv> \
-					<p id=selectText>Sort: </p> \
-					<select id=listSelect> \
-					  <option value="by Connectivity">by Connectivity</option> \
-			  		<option value="Alphabetically">Alphabetically</option> \
-					</select> \
-				</div> \
-				<div id=listDiv></div> \
-				<div id="legend"></div> \
-			</div> \
-		</div> \
-		<div id="overlay"> \
-			<div class="closeButton">&times;</div> \
-			<div id="overlayTextDiv"> \
-				<p class="overlayText overlayP">Trump World uses a dataset created by BuzzFeed and <a href="https://www.buzzfeed.com/johntemplon/help-us-map-trumpworld?utm_term=.qvG2RERqe#.ii62k3kDR" target="_blank">crowdsourced to the general public</a>. You can view and download the raw data <a href="https://github.com/BuzzFeedNews/trumpworld" target="_blank">here</a>.</p> \
-			</div> \
-		</div> \
-	</body> \
-		<script src="trumpworld-interaction.js" charset="utf-8"></script> \
-	</html>'
+// import html stub
+var htmlStub = fs.readFileSync('./trumpworld-html-stub.html', 'utf8');
 
 jsdom.env({
 	features : { QuerySelector : true }
@@ -75,6 +27,7 @@ jsdom.env({
 	    .y(function(d) { return d.y; })
 	    .extent([[-(width * 2), -(height * 3)], [width * 3 , height * 4]]);
 
+// how much of this stuff can be deleted because it's used only for the zoom function?
 	  var nominal_text_size = 60;
 	  var max_text_size = 14;
 
@@ -86,20 +39,7 @@ jsdom.env({
 
 		var svg = d3.select(el).attr("id", "dataviz-container").append("svg")
 			.attr("width", width)
-			.attr("height", height + margin.top + margin.bottom)
-			.on("click", function(){
-				if (d3.event.target === this) {
-					// clear any "onClick" styles for nodes
-	 				d3.selectAll(".nodes").classed("selectedNode", false)
-	 					.select(".nodeCircle")
-	 					.style("stroke", "white")
-	 					.style("fill-opacity", 1);
-	 				// clear any "onClick" styles for links
-	 				d3.selectAll(".lines")
-	 					.style("stroke", "grey")
-	 					.style("stroke-opacity", 1);
-				};
-			});
+			.attr("height", height + margin.top + margin.bottom);
 
 		var gContainer = svg.append("g")
 			.attr("id", "gContainer")
@@ -135,14 +75,6 @@ jsdom.env({
 
 	  function ready (error, trumpworld) {
 	  	if (error) throw error;
-		// console.log("Entity Count: " + trumpworld.length);
-
-		// list of entity types for use in legend
-	  	// var entityTypeList = d3.set(
-	  	// 	trumpworld.map(function(d) {return d["Entity A Type"] })
-	  	// 	.concat(trumpworld.map(function(d) {return d["Entity B Type"] })));
-	  		// .values();
-	  	// console.log("entityTypeList: " + entityTypeList)
 
 	  	var orgAs = trumpworld
 	  		.filter( function(d) { return d["Entity A Type"] === "Organization"})
@@ -175,12 +107,6 @@ jsdom.env({
 	  	var allOrgs = d3.set(orgs).values();
 	  	var allPeeps = d3.set(peeps).values();
 	  	var allFeds = d3.set(feds).values();
-
-	  	// // some console logs for reference
-	  	// var entitiesList = allOrgs.concat(allPeeps).concat(allFeds).sort();
-	  	// console.log(entitiesList);
-	  	// var nodeCount = (allPeeps.length + allOrgs.length + allFeds.length)
-	  	// console.log("nodeCount: " + nodeCount);
 
 			var nodes = [],
 					links = [],
@@ -216,11 +142,9 @@ jsdom.env({
 				})
 			});
 
-			/////
-
+			// get nodes' connection count
 			var connectionCountList = {};
 
-			// get nodes' connection count
 			links.forEach(function(d) {
 				if (!connectionCountList[d.source]) {
 					connectionCountList[d.source] = 1
@@ -239,8 +163,6 @@ jsdom.env({
 			nodes.forEach(function(d) {
 				d.count = connectionCountList[d.id];
 			});
-
-			/////
 
 			// GRAPH
 			var graph = {
@@ -289,31 +211,32 @@ jsdom.env({
 		 		.style("font-size", nominal_text_size + "px")
 		 		.text(function(d) { return d.id; });
 
-			var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
-				gContainer.attr("transform", d3.event.transform);
-				// console.log(d3.event.transform);
-				// console.log(max_text_size);
+// delete zoom stuff as it doesn't seem necessary
+			// var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
+			// 	gContainer.attr("transform", d3.event.transform);
+			// 	// console.log(d3.event.transform);
+			// 	// console.log(max_text_size);
 
-				var stroke = nominal_stroke;
-			    if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
-			    link.style("stroke-width",stroke);
-			    circle.style("stroke-width",stroke * 1.5);
+			// 	var stroke = nominal_stroke;
+			//     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
+			//     link.style("stroke-width",stroke);
+			//     circle.style("stroke-width",stroke * 1.5);
 
-				var text_size = nominal_text_size ;
-					if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
-					label.style("font-size",text_size + "px");
-					labelShadow.style("font-size",text_size + "px");
+			// 	var text_size = nominal_text_size ;
+			// 		if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
+			// 		label.style("font-size",text_size + "px");
+			// 		labelShadow.style("font-size",text_size + "px");
 
-				var labelStroke = text_size / 7.5;
-			    if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
-			    labelShadow.style("stroke-width", labelStroke);
-			    // console.log("labelStroke: " + labelStroke);
-					// console.log(text_size);
-					// console.log(text_size / 10);
+			// 	var labelStroke = text_size / 7.5;
+			//     if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+			//     labelShadow.style("stroke-width", labelStroke);
+			//     // console.log("labelStroke: " + labelStroke);
+			// 		// console.log(text_size);
+			// 		// console.log(text_size / 10);
 
-			}); // zoom function callback
+			// }); // zoom function callback
 
-			svg.call(zoomEvent);
+			// svg.call(zoomEvent);
 
 // UNCOMMENT to troubleshoot
 	 		// zoomEvent.scaleTo(svg, .185);
@@ -330,7 +253,8 @@ jsdom.env({
 	 			.append("path")
 	 			.attr("class", "clip-path-circle");
 
-	 		var clickHilightColor = "rgb(52, 255, 38)";
+// delete 'cause doesn't seem necessary
+	 		// var clickHilightColor = "rgb(52, 255, 38)";
 
 	 		var ul = d3.select(listDiv).append("ul")
 	 			.selectAll("li")
@@ -344,7 +268,6 @@ jsdom.env({
 	 		var circleCatcher = node.append("circle")
 	 			.attr("r", 30)
 	 			// .style("fill", function(d, i) { return colorScale(i); })
-	 			// .style("fill", "green")
 	 			.attr("class", "circleCatcher")
 	 			.style("fill-opacity", 0)
 	 			.style("stroke", "none")
