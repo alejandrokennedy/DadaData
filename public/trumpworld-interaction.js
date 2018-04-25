@@ -662,7 +662,8 @@ function onClickFunction (d, isNeighbourObj) {
 	clearStylesForClick.call();
 
 	// class selected node
-	selectedCircleD3Selection.classed("selectedNode", true)
+	d3.select(clickedEntityNode).classed("selectedNode", true)
+	// selectedCircleD3Selection.classed("selectedNode", true)
 
 	// add styles to selected node
 	hilightNodeCircle(selectedCircleD3Selection);
