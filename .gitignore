@@ -8,3 +8,7 @@ views/d3.min.js
 public/d3.min.js
 
 views/quartet_bootstrap.html
+
+*.sublime-project
+
+*.sublime-workspace

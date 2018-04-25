@@ -49,9 +49,6 @@ var selectedNodeSlugID;
 var linkSource;
 var linkTarget;
 
-// var selectedStroke = 
-
-
 /// --- /// Move variables below this line when categorizing them
 
 // onMousoverFunction global variables
@@ -69,7 +66,10 @@ var getLi;
 var clickedEntityNode;
 var clickedEntityLi;
 // does selectedCircleD3Selection make sense as a global variable?
+// re-factor variables below this line
 var selectedCircleD3Selection;
+var hoveredCircleD3Selection;
+var selectConnectD3Selection;
 var neighbouringNodeLIsSelection;
 var selectedLi;
 
@@ -158,13 +158,16 @@ var max_stroke = 3.5;
 var nominal_labelStroke = 1
 var max_labelStroke = 20
 
-function styleSelectedNodeCircle(selectedCircle) {
+// extra strokes
+// re-factor, if necessary
+var adjusted_nominal_stroke = 1.25;
+var selectedCircleStroke = adjusted_nominal_stroke * 8;
+var selectConnectStroke = adjusted_nominal_stroke * 3;
+
+function hilightNodeCircle(selectedCircle) {
 	selectedCircle
 	.style("fill", function(d) { return color(d.type) })
 	.style("stroke", clickHilightColor)
-	.transition()
-	.duration(200)
-	.ease(d3.easeQuadOut)
 	.style("stroke-width", selectedCircleStroke)
 	.style("paint-order", "stroke")
 	;
@@ -175,41 +178,40 @@ var zoomEvent = d3.zoom()
     .scaleExtent([0.1, 9])
     .on("zoom", zoomed);
 
-var selectedCircleStroke = nominal_stroke * 8;
-
 function zoomed() {
 	gContainer.attr("transform", d3.event.transform);
 
-	// console.log(clickedEntityNode);
-
 	var stroke = nominal_stroke;
-    if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
-    // if (nominal_stroke * d3.event.transform.k > max_stroke) console.log(nominal_stroke);
-    lines.style("stroke-width", stroke);
-    circle.style("stroke-width", stroke * 1.5);
-    // for when a circle becomes selected
-    selectedCircleStroke = stroke * 8;
 
-    ///
+		// if zoomed in close, do these things
+    if (nominal_stroke * d3.event.transform.k > max_stroke) {
 
-    if (d3.select(".selectedNode").node() !== null) {
-    	// var selectedNodeCircleD3Selection = d3.select(".selectedNode").select(".nodeCircle");
-    	selectedCircleD3Selection.style("stroke-width", selectedCircleStroke)
+    	// why do I need stroke AND adjusted_nominal_stroke?
+    	// make zoom function "stroke" a global variable?
+    	stroke = max_stroke / d3.event.transform.k;
+	    adjusted_nominal_stroke = max_stroke / d3.event.transform.k;
 
-    	// fix transition on zoom (should be immediately responsive)
-    	// styleSelectedNodeCircle(selectedCircleD3Selection);
-
-    	// if ()
-    	// selectedNodeCircleD3Selection.style("stroke-width", stroke * 8);
-    	// console.log(selectedNodeCircleD3Selection);
+	    lines.style("stroke-width", stroke);
+	    circle.style("stroke-width", stroke * 1.5);
+	    
+	    // for when a node is selected
+	    selectedCircleStroke = stroke * 8;
+    	selectConnectStroke = stroke * 3
     }
 
+    // if a node is selected, do these things
+    if (d3.select(".selectedNode").node() !== null) {
+    	selectedCircleD3Selection.style("stroke-width", selectedCircleStroke);
+    	selectConnectD3Selection.style("stroke-width", selectConnectStroke)
 
-    ///
+    	// if a neighbouring node is hovered, do these things
+    	if (selectConnectD3Selection["_groups"][0][0] !== null && selectConnectD3Selection.attr("class").split(" ").includes(hoveredEntityID)) {
+	    	hoveredCircleD3Selection.style("stroke-width", selectedCircleStroke);
+    	}
+    }
 
 	var text_size = nominal_text_size ;
 		if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
-		// if (nominal_text_size * d3.event.transform.k > max_text_size) console.log(nominal_text_size);
 		label.style("font-size",text_size + "px");
 		labelShadow.style("font-size",text_size + "px");
 
@@ -299,12 +301,14 @@ function clearStylesForClick(selectedCircle) {
 		.select(".nodeCircle")
 		.style("stroke", "white")
 		.style("fill-opacity", .15)
-		.style("stroke-width", nominal_stroke)
+		.style("stroke-width", adjusted_nominal_stroke)
 		.style("paint-order", "fill");
 	// clear any "onClick" styles for links
 	d3.selectAll(".lines")
 		.style("stroke", "grey")
-		.style("stroke-opacity", .15);
+		.style("stroke-opacity", .15)
+		// is the below line needed?
+		// .style("stroke-width", adjusted_nominal_stroke);
 	// clear any "onClick" styles for LIs
 	li.classed("selectedLi", false)
 		.style("border", "none")
@@ -320,7 +324,7 @@ var svg = d3.select("svg")
 				.classed("neighbouringNodeCircles", false)
 				.select(".nodeCircle")
 				.style("stroke", "white")
-				.style("stroke-width", nominal_stroke)
+				.style("stroke-width", adjusted_nominal_stroke)
 				.style("fill-opacity", 1)
 				.style("paint-order", "fill");
 			// clear any "onClick" styles for links
@@ -398,6 +402,9 @@ function onMouseoverFunction (d) {
 	// raise hovered node above other elements
 	d3.select(hoveredEntityNode).raise();
 
+	hoveredCircleD3Selection = d3.select(hoveredEntityNode).select(".nodeCircle");
+	// console.log(hoveredCircleD3Selection.node().parentNode);
+
 	// if an entity is selected, do the following
 	if (d3.select(".selectedNode").node() !== null) {
 		// assign selectedNodeSlugID and selectedNodeID to existing global variables
@@ -414,16 +421,22 @@ function onMouseoverFunction (d) {
 					return true;
 				}	 						
 		});
-	} // if (selectedNode) statement  callback
+	} // if (selectedNode) statement callback
+
+	// update selectConnect variable
+	selectConnectD3Selection = d3.select(".selectConnect")
 
 	// declare ConnectionDescriptionText
-	if (d3.select(".selectConnect")["_groups"][0][0] !== null) {
-		ConnectionDescriptionText = d3.select(".selectConnect").data()[0].connection;
+	if (selectConnectD3Selection["_groups"][0][0] !== null) {
+		ConnectionDescriptionText = selectConnectD3Selection.data()[0].connection;
 	}
 
 	// style selectConnect link
-	d3.select(".selectConnect")
+	selectConnectD3Selection
 		.style("stroke", clickHilightColor)
+		.style("stroke-width", selectConnectStroke);
+
+	selectConnectD3Selection
 		.each(
 			function(d) {
 				var slugSource = "T" + slug(d.source);
@@ -433,9 +446,8 @@ function onMouseoverFunction (d) {
 
 // IS THIS ADDING UNECESSARY CLASSES TO LINES (screwing up other things)?
 // If it is, be sure to remove these classes on mouseout
-				var selCon = d3.select(".selectConnect");
-				selCon.classed(slugSource, true);
-				selCon.classed(slugTarget, true);
+				selectConnectD3Selection.classed(slugSource, true);
+				selectConnectD3Selection.classed(slugTarget, true);
 			}
 		)
 		// how to raise above circles?
@@ -458,7 +470,7 @@ function onMouseoverFunction (d) {
 			.text(function(d) { return d.id } );
 		d3.select(hoveredEntityNode).select(".labelShadow")
 			.text(function(d) { return d.id } );
-	} else if (d3.select(".selectConnect")["_groups"][0][0] === null) {
+	} else if (selectConnectD3Selection["_groups"][0][0] === null) {
 		d3.select(hoveredEntityNode).select(".nodeCircle")
 			.style("stroke", function(d) { return color(d.type) })
 			.style("fill", "white");
@@ -466,18 +478,11 @@ function onMouseoverFunction (d) {
 			.text(function(d) { return d.id } );
 		d3.select(hoveredEntityNode).select(".labelShadow")
 			.text(function(d) { return d.id } );
-	} else if (d3.select(".selectConnect").attr("class").split(" ").includes(hoveredEntityID)) {
-		d3.select(hoveredEntityNode).select(".nodeCircle")
-			.style("stroke", clickHilightColor)
-			.style("fill", function(d) { return color(d.type) });
+	} else if (selectConnectD3Selection.attr("class").split(" ").includes(hoveredEntityID)) {
+		// style hovered and connected node
+		hilightNodeCircle(d3.select(hoveredEntityNode).select(".nodeCircle"));
 
-			// update connection info label on click
-		// 	d3.select(this.parentNode).select(".label")
-		// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + ConnectionDescriptionText; } );
-		// 	d3.select(this.parentNode).select(".labelShadow")
-		// 		.text(function(d) { return d.id + " [ connection with " + selectedNodeID + ": ] " + ConnectionDescriptionText; } );
-		// }
-
+		// style label and labelShadow
 		var getLabel = d3.select(hoveredEntityNode).select(".label");
 		var getLabelShadow = d3.select(hoveredEntityNode).select(".labelShadow");
 		
@@ -508,25 +513,34 @@ function onMouseoverFunction (d) {
 
 ////////// GENERIC ON("MOUSELEAVE") FUNCTIONS //////////
 function onMouseleaveFunction () {
+	var hovered = d3.select(hoveredEntityNode);
+
+	// console.log(adjusted_nominal_stroke);
+	// console.log("------");
 
 		d3.selectAll(".neighbouringLines")
 			.classed("selectConnect", false)
-			.style("stroke", "grey");
-		d3.select(hoveredEntityNode).select(".label")
+			.style("stroke", "grey")
+			// make sure this is actually the stroke it was before the hover
+			.style("stroke-width", adjusted_nominal_stroke);
+		hovered.select(".label")
 			.style("display", "none")
 			.style("text-shadow", "none");
-		d3.select(hoveredEntityNode).select(".labelShadow")
+		hovered.select(".labelShadow")
 			.style("display", "none")
 			.style("stroke", "white");
-		if (d3.select(hoveredEntityNode).attr("class").split(" ").includes("selectedNode")) {
-				d3.select(hoveredEntityNode).select(".nodeCircle")
+
+		// if (hovered)
+
+		if (hovered.attr("class").split(" ").includes("selectedNode")) {
+				hovered.select(".nodeCircle")
 				.style("stroke", "clickHilightColor")
 				.style("fill", function(d) { return color(d.type) });
 		} else {
-			d3.select(hoveredEntityNode).select(".nodeCircle")
+			hovered.select(".nodeCircle")
+			.style("stroke-width", adjusted_nominal_stroke)
 			.style("stroke", "white")
-			//change nominal stroke to computed one (make zoom function "stroke" a global variable?)
-			.style("stroke-width", nominal_stroke)
+			.style("paint-order", "fill")
 			.style("fill", function(d) { return color(d.type) });
 		}
 } // onMouseleaveFunction callback
@@ -642,30 +656,16 @@ function onClickFunction (d, isNeighbourObj) {
 	clickedEntityNode = clickedEntityMultiElementSelection.nodes()[getNode];
 	clickedEntityLi = clickedEntityMultiElementSelection.nodes()[getLi];
 
+	selectedCircleD3Selection = d3.select(clickedEntityNode).select(".nodeCircle");
+
 	// clear styles
 	clearStylesForClick.call();
 
-	///
+	// class selected node
+	selectedCircleD3Selection.classed("selectedNode", true)
 
-	selectedCircleD3Selection = d3.select(clickedEntityNode).select(".nodeCircle");
-	console.log(selectedCircleD3Selection);
-
-	styleSelectedNodeCircle(selectedCircleD3Selection);
-
-	///
-
-	// class and style selected node
-	d3.select(clickedEntityNode)
-		.classed("selectedNode", true)
-
-		///
-		// .style("paint-order", "stroke")
-		// .style("stroke-width", selectedCircleStroke)
-		// .style("stroke-width", "30px")
-		///
-
-		
-		;
+	// add styles to selected node
+	hilightNodeCircle(selectedCircleD3Selection);
 
 	// Create array of links connecting to immediate neighbours
 	isNeighbour = links.reduce(function (neighbours, link) {
@@ -713,16 +713,13 @@ function onClickFunction (d, isNeighbourObj) {
 	d3.select(clickedEntityLi)
 		.classed("selectedLi", true);
 
-
-// Style and lower (sort) LIs that represent neighbouring node
-
+	// Style and lower (sort) LIs that represent neighbouring node
 	// clear any "onClick" styles for LIs
 	li.classed("neighbouringNodeLIs", false)
 		.style("opacity", .25);
 
 	// class neighbouring LIs on click
-	li
-		.classed("neighbouringNodeLIs", function(e) {
+	li.classed("neighbouringNodeLIs", function(e) {
 			// if (isNeighbour.includes(e.id)) {
 			if (isNeighbourObj[e.id]) {
 				return true;
@@ -731,15 +728,11 @@ function onClickFunction (d, isNeighbourObj) {
 
 	// style neighbouring Lis on click
 	neighbouringNodeLIsSelection = d3.selectAll(".neighbouringNodeLIs");
-	
 	neighbouringNodeLIsSelection.style("opacity", 1).lower();
-
-// uncomment once listSort has been amended
 	listSort(neighbouringNodeLIsSelection);
 
 	// style selected Li on click
 	selectedLi = d3.selectAll(".selectedLi")
-
 	selectedLi
 		.style("border", "2px solid")
 		.style("border-color", clickHilightColor)
@@ -747,7 +740,7 @@ function onClickFunction (d, isNeighbourObj) {
 		.lower();
 
 
-// Scroll to top of D2 (entity list)
+	// Scroll to top of D2 (entity list)
 	scrollToTopOfSidebar();
 
 	onMouseleaveFunction();

@@ -211,35 +211,7 @@ jsdom.env({
 		 		.style("font-size", nominal_text_size + "px")
 		 		.text(function(d) { return d.id; });
 
-// delete zoom stuff as it doesn't seem necessary
-			// var zoomEvent = d3.zoom().scaleExtent([0.1, 9]).on("zoom", function () {
-			// 	gContainer.attr("transform", d3.event.transform);
-			// 	// console.log(d3.event.transform);
-			// 	// console.log(max_text_size);
-
-			// 	var stroke = nominal_stroke;
-			//     if (nominal_stroke * d3.event.transform.k > max_stroke) stroke = max_stroke / d3.event.transform.k;
-			//     link.style("stroke-width",stroke);
-			//     circle.style("stroke-width",stroke * 1.5);
-
-			// 	var text_size = nominal_text_size ;
-			// 		if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
-			// 		label.style("font-size",text_size + "px");
-			// 		labelShadow.style("font-size",text_size + "px");
-
-			// 	var labelStroke = text_size / 7.5;
-			//     if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
-			//     labelShadow.style("stroke-width", labelStroke);
-			//     // console.log("labelStroke: " + labelStroke);
-			// 		// console.log(text_size);
-			// 		// console.log(text_size / 10);
-
-			// }); // zoom function callback
-
-			// svg.call(zoomEvent);
-
-// UNCOMMENT to troubleshoot
-	 		// zoomEvent.scaleTo(svg, .185);
+			///
 
 		 	simulation
 		 		.nodes(graph.nodes);
