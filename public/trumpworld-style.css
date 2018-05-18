@@ -206,11 +206,6 @@ li:hover {
   stroke: white;
 }
 
-/*
-.nodes.selectedNode circle {
-  paint-order: stroke;
-}*/
-
 .nodes text {
   display: none;
   font: sans-serif;
