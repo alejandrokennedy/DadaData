@@ -401,7 +401,7 @@ function ready (error, trumpJSON) {
 		hoveredEntityNode = hoveredEntityMultiElementSelection.nodes()[getNodeOnHover];
 
 		// raise hovered node above other elements
-		// d3.select(hoveredEntityNode).raise();
+		d3.select(hoveredEntityNode).raise();
 
 		hoveredCircleD3Selection = d3.select(hoveredEntityNode).select(".nodeCircle");
 		// console.log(hoveredCircleD3Selection.node().parentNode);
