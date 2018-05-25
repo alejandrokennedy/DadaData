@@ -123,6 +123,8 @@ function ready (error, trumpJSON) {
 		.style("paint-order", "stroke");
 	}
 
+////////// RE-CREATE SECTION //////////
+
 	// re-define variables from svg generator
 	var gContainer = d3.select("#gContainer");
 	var clickHilightColor = "rgb(52, 255, 38)";
@@ -154,7 +156,6 @@ function ready (error, trumpJSON) {
 	// li re-bind
 	var li = d3.selectAll("li");
 	li.data(trumpJSON.nodes);
-	// li.data(trumpJSON.nodes, function(d) { return d ? "T" + slug(d.id) : this.id; });
 
 	////////// ZOOM SECTION //////////
 
@@ -164,13 +165,13 @@ function ready (error, trumpJSON) {
 	var nominal_stroke = 1.25;
 	var max_stroke = 3.5;
 
-	// is nominal_labelStroke used anywhere? Or is this just a pointless variable?
-	var nominal_labelStroke = 1
-	var max_labelStroke = 20
+	// setting labelStroke as a fraction of text size, so not needing these variables
+	// var nominal_labelStroke = 1
+	// var max_labelStroke = 20
 
 	// extra strokes
-	// re-factor, if necessary
 	var adjusted_nominal_stroke = 1.25;
+
 	var selectedCircleStroke = adjusted_nominal_stroke * 8;
 	var selectConnectStroke = adjusted_nominal_stroke * 3;
 
@@ -211,15 +212,17 @@ function ready (error, trumpJSON) {
 	    	}
 	    }
 
-		var text_size = nominal_text_size ;
-			if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
-			label.style("font-size",text_size + "px");
-			labelShadow.style("font-size",text_size + "px");
+		var text_size = nominal_text_size;
 
-	// this doesn't seem to actually work (get activated)
+		if (nominal_text_size * d3.event.transform.k > max_text_size) text_size = max_text_size / d3.event.transform.k;
+		label.style("font-size",text_size + "px");
+		labelShadow.style("font-size",text_size + "px");
+
 		var labelStroke = text_size / 7.5;
-	    // if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
-	    if (text_size / 7.5 > max_labelStroke) console.log(text_size);
+
+		// setting labelStroke as a fraction of text size, so not needing line below
+    // if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
+
 	    labelShadow.style("stroke-width", labelStroke);
 	}
 
@@ -512,15 +515,12 @@ function ready (error, trumpJSON) {
 
 	} // onMouseoverFunction callback
 
+////////// GENERIC ON("MOUSELEAVE") FUNCTIONS //////////
 
-	////////// GENERIC ON("MOUSELEAVE") FUNCTIONS //////////
 	function onMouseleaveFunction () {
-
-
 
 		// define hovered node
 		var hovered = d3.select(hoveredEntityNode);
-		// console.log(hovered);
 
 		d3.selectAll(".neighbouringLines")
 			.classed("selectConnect", false)
