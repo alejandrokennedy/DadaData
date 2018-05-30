@@ -162,18 +162,22 @@ function ready (error, trumpJSON) {
 	var nominal_text_size = 60;
 	var max_text_size = 14;
 
-	var nominal_stroke = 1.25;
+	var nominal_stroke = 2;
 	var max_stroke = 3.5;
+
+	var current_stroke = nominal_stroke;
+
+	// implement this later
+	// var nominal_line_stroke = nominal_stroke - 1;
+	// var max_line_stroke = max_stroke - 1;
 
 	// setting labelStroke as a fraction of text size, so not needing these variables
 	// var nominal_labelStroke = 1
 	// var max_labelStroke = 20
 
-	// extra strokes
-	var adjusted_nominal_stroke = 1.25;
 
-	var selectedCircleStroke = adjusted_nominal_stroke * 8;
-	var selectConnectStroke = adjusted_nominal_stroke * 3;
+	var selectedCircleStroke = current_stroke * 8;
+	var selectConnectStroke = current_stroke * 3;
 
 	var zoomEvent = d3.zoom()
 	    .scaleExtent([0.1, 9])
@@ -181,36 +185,49 @@ function ready (error, trumpJSON) {
 
 	function zoomed() {
 		gContainer.attr("transform", d3.event.transform);
+		// console.log(d3.event.transform.k);
 
-		var stroke = nominal_stroke;
+		// if zoomed in close, do these things
+    if (nominal_stroke * d3.event.transform.k > max_stroke) {
+    	// console.log(nominal_stroke * d3.event.transform.k);
 
-			// if zoomed in close, do these things
-	    if (nominal_stroke * d3.event.transform.k > max_stroke) {
+	    current_stroke = max_stroke / d3.event.transform.k;
+	    // console.log(current_stroke);
 
-	    	// why do I need stroke AND adjusted_nominal_stroke?
-	    	// make zoom function "stroke" a global variable?
-	    	stroke = max_stroke / d3.event.transform.k;
-		    adjusted_nominal_stroke = max_stroke / d3.event.transform.k;
+	    // have different nominal and max strokes for lines and circles?
+	    lines.style("stroke-width", current_stroke);
+	    circle.style("stroke-width", current_stroke);
+	    
+	    // for when a node is selected
+	    // make this accurate even after quick zoom out
+	    selectedCircleStroke = current_stroke * 8;
+    	selectConnectStroke = current_stroke * 3
 
-		    lines.style("stroke-width", stroke);
-		    circle.style("stroke-width", stroke * 1.5);
-		    
-		    // for when a node is selected
-		    selectedCircleStroke = stroke * 8;
-	    	selectConnectStroke = stroke * 3
-	    }
+    } else { // check performance of this. If slow, figure out way to detect crossing back over the threshold
 
-	    // if a node is selected, do these things
-	    if (d3.select(".selectedNode").node() !== null) {
-	    	selectedCircleD3Selection.style("stroke-width", selectedCircleStroke);
+    	current_stroke = nominal_stroke;
 
-	    	// if a connected node is hovered, do these things
-	    	if (selectConnectD3Selection !== null) {
+	    lines.style("stroke-width", current_stroke);
+	    circle.style("stroke-width", current_stroke);
+    }
 
-	    		selectConnectD3Selection.style("stroke-width", selectConnectStroke)
-		    	hoveredCircleD3Selection.style("stroke-width", selectedCircleStroke);
-	    	}
-	    }
+    // if a node is selected, do these things
+    if (d3.select(".selectedNode").node() !== null) {
+    	selectedCircleD3Selection.style("stroke-width", selectedCircleStroke);
+
+    	// if a node is hovered but not connected, do nothing
+    	if (selectConnectD3Selection === null || selectConnectD3Selection.nodes()[0] === undefined) {
+
+    	} else {
+    	// ...but if a connected node IS hovered, do these things
+
+    		// style link
+    		selectConnectD3Selection.style("stroke-width", selectConnectStroke);
+
+				// style hovered and connected node
+				hilightNodeCircle(d3.select(hoveredEntityNode).select(".nodeCircle"));
+			}
+    }
 
 		var text_size = nominal_text_size;
 
@@ -305,14 +322,14 @@ function ready (error, trumpJSON) {
 			.select(".nodeCircle")
 			.style("stroke", "white")
 			.style("fill-opacity", .15)
-			.style("stroke-width", adjusted_nominal_stroke)
+			.style("stroke-width", current_stroke)
 			.style("paint-order", "fill");
 		// clear any "onClick" styles for links
 		d3.selectAll(".lines")
 			.style("stroke", "grey")
 			.style("stroke-opacity", .15)
 			// is the below line needed?
-			// .style("stroke-width", adjusted_nominal_stroke);
+			// .style("stroke-width", current_stroke);
 		// clear any "onClick" styles for LIs
 		li.classed("selectedLi", false)
 			.style("border", "none")
@@ -328,7 +345,7 @@ function ready (error, trumpJSON) {
 					.classed("neighbouringNodeCircles", false)
 					.select(".nodeCircle")
 					.style("stroke", "white")
-					.style("stroke-width", adjusted_nominal_stroke)
+					.style("stroke-width", current_stroke)
 					.style("fill-opacity", 1)
 					.style("paint-order", "fill");
 				// clear any "onClick" styles for links
@@ -526,7 +543,7 @@ function ready (error, trumpJSON) {
 			.classed("selectConnect", false)
 			.style("stroke", "grey")
 			// make sure this is actually the stroke it was before the hover
-			.style("stroke-width", adjusted_nominal_stroke);
+			.style("stroke-width", current_stroke);
 		hovered.select(".label")
 			.style("display", "none")
 			.style("text-shadow", "none");
@@ -542,7 +559,7 @@ function ready (error, trumpJSON) {
 				.style("fill", function(d) { return color(d.type) });
 		} else {
 			hovered.select(".nodeCircle")
-			.style("stroke-width", adjusted_nominal_stroke)
+			.style("stroke-width", current_stroke)
 			.style("stroke", "white")
 			.style("paint-order", "fill")
 			.style("fill", function(d) { return color(d.type) });
