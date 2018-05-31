@@ -165,7 +165,11 @@ function ready (error, trumpJSON) {
 	var nominal_stroke = 2;
 	var max_stroke = 3.5;
 
+	var nominal_link_stroke = nominal_stroke / 1.6;
+	var max_link_stroke = max_stroke / 1.6;
+
 	var current_stroke = nominal_stroke;
+	var current_link_stroke = nominal_link_stroke
 
 	// implement this later
 	// var nominal_line_stroke = nominal_stroke - 1;
@@ -194,12 +198,14 @@ function ready (error, trumpJSON) {
 	    current_stroke = max_stroke / d3.event.transform.k;
 	    // console.log(current_stroke);
 
-	    // have different nominal and max strokes for lines and circles?
-	    lines.style("stroke-width", current_stroke);
+	    current_link_stroke = max_link_stroke / d3.event.transform.k;
+	    console.log(current_link_stroke);
+
 	    circle.style("stroke-width", current_stroke);
+	    lines.style("stroke-width", current_link_stroke);
 	    
 	    // for when a node is selected
-	    // make this accurate even after quick zoom out
+	    // make sure this is accurate even after quick zoom out
 	    selectedCircleStroke = current_stroke * 8;
     	selectConnectStroke = current_stroke * 3
 
@@ -207,8 +213,8 @@ function ready (error, trumpJSON) {
 
     	current_stroke = nominal_stroke;
 
-	    lines.style("stroke-width", current_stroke);
 	    circle.style("stroke-width", current_stroke);
+	    lines.style("stroke-width", current_link_stroke);
     }
 
     // if a node is selected, do these things
@@ -325,11 +331,12 @@ function ready (error, trumpJSON) {
 			.style("stroke-width", current_stroke)
 			.style("paint-order", "fill");
 		// clear any "onClick" styles for links
+		selectConnectD3Selection = null;
 		d3.selectAll(".lines")
 			.style("stroke", "grey")
 			.style("stroke-opacity", .15)
-			// is the below line needed?
-			// .style("stroke-width", current_stroke);
+			.style("stroke-width", current_link_stroke)
+			.classed("selectConnect", false);
 		// clear any "onClick" styles for LIs
 		li.classed("selectedLi", false)
 			.style("border", "none")
@@ -471,7 +478,6 @@ function ready (error, trumpJSON) {
 					selectConnectD3Selection.classed(slugTarget, true);
 				}
 			)
-			// how to raise above circles?
 			.raise();
 
 		// style labels on hover
@@ -529,7 +535,6 @@ function ready (error, trumpJSON) {
 				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
 				.text(function(d) { return ConnectionDescriptionText; } );
 			}
-
 	} // onMouseoverFunction callback
 
 ////////// GENERIC ON("MOUSELEAVE") FUNCTIONS //////////
@@ -543,7 +548,7 @@ function ready (error, trumpJSON) {
 			.classed("selectConnect", false)
 			.style("stroke", "grey")
 			// make sure this is actually the stroke it was before the hover
-			.style("stroke-width", current_stroke);
+			.style("stroke-width", current_link_stroke);
 		hovered.select(".label")
 			.style("display", "none")
 			.style("text-shadow", "none");
@@ -726,7 +731,8 @@ function ready (error, trumpJSON) {
 
 		// style neighbouring lines
 		d3.selectAll(".neighbouringLines")
-			.style("stroke-opacity", 1);
+			.style("stroke-opacity", 1)
+			.raise();
 
 		// turn isNeighbour array into an object
 		isNeighbourObj = {};
