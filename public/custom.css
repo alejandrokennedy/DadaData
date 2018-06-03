@@ -21,6 +21,23 @@ body {
   background-image: linear-gradient(to bottom,#bcf3ff 0,#ccf6ff 100%);
 }
 
+.btn-see-visualizations {
+  background-image: linear-gradient(to bottom,#bcf3ff 0,#bcf3ff 100%);
+  text-shadow: none;
+  border-radius: 1px;
+  border-width: 1.5px;
+  border-color: #bcf3ff;
+  font-weight: 300;
+  font-size: 22px;
+}
+
+.btn-see-visualizations:hover {
+  color: #bcf3ff;
+  background-image: linear-gradient(to bottom,rgb(20, 20, 20, .0) 0,rgb(20, 20, 20, .0) 100%);
+  border-color: #bcf3ff;
+  background-color: rgb(20, 20, 20, .4);
+}
+
 /*.navbar-default.navbar-nav>li>a {
   color: #000;
 }*/
@@ -38,6 +55,10 @@ body {
   margin-bottom: 30px;
 }
 
+.home-text {
+  font-size: 26px;
+}
+
 .boxed {
   padding: 10px;
   line-height: 200%;
@@ -45,13 +66,12 @@ body {
 }
 
 .blurb {
-  text-shadow: #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 4px;
-  /*font-size: 20px;*/
+  text-shadow: #ffffff 0 0 25px, #ffffff 0 0 20px, #ffffff 0 0 15px, #ffffff 0 0 10px, #ffffff 0 0 6px, #ffffff 0 0 3px;
+  color: black;
 }
 
 .blurb.boxed {
 	text-shadow: #bcf3ff 0 0 15px, #bcf3ff 0 0 10px, #bcf3ff 0 0 4px;
-  /*font-weight: 400;*/
 }
 
 .full {

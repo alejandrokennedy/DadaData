@@ -7,6 +7,7 @@
 
 // EXTRA EMBELlISHMENTS
 
+// When selection is present, change fill opacity to 1 on hovered nodes that aren't linked to the selected node
 // Pin selected li to top of list
 // Tweak overlay
 // Change color of government Agencies
@@ -189,29 +190,26 @@ function ready (error, trumpJSON) {
 
 	function zoomed() {
 		gContainer.attr("transform", d3.event.transform);
-		// console.log(d3.event.transform.k);
 
 		// if zoomed in close, do these things
     if (nominal_stroke * d3.event.transform.k > max_stroke) {
-    	// console.log(nominal_stroke * d3.event.transform.k);
 
 	    current_stroke = max_stroke / d3.event.transform.k;
-	    // console.log(current_stroke);
-
 	    current_link_stroke = max_link_stroke / d3.event.transform.k;
-	    console.log(current_link_stroke);
 
 	    circle.style("stroke-width", current_stroke);
 	    lines.style("stroke-width", current_link_stroke);
 	    
 	    // for when a node is selected
 	    // make sure this is accurate even after quick zoom out
+	    // maybe set up nominal and max strokes for these, above
 	    selectedCircleStroke = current_stroke * 8;
     	selectConnectStroke = current_stroke * 3
 
     } else { // check performance of this. If slow, figure out way to detect crossing back over the threshold
 
     	current_stroke = nominal_stroke;
+    	// add current_link_stroke, selectedCircleStroke, SelectConnectStroke
 
 	    circle.style("stroke-width", current_stroke);
 	    lines.style("stroke-width", current_link_stroke);
@@ -431,7 +429,6 @@ function ready (error, trumpJSON) {
 		d3.select(hoveredEntityNode).raise();
 
 		hoveredCircleD3Selection = d3.select(hoveredEntityNode).select(".nodeCircle");
-		// console.log(hoveredCircleD3Selection.node().parentNode);
 
 		// if an entity is selected, do the following
 		if (d3.select(".selectedNode").node() !== null) {
@@ -501,6 +498,8 @@ function ready (error, trumpJSON) {
 			d3.select(hoveredEntityNode).select(".nodeCircle")
 				.style("stroke", function(d) { return color(d.type) })
 				.style("fill", "white");
+				// use the below line to troubleshoot getting full opacity on white-filled circles
+				// .style("fill", "purple");
 			d3.select(hoveredEntityNode).select(".label")
 				.text(function(d) { return d.id } );
 			d3.select(hoveredEntityNode).select(".labelShadow")
