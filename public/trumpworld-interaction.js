@@ -8,6 +8,7 @@
 // EXTRA EMBELlISHMENTS
 
 // When selection is present, change fill opacity to 1 on hovered nodes that aren't linked to the selected node
+// Why does DELAWARE MANAGEMENT HOLDINGS, INC. zoom when clicked if everything is in the frame?
 // Pin selected li to top of list
 // Tweak overlay
 // Change color of government Agencies
@@ -497,9 +498,8 @@ function ready (error, trumpJSON) {
 		} else if (selectConnectD3Selection["_groups"][0][0] === null) {
 			d3.select(hoveredEntityNode).select(".nodeCircle")
 				.style("stroke", function(d) { return color(d.type) })
-				.style("fill", "white");
-				// use the below line to troubleshoot getting full opacity on white-filled circles
-				// .style("fill", "purple");
+				.style("fill", "white")
+				.style("fill-opacity", 1);
 			d3.select(hoveredEntityNode).select(".label")
 				.text(function(d) { return d.id } );
 			d3.select(hoveredEntityNode).select(".labelShadow")
@@ -555,12 +555,30 @@ function ready (error, trumpJSON) {
 			.style("display", "none")
 			.style("stroke", "white");
 
-		// if (hovered)
-
-		if (hovered.attr("class").split(" ").includes("selectedNode")) {
+		// if a selection is present...
+		if (d3.select(".selectedNode").node() !== null) {
+			// if the hovered node is the selected node
+			if (hovered.attr("class").split(" ").includes("selectedNode")) {
+					hovered.select(".nodeCircle")
+					.style("stroke", "clickHilightColor")
+					.style("fill", function(d) { return color(d.type) });
+			// if the hovered node is a neighbouring node
+			} else if (hovered.attr("class").split(" ").includes("neighbouringNodeCircles")) {
 				hovered.select(".nodeCircle")
-				.style("stroke", "clickHilightColor")
+				.style("stroke-width", current_stroke)
+				.style("stroke", "white")
+				.style("paint-order", "fill")
 				.style("fill", function(d) { return color(d.type) });
+			// if the hovered node is any other node
+			} else {
+				hovered.select(".nodeCircle")
+				.style("stroke-width", current_stroke)
+				.style("stroke", "white")
+				.style("fill-opacity", .15)
+				.style("paint-order", "fill")
+				.style("fill", function(d) { return color(d.type) });
+			}
+		// if a selection is not present...
 		} else {
 			hovered.select(".nodeCircle")
 			.style("stroke-width", current_stroke)
