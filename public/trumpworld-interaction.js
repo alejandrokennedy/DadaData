@@ -7,7 +7,6 @@
 
 // EXTRA EMBELlISHMENTS
 
-// When selection is present, change fill opacity to 1 on hovered nodes that aren't linked to the selected node
 // Why does DELAWARE MANAGEMENT HOLDINGS, INC. zoom when clicked if everything is in the frame?
 // Pin selected li to top of list
 // Tweak overlay
@@ -170,8 +169,12 @@ function ready (error, trumpJSON) {
 	var nominal_link_stroke = nominal_stroke / 1.6;
 	var max_link_stroke = max_stroke / 1.6;
 
+	var nominal_em_size = 43
+	var max_em_size = 10
+
 	var current_stroke = nominal_stroke;
-	var current_link_stroke = nominal_link_stroke
+	var current_link_stroke = nominal_link_stroke;
+	var current_em_size = nominal_em_size;
 
 	// implement this later
 	// var nominal_line_stroke = nominal_stroke - 1;
@@ -197,6 +200,7 @@ function ready (error, trumpJSON) {
 
 	    current_stroke = max_stroke / d3.event.transform.k;
 	    current_link_stroke = max_link_stroke / d3.event.transform.k;
+	    current_em_size = max_em_size / d3.event.transform.k;
 
 	    circle.style("stroke-width", current_stroke);
 	    lines.style("stroke-width", current_link_stroke);
@@ -207,7 +211,7 @@ function ready (error, trumpJSON) {
 	    selectedCircleStroke = current_stroke * 8;
     	selectConnectStroke = current_stroke * 3
 
-    } else { // check performance of this. If slow, figure out way to detect crossing back over the threshold
+    } else {
 
     	current_stroke = nominal_stroke;
     	// add current_link_stroke, selectedCircleStroke, SelectConnectStroke
@@ -223,9 +227,8 @@ function ready (error, trumpJSON) {
     	// if a node is hovered but not connected, do nothing
     	if (selectConnectD3Selection === null || selectConnectD3Selection.nodes()[0] === undefined) {
 
-    	} else {
     	// ...but if a connected node IS hovered, do these things
-
+    	} else {
     		// style link
     		selectConnectD3Selection.style("stroke-width", selectConnectStroke);
 
@@ -246,6 +249,19 @@ function ready (error, trumpJSON) {
     // if (text_size / 7.5 > max_labelStroke) labelStroke = max_labelStroke / d3.event.transform.k;
 
 	    labelShadow.style("stroke-width", labelStroke);
+
+	  // adjust current_em_size based on zoom level
+		if (nominal_text_size * d3.event.transform.k > max_text_size) current_em_size = max_em_size / d3.event.transform.k;
+
+		// if no selection, do nothing
+		if (selectConnectD3Selection === undefined || selectConnectD3Selection === null) {
+			// else, style em(s) on tspans according to zoom
+		} else {
+			d3.select(hoveredEntityNode).select(".label").selectAll("tspan")
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
+			d3.select(hoveredEntityNode).select(".labelShadow").selectAll("tspan")
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
+		}
 	}
 
 	////////// SORT SECTION //////////
@@ -468,7 +484,7 @@ function ready (error, trumpJSON) {
 					var slugSource = "T" + slug(d.source);
 					var slugTarget = "T" + slug(d.target);
 					// is this line needed?
-					var reference = d.reference;
+					// var reference = d.reference;
 
 	// IS THIS ADDING UNECESSARY CLASSES TO LINES (screwing up other things)?
 	// If it is, be sure to remove these classes on mouseout
@@ -488,9 +504,6 @@ function ready (error, trumpJSON) {
 
 		// conditionally style hovered nodes and add connection text
 		if (d3.select(hoveredEntityNode).attr("class").split(" ").includes("selectedNode")) {
-			// pretty sure I don't need to alter the selected node
-			// d3.select(hoveredEntityNode).select(".nodeCircle")
-
 			d3.select(hoveredEntityNode).select(".label")
 				.text(function(d) { return d.id } );
 			d3.select(hoveredEntityNode).select(".labelShadow")
@@ -516,22 +529,22 @@ function ready (error, trumpJSON) {
 			getLabel.text(function(d) { return d.id; } )
 				.append("tspan")
 				.attr("dy", "1.5em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
 				.style("fill", "#585858")
 				.text(function(d) { return "connection with " + selectedNodeID + ":" } )
 				.append("tspan")
 				.attr("dy", "1.25em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
 				.text(function(d) { return ConnectionDescriptionText; } );
 
 			getLabelShadow.text(function(d) { return d.id; } )
 				.append("tspan")
 				.attr("dy", "1.5em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
 				.text(function(d) { return "connection with " + selectedNodeID + ":" } )
 				.append("tspan")
 				.attr("dy", "1.25em")
-				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + 40)
+				.attr("x", parseFloat(d3.select(hoveredEntityNode).select(".label").attr("x")) + current_em_size)
 				.text(function(d) { return ConnectionDescriptionText; } );
 			}
 	} // onMouseoverFunction callback
