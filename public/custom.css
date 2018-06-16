@@ -117,3 +117,10 @@ h3 > a {
     overflow: visible;
   }
 }
+
+.thumbnail {
+  padding: 2px;
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 1px;
+}
