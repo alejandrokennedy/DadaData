@@ -21,6 +21,12 @@ body {
   background-image: linear-gradient(to bottom,#bcf3ff 0,#ccf6ff 100%);
 }
 
+.navbar-nav>li>a {
+  font-weight: 300;
+  letter-spacing: .06em;
+  font-size: 15px;
+}
+
 .btn-see-visualizations {
   background-image: linear-gradient(to bottom,#bcf3ff 0,#bcf3ff 100%);
   text-shadow: none;
