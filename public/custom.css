@@ -14,7 +14,8 @@ body {
 
 .navbar {
 	margin-bottom: 0;
-  /*background-image: linear-gradient(to bottom,#bcf3ff 0,#ccf6ff 100%);*/
+  /*background-image: linear-gradient(to bottom,#bcf3ff 0,#bcf3ff 100%);*/
+  border: 0px;
 }
 
 .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.open>a {
