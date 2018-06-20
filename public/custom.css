@@ -49,6 +49,14 @@ body {
   color: #000;
 }*/
 
+.container-inner {
+  display: grid;
+  /*grid-template-columns: auto auto;*/
+  /*grid-template-rows: 40px 200px 40px;*/
+  grid-template: repeat(3, 80px) / repeat(3, 1fr);
+  grid-gap: 15px
+}
+
 .cover {
 	position: fixed;
 	top: 50%;
